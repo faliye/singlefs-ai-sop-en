@@ -87,6 +87,96 @@ The last two are the ones most easily discarded as "readability". They are not.
 - Comments say "why it is this way", not "what this does" — the latter a machine
   reads for itself
 
+## What these two corollaries look like: code examples
+
+The first two corollaries are the ones people argue about, so here they are in a form
+you can point at. The argument usually starts as "is this branch really necessary?" —
+**but the criterion is not necessity, it is who checks exhaustiveness.**
+
+### Corollary one: exhaustive explicit branches beat a clever general path
+
+```rust
+// ✗ General path: when a new case appears, the compiler says nothing
+fn node_size(dev: &Device) -> u32 {
+    if dev.rotational { 64 * 1024 } else { 16 * 1024 }
+}
+```
+
+```rust
+// ✓ Exhaustive branches: add Zoned and this stops compiling until you handle it
+enum Medium {
+    Rotational,
+    Ssd,
+    Zoned { zone_size: u32 },
+}
+
+fn node_size(m: &Medium) -> u32 {
+    match m {                       // the point is the `_ =>` arm that is **not** there
+        Medium::Rotational          => 64 * 1024,
+        Medium::Ssd                 => 16 * 1024,
+        Medium::Zoned { zone_size } => (*zone_size).min(256 * 1024),
+    }
+}
+```
+
+**The load-bearing part is the wildcard arm you did not write.** Add `_ =>` and the code
+looks shorter and more "general", while what it actually did was switch off the
+compiler's exhaustiveness check — a new case will quietly fall into the wildcard and
+behave wrongly with nobody raising an alarm.
+
+**So the criterion is not "are there many branches", it is "when a case is missed,
+who notices first"**: the compiler, or production. The former means explicit branches;
+the latter is not generality, it is a deleted check.
+
+### Corollary two: let types make illegal states unrepresentable
+
+```rust
+// ✗ One underlying type carrying several meanings: mixing them compiles, and fails at runtime
+fn read_block(addr: u64) -> Block;
+fn free_extent(start: u64, len: u64);
+// A caller passes a logical address where a physical one belongs; the compiler has nothing to say
+```
+
+```rust
+// ✓ Newtypes: mixing them does not compile
+#[derive(Clone, Copy, PartialEq, Eq)] pub struct Lba(pub u64);  // logical address
+#[derive(Clone, Copy, PartialEq, Eq)] pub struct Pba(pub u64);  // physical address
+
+fn read_block(addr: Pba) -> Block;
+// read_block(Lba(x)) fails to compile — a whole class of runtime bugs becomes a compile error
+```
+
+Go one step further and **make "not yet validated" a type too**, so that "forgot to
+validate" cannot be expressed:
+
+```rust
+// ✗ State as a boolean field: forget to check it and the compiler does not care
+struct Node { bytes: Vec<u8>, checksum_ok: bool }
+
+// ✓ State as a type: what has not been verified simply cannot become the verified type
+struct RawNode(Vec<u8>);        // straight off the disk, unverified
+struct VerifiedNode(Vec<u8>);   // checksum compared and matched
+
+impl RawNode {
+    fn verify(self, expect: Checksum) -> Result<VerifiedNode, CorruptBlock> { /* ... */ }
+}
+
+fn walk(node: &VerifiedNode) { /* ... */ }   // skip verification and you cannot build the argument
+```
+
+**The two corollaries are two sides of one thing**: the first makes "a missed case" something
+the compiler catches, the second makes an illegal combination something you cannot write.
+**Both move the check off the human and onto the machine** — which is exactly this file's
+criterion: does it make the code easier to verify mechanically.
+
+### When not to apply them
+
+**These two hold unconditionally for things you can delete, and need a separate calculation
+for things you cannot.** A wrong code branch gets deleted; a branch written into an external
+contract — an on-disk format, a protocol, a public API — cannot be, and every implementation
+afterwards has to support it forever. That side needs its own criterion; you cannot get there
+by saying "explicit branches are safer".
+
 ## One reminder in the other direction: documentation discipline is not up for dropping
 
 The `doc-discipline.md` family (body text states only the current state, history at
