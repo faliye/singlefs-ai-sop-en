@@ -24,6 +24,26 @@ In `cmd 2>/dev/null; echo "done"`, that echo runs **unconditionally** — it pri
 Any command that changes state must be verified by **reading the state back**: after
 `systemctl stop X`, confirm with `is-active`; the exit code of `stop` is not enough.
 
+## Result collection needs a completeness gate
+
+The program under test prints results and a script outside collects them — **losing a
+line on that path is silent**. Consoles get polluted by BIOS escape sequences, kernel
+logs and serial noise, and anchoring at start-of-line (`grep '^ANCHOR'`) quietly drops
+the line whose start got overwritten. What you see outside is "one item fewer",
+not "something failed".
+
+**Do this**: have the program under test report, on its final line, how many results it
+emitted; the collector compares the count and discards the round on a mismatch.
+That gate must itself be proven to go red first — feed it a fake program that claims
+N results and emits N−1, and it must fail.
+
+## Assignments inside a subshell do not travel back to the parent
+
+In `rc="$(run_one ...)"`, any variable `run_one` assigns is **empty in the parent**.
+If result collection depends on that variable (a log path, say) it will collect zero
+results forever while the exit code stays 0 — green light, wrong answer.
+**Pass values through a file, not through a variable.**
+
 ## Test images always go in a temporary directory
 
 Never inside the repository. Accidentally committing a multi-gigabyte image into git

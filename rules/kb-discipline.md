@@ -34,6 +34,12 @@ identical in a retrieval result.
   hardware under what workload.
 - Conclusions read elsewhere carry their source and the note "not verified in this
   project".
+- **When you cite someone else's measurement, write down what it does and does not prove.**
+  Provenance is not enough: provenance answers "where did this number come from",
+  while whoever retrieves it actually needs to know "does this number apply to me".
+  There is a layer of extrapolation between the two, and **the person writing it down
+  must do that extrapolation and record it** — leave it to the next reader and they
+  will most likely skip it and use the number as is.
 - **All historical data is reference only.** Every measurement is bound to the build
   it was taken on; to use it in support of a new conclusion, re-run it first and
   confirm it still holds today.

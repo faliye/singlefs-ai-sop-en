@@ -31,6 +31,26 @@ there is no reference implementation to compare against — the convenience a po
 project has, of "treat an existing tool's output as the right answer", does not exist
 here; it has to be built.
 
+## An experiment's failure clause must not make its conclusion unfalsifiable
+
+The easiest mistake to make when designing an experiment, and the hardest to catch
+yourself: **defining "the effect did not show up" as an implementation bug**.
+
+Write it that way and the experiment can only ever produce supporting evidence —
+the effect appears and you record a finding, it does not appear and you record
+"implementation is broken, discard the round". **No observation can refute the conclusion.**
+
+Keep the two apart, and **run both controls**:
+
+| Control | What it is for | Verdict when no difference shows |
+|---|---|---|
+| **Positive control**: a baseline where the effect is firmly established in the literature | Proves the measurement has discriminating power | **The implementation is broken, discard the round** |
+| **Real baseline**: the design this project actually intends to build | Answers what the experiment is really asking | **A legitimate result, record it as such** |
+
+Without the positive control, "no advantage" cannot be told apart from a broken
+implementation. Without the real baseline you are measuring "does this mechanism exist"
+rather than "what does this mechanism buy over what we already have".
+
 ## The checker is the specification
 
 Every entry added to the invariant list adds a check to the checker.

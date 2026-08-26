@@ -47,3 +47,10 @@ If this round overturned or settled any design decision, **write it into
 `kb/decisions.md` right away**, with what overturned it.
 One missing decision record means that in three months "why did we decide this?" needs
 archaeology to answer.
+
+**A verdict reached by argument is also a decision change.** When weighing something up
+leads you to "this one should not be settled yet" or "keep the current approach", and
+that conclusion in substance overturns a sentence already written in `kb/decisions.md`,
+that is an overturn: record it on the spot, with the grounds.
+A verdict that lives only in the conversation while the decision file stays untouched
+leaves nobody, three months later, knowing why that sentence no longer holds.
