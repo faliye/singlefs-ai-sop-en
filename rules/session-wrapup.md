@@ -30,10 +30,16 @@ Was any step held together by memory? Was a criterion added only after the fact?
 the same boilerplate copied a third time?
 **If so, change that file now**, not "next time".
 
-Where to change it — ask "**would another project need this too?**":
+Where to change it — look at what the item governs:
 
-- Yes → change singlefs-ai-sop (`rules/` / `skills/` / `scripts/`) and bump `VERSION`
-- No → change the project's own `kb/` or the project's `CLAUDE.md`
+- **Collaboration** (evidence, documents, where decisions land, gate feedback) →
+  change singlefs-ai-sop (`rules/` / `skills/` / `scripts/`) and bump `VERSION`
+- **How the filesystem is designed** → change the project's own `kb/`,
+  `.claude/rules/`, or the project's `CLAUDE.md`
+
+**When in doubt, keep it in the project.** singlefs is this SOP's only user, so
+"would another project need it" is not a criterion — there is no other project to
+look at, and anyone can answer "yes".
 
 ## 3. Did any decision change?
 

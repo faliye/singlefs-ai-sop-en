@@ -2,12 +2,12 @@
 # singlefs-ai-sop-en
 
 **Contributor governance rules and gate tooling (Contributor Governance).**
-It governs **how a project collaborates with AI**, not how any particular kind of
-system should be designed.
+It governs **how a project collaborates with AI**, not how a filesystem should be
+designed. singlefs is its only user.
 Work inside this repository is bound by these rules too.
 
 Changing `rules/` or `scripts/` **must bump `VERSION` in the same change**;
-otherwise every project's gate will report a version mismatch.
+otherwise the project's gate will report a version mismatch.
 
 ## Language of collaboration
 
@@ -44,26 +44,31 @@ see that a hash does not match — not whether the editions say the same thing.
 
 ## Where a thing belongs
 
-To decide where a piece of content goes, ask one question: **would another project need it too?**
+**This SOP was made for singlefs. singlefs is its only user, and nothing here
+presumes it generalises to other projects.** So the criterion is not "would another
+project need it too" — there is no other project to look at, so anyone can answer
+"yes", and everything ends up upstream.
 
-- Yes → this repository. Methodology into `rules/`, procedure into `skills/`,
+To decide where a piece of content goes, look at what it governs:
+
+- **Collaboration** — what evidence a submission carries, how documents are written,
+  where decisions are recorded, what next step a gate rejection must give.
+  → this repository. Methodology into `rules/`, procedure into `skills/`,
   anything runnable into `scripts/`.
-- No → the project. Design decisions into `kb/decisions.md`, invariants into
+- **How the filesystem is designed** — transactions, crash consistency, on-disk
+  format, the disciplines specific to this kind of system.
+  → the project. Design decisions into `kb/decisions.md`, invariants into
   `kb/invariants.md`, **project-specific rules into `.claude/rules/`**, and
   project-specific scripts into `.claude/scripts/`.
 
-"Another project" means **any** project using this SOP, not "another project of the
-same kind". A discipline only a filesystem needs belongs to that project, however
-well written it is.
-
-The other direction: if you find a passage in a project's files that **another project
-has copied out as well**, this repository is missing a rule — bring it up here.
-Do not let it be copied a third time.
+**When in doubt, keep it in the project.** A rule that should not have gone upstream
+has to be worked around every round from then on; one misplaced in the project is a
+single file to fix.
 
 ## How a project hooks in
 
-Projects do not copy this repository's content. Each of the three layers has its own
-hook-up (**no symlinks**):
+The project does not copy this repository's content. Each of the three layers has its
+own hook-up (**no symlinks**):
 
 | Layer | How it hooks in |
 |---|---|
@@ -72,5 +77,6 @@ hook-up (**no symlinks**):
 | skills | The project's `.claude/skills/<name>/SKILL.md` is a **stub**: frontmatter plus a pointer to the shared body |
 | scripts | The project's `.claude/scripts/x.sh` is a **wrapper**: set up the environment, then `exec` the shared script |
 
-Never put substance or logic inside a stub or a wrapper — written there, no other
-project can see it, and it will be copied out again next time.
+Never put substance or logic inside a stub or a wrapper — the substance should exist
+in exactly one place; put it there and a second copy exists, and two copies will
+disagree sooner or later.

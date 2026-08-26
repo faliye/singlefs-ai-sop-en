@@ -30,7 +30,7 @@ commits. That cost is not linear.
 - **Gate scripts need tests too**: change `scripts/` and you must construct an
   input that ought to be rejected, and confirm it really goes red. A gate that
   cannot check itself is decoration.
-- SOP changes bump `VERSION`, so every project learns the rules moved the next
+- SOP changes bump `VERSION`, so the project learns the rules moved the next
   time it runs the gate.
 
 # The gate is a teaching instrument, not a sieve

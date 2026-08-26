@@ -7,9 +7,14 @@ carry, how to write documents that retrieval will not misread, where decisions a
 recorded, what a gate must show when it refuses. None of this depends on what kind of
 system is being built.
 
-**It does not govern how any particular kind of system should be designed.** A
-discipline only one kind of project needs (say, a filesystem's "start from the
-transaction") belongs to that project, in its own `.claude/rules/`.
+**It does not govern how the filesystem should be designed.** Disciplines like
+"start from the transaction" belong to the project, in its own `.claude/rules/`.
+
+**This SOP was made for singlefs. singlefs is its only user, and nothing here
+presumes it generalises to other projects.** So the criterion is not "would another
+project need it too" — there is no other project to look at, so anyone can answer
+"yes". The criterion is whether the item governs collaboration, or governs how the
+filesystem is designed.
 
 > **AI-friendly to implement, human-friendly to review.**
 
@@ -49,12 +54,12 @@ Terminology comes from [GLOSSARY.md](GLOSSARY.md), shared across all three langu
 ## The bar for changing it
 
 **Once settled, this SOP should barely move.** It is the shared floor under every
-project that hooks into it, so changing one line changes every project's floor at once.
+contributor, so changing one line changes everyone's floor at once.
 Every such judgement is made by people — the SOP is a standard, not something under
 test. The real signal is **how often it changes**: frequent change means the design is
 wrong, not that it is improving.
 
-**Work does not happen here.** Day-to-day work lives in the projects that hook in.
+**Work does not happen here.** Day-to-day work lives in singlefs.
 `0.x` means not yet settled; after `1.0.0`, changes to `rules/` should be rare.
 
 ## Staying in sync
