@@ -1,4 +1,4 @@
-<!-- generated-from: rules/engineering-philosophy.md sha256:932cf6bac9928e782677de036e17d4fdb0a12abceee42f7301e8f01f00f57437 -->
+<!-- generated-from: rules/engineering-philosophy.md sha256:79c6091ec80bab390f2562d09bf4fc38d74b4c16bf04008303fdb196b7d3d5a6 -->
 <!-- doc-lint:rule-definition -->
 # Engineering Philosophy
 
@@ -26,6 +26,13 @@ covering cases exhaustively — these happen to be machine strengths, and machin
 capacity passed the human ceiling some time ago.
 
 **A floor calibrated to the old ceiling is now a floor set too low.**
+
+**"Machine capacity passed the human ceiling" rests on two falsifiable premises**
+— the order of magnitude of the context window, and that concurrent interleavings
+can be decided exhaustively. The premises themselves, their calibration, and what
+you would have to observe to overturn them are in `machine-first.md`, under "What
+this stance assumes, and how to overturn it". They are not repeated here: write
+one premise in two places and the two places will eventually disagree.
 
 So this project's stance toward established best practice is to **follow it
 critically, not by default.** Each rule gets re-asked: what problem did it

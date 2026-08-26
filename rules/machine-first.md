@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:2b4c8c20f0354313b67712d81676a5899dfb44a47bf294e54fd4765b6ec4d8cf -->
+<!-- generated-from: rules/machine-first.md sha256:478d5d7f3ab2a8b0f32a6ce169ed1439ccab9f163df77256bf8c9a2e378fcdb1 -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -21,6 +21,68 @@ calibrated to the human limit. Machine capacity passed that line some time ago, 
 
 This does not mean they are all wrong — it means **their reasons must be re-checked**,
 and "everyone does it this way" is not one of them.
+
+## What this stance assumes, and how to overturn it
+
+"Machine capacity passed that line some time ago" is the foundation the whole
+methodology rests on. **It is a falsifiable empirical claim, not an article of
+faith.** So this section states the two premises it depends on, and what
+observation would overturn them — **to argue against this file, aim at these two
+premises, not at the tables below.**
+
+### Premise 1: context windows are now in the 2×10⁵ – 10⁶ token range
+
+Three tiers: 200K / 500K / 1M. The 1M tier holds one crate together with its
+tests, its kb, and its decision record in a single window. Basis: this round of
+work on this repository runs in a 1M-tier session. Other vendors' numbers are not
+written down here — a number you cannot check on the spot is not evidence.
+
+**Calibration**: this is the **advertised window ceiling**, not "the same accuracy
+across the whole window." Recall decay in the middle of a long context is a known
+phenomenon, and this project has never measured at what scale it starts to bite.
+
+- **What it holds up**: the relaxations of "keep PRs small", "minimise concepts",
+  and "DRY by hand". Their original reason was entirely "it does not fit at once",
+  and at the 1M tier that reason no longer holds automatically.
+- **What it does not hold up**: "bound the scope of reasoning" is not among the
+  relaxations. The window got bigger but is **still finite**, and accuracy decays
+  with distance — so module boundaries and explicit contracts are worth more than
+  before, not less.
+
+### Premise 2: concurrent interleavings can now be decided exhaustively
+
+For a judgement like "is this barrier enough", **intuition cannot produce a
+re-checkable answer.** That job now splits in two:
+
+| Who | Does what | Precision |
+|---|---|---|
+| herd7 / LKMM | **Exhausts** every interleaving the memory model permits, returns a Never / Sometimes verdict | Complete for the litmus you actually wrote |
+| The model | Translates the synchronisation pattern in the code into a litmus; enumerates which scenarios to ask about | **Incomplete — the gap is here** |
+
+**Calibration**: the tool is precise, the model is not. The tool answers only the
+litmus you wrote; nothing guarantees you did not omit a scenario that should have
+been asked. That is why `scripts/lkmm.sh` requires controls on both sides: with a
+Never and no Sometimes, you cannot tell whether the barrier held or whether the
+pattern never had a chance to hit.
+
+- **What it holds up**: "exhaustiveness is machine-checkable", and what follows
+  from it — "prefer exhaustive explicit branches" and "a bounded path count means
+  it can be verified".
+
+### When a premise fails, take these back
+
+Premises are not permanent. Observe any of the following and the matching
+relaxation is withdrawn on the spot:
+
+| What you observe | What is withdrawn |
+|---|---|
+| The model drops a mid-context fact at this project's actual scale — misses a constraint already in the window | The "keep PRs small" relaxation; go back to slicing at a size that fits |
+| Generated duplicate code no longer matches its generator | The "DRY" relaxation; back to no duplication |
+| A litmus verdict contradicts a real-hardware stress result | "Exhaustiveness is machine-checkable"; `lkmm.sh` demotes to reference and stops being a gate |
+
+**This table is this file's own disproof step** (`evidence-discipline.md`): a
+premise for which you cannot state "what would overturn it" is not a premise, it
+is a belief.
 
 ## When you meet an established principle, run this procedure
 
