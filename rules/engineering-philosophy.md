@@ -155,6 +155,6 @@ semantic correctness.** Below it is the implementation axis; above it, review.
 
 | Axis | Lands in |
 |---|---|
-| Implementation | `machine-first.md`, the branching rule in `fs-design.md`, `kb-discipline.md` |
+| Implementation | `machine-first.md`, `kb-discipline.md`, plus each project's own design discipline |
 | Review | the howto requirement in `show-me-test.md`, `design-doc-discipline.md`, the basis requirement for decision records |
 | The line | `show-me-test.md`, "what the gate can and cannot prove" |
