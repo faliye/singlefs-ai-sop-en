@@ -1,4 +1,4 @@
-<!-- generated-from: rules/engineering-philosophy.md sha256:79c6091ec80bab390f2562d09bf4fc38d74b4c16bf04008303fdb196b7d3d5a6 -->
+<!-- generated-from: rules/engineering-philosophy.md sha256:ddabf92dc7ce0e6a23c59536e179bdda7816107521ee647584f191f409441093 -->
 <!-- doc-lint:rule-definition -->
 # Engineering Philosophy
 
@@ -65,7 +65,7 @@ information content):
 
 | Item | Why it stays |
 |---|---|
-| Naming | **A name is information, not decoration.** `fn f(a: u64, b: u64)` carries a whole layer of meaning less than `fn commit_txn(gen: Generation, root: Logical)`, and a model cannot recover it either |
+| Naming | **A name is information, not decoration.** `fn f(a: u64, b: u64)` carries a whole layer of meaning less than `fn commit_txn(gen: Generation, root: Logical)`, and a model cannot recover it either. **Function names in detail: see below** |
 | One responsibility per function | a function does one **independently verifiable** thing — that sets its length, not screen height |
 | **Bounded path count** | how many cases does exhaustive coverage of this code need? If you can state it and it is bounded → verifiable. **Note: path count, not nesting depth**, see below |
 | Consistent conventions | inconsistent conventions defeat mechanical checking — this is a different thing from "design uniformity"; do not conflate them |
@@ -74,6 +74,39 @@ information content):
 does it only make things easier on the eye? All four above are the former, so
 they stay — **with their reasons rewritten in terms of verification and
 information, no longer hung on "readability".**
+
+### Function names have no length cap, but no abbreviations either
+
+The length cap is dropped for the same reason "keep functions short" was relaxed:
+it measured line width and human short-term memory. Ten more characters for one
+more layer of meaning is always a good trade on the machine's side.
+
+**An abbreviation is pure loss**: it saves characters and drops meaning, and the
+model cannot recover it — worse, it will fill it in. `cnt` means block count in
+one place and retry count in another, and the model that retrieves one of them
+will not say "I can't tell"; it will proceed on the most common reading.
+There is exactly one exception: domain abbreviations that have an entry in the
+glossary (`lba`, `crc`) — those are **proper names**, and the criterion is
+"is there one authoritative definition", not "will everyone recognise it".
+
+**The criterion: stripped of comments and of the call site, does the name alone
+say what it does — and what it does not do?**
+
+A good name also carries **context constraints** — putting preconditions and
+scope into the name lifts part of the contract up into the signature:
+
+| Name | What it constrains |
+|---|---|
+| `write_node` | nothing: where it writes, whether it was verified, whether it can be cut short by a crash — all of it requires reading the implementation |
+| `append_verified_node_to_journal` | appends rather than overwrites, the argument is already verified, the destination is the journal — three preconditions stated in the name |
+
+**Constraints the type system can express go into types; those it cannot go into
+names — neither belongs in a comment.** Comments drift away from the
+implementation; names and types do not.
+
+This one cannot be checked mechanically, so it is a review criterion, not a gate
+item (`show-me-test.md`, "What the gate can and cannot prove"). **Failing to
+produce such a name usually means the function's job is not yet pinned down.**
 
 ### Nesting depth itself is not capped
 
