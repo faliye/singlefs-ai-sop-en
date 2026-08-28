@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:8ff1c9f49e7278beeae9062c06a279eba4c08c042eacfce6d16150f522445e10 -->
+<!-- generated-from: rules/test-discipline.md sha256:6844e91ffe5fdd113c7af891934b9ae76f66c8979ed2ae08500f3038b3e16ec7 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -66,6 +66,32 @@ its numbers had already been written into a decision document.
 it against the first one". This is especially dangerous when an arm is added later —
 whoever adds it usually only touches the arm under test, and forgets the control loop
 exists.
+
+## Comparing the arms only against each other cannot detect "every arm is wrong together"
+
+**Equality between arms is a weak criterion**: it only rules out "one arm alone went
+wrong". It does not rule out "the same formula is shared by every arm, and that formula
+is wrong". In a cross-arm comparison the latter looks exactly like correctness —
+**everything is equal**.
+
+⇒ **Next to every cross-arm assertion there must be an assertion that pins down an
+absolute value.** "The three arms have equal overhead" is not enough; you also need
+"the overhead is exactly N", with N derived by independent arithmetic.
+
+Observed: a three-arm experiment with 18 unit tests, one conservation check and one set
+of positive controls — **all of them cross-arm comparisons and nothing else**. Mutation
+testing was run three rounds in a row, and every round had entries where "not a single
+test went red". They all exposed the same shape: doubling an interval parameter,
+changing the accounting basis for record charging, making one arm perform no publish at
+all — all three arms went wrong **together**, and the cross-arm comparisons still came
+out equal. One of those errors left an arm **publishing not one root** across 200,000
+operations, and no check raised an alarm.
+
+**What to do**: once you have written a cross-arm assertion, ask yourself "if all three
+arms were wrong **together**, who would notice". If you cannot answer, add one that
+pins down an absolute value. **This and "the positive control must run against every
+arm" are two sides of the same discipline** — that one is about every arm going through
+the gate, this one is about the gate itself not being relative.
 
 ## The checker is the specification
 
