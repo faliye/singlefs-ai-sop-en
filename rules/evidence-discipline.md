@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:0a006ef2aae1379e92dfcd05135bbfef1eae059850fdf4e26455a5675275841a -->
+<!-- generated-from: rules/evidence-discipline.md sha256:52a3eb62e42bde1c7a8ce058beeac31579caf92ba812cc58f51661c27dfd7ccc -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -38,6 +38,25 @@ agreement could just be the second path echoing the first.
 **This is the same discipline as "every verification must be able to fail", applied to
 the cross-check path**: the main check must be shown to go red, and so must the
 cross-check. **Showing only the former is doing half the work.**
+
+## Background material fed into multi-party argumentation must itself be checked first
+
+When cross-checking a conclusion across multiple independent sources, you typically
+write up a "known facts" brief and hand it to each party. **Every external fact in
+that brief must be checked by the person asking the question, first.**
+
+The reason is mechanical: **every party takes it as a given, so an error in the brief
+gets inherited by all of them together** — and they will still come back with an
+"agreement". **Agreement therefore stops being evidence.**
+
+Observed: a background brief stated that some production implementation "has no
+such-and-such field". One of the three parties itself found the opposite in the
+primary source — **and still used the brief's claim as the baseline for comparison.**
+The eventual agreement was three parties jointly inheriting the same error.
+
+**What to do**: before writing "implementation X works like this" into the brief,
+check it yourself. What you cannot check, mark "unverified", so every party knows not
+to treat that line as a given.
 
 ## A hypothesis must be refutable by observation, or it is not a hypothesis
 

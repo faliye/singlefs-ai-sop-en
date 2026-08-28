@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:b95d529bfd72f0d38fb8a32e1e27f5a98a395dfa2014fb34c69b8a9725a1937b -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:78555e22c3feb89b0db8ed13d84c3a1eecb31a04033782e30888674447a5221a -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -21,6 +21,24 @@ without my knowing:
 
 **What does not need checking now**: files read earlier in this same conversation,
 pure code-logic derivation, arithmetic.
+
+## "Is it settled" and "what does it actually say" are two different questions
+
+Checking the status column and confirming a decision is "settled" does not mean you
+know what it settled on. Before using a decision to build a model, write a check, or
+overturn some other conclusion, **you must read its definition word for word** — not
+model it from memory.
+
+Observed: an experiment set out to test whether some decision would break under a new
+scenario. The model was built from two possible readings of the decision's wording,
+both readings showed a failure, and the decision was overturned on that basis. **The
+decision's own text already spelled out a third reading** — under it the error rate is
+exactly zero, so the conclusion pointed the wrong way entirely. In hindsight: the
+status column got checked, the definition never got read.
+
+**What to do**: before using a decision in any derivation, paste its defining sentence
+verbatim into your notes or experiment comments. If you cannot paste it, you were
+working from memory.
 
 ## Putting it into practice
 

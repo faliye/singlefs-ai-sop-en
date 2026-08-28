@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:80194a083f390eba2bedbcca56dd1e3000407f3164c0c626b1a7bd37996c1c33 -->
+<!-- generated-from: rules/test-discipline.md sha256:8ff1c9f49e7278beeae9062c06a279eba4c08c042eacfce6d16150f522445e10 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -50,6 +50,22 @@ Keep the two apart, and **run both controls**:
 Without the positive control, "no advantage" cannot be told apart from a broken
 implementation. Without the real baseline you are measuring "does this mechanism exist"
 rather than "what does this mechanism buy over what we already have".
+
+## The positive control must run against **every** arm under test
+
+When an experiment has N arms, running the positive control on just one of them means
+the other N−1 **never went through the gate at all** — and it is usually one of those
+un-gated arms that ends up producing the conclusion.
+
+Observed: an experiment had two rule arms; the positive control was run against only
+the first. Once run against the second, **it failed on the very control workload** —
+by the experiment's own failure clause it should have been discarded on the spot, but
+its numbers had already been written into a decision document.
+
+**What to do**: the control loop must iterate over the full set of arms, not "just run
+it against the first one". This is especially dangerous when an arm is added later —
+whoever adds it usually only touches the arm under test, and forgets the control loop
+exists.
 
 ## The checker is the specification
 
