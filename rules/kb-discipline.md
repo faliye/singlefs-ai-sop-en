@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:58ce193023eca2b75952994b5357abc40e9370e78e7d4e01894bfae420970b5f -->
+<!-- generated-from: rules/kb-discipline.md sha256:d2cf09eab6a1c26f389593e23182d295c9cb76d5836d7f4e7e131d6d028ee92c -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -60,16 +60,49 @@ A given fact gets **exactly one** authoritative record; everywhere else links to
 A person reading through notices when two passages disagree. **Retrieval will not
 serve up both — it picks one, and does not tell you it picked.**
 
-## 5. Tables beat prose
+## 5. A number can serve as an index, never as a name
+
+**Giving a concept a number is not the same as giving it a name.** In retrieval a
+number **does not stand on its own** — it leaves the definition somewhere else and
+leaves nothing but a symbol at the point of use. So **whoever cites it can change its
+meaning without noticing**, because not one word will look out of place.
+
+⇒ **Carry the name at every citation**: write "O2 (independent parser + checker)",
+never just "O2".
+⇒ **A number gets exactly one definition**; everywhere else links to it (a direct
+corollary of clause 4 of this file, "A contradiction is worse than a gap" — **note that
+this citation carries the name too**).
+
+Observed: one decision document numbered three verification means O1/O2/O3 and gave each
+its definition. Afterwards, **two other documents, using that same number, each pointed
+at something other than the original sense** — the original sense is "independent
+parser + checker", judging a **single** image only; one of them required it to
+"implement journal replay over again", the other required it to "compute the same answer
+independently and then compare byte for byte". Both of the latter need a **second
+input** and are **not, at the type level, the thing the original sense named** — and
+nowhere did anything look wrong.
+
+**The cost was not on paper**: one of those documents went on to write a backward
+criterion on that basis — "if the number of events caught by X but not by **the
+checker** is 0, that ground is worth zero" — while in the original sense **X is the
+checker**. ⇒ Read literally, that criterion is always 0 and therefore
+**unfalsifiable**, and it was written precisely to make another ground falsifiable.
+**A gate criterion was hollowed out by a number.**
+
+⇒ **The criterion**: substitute every number in the text with its defining sentence —
+does the sentence still read? If it does not, the citation drifted long ago, and the
+number hid the drift.
+
+## 6. Tables beat prose
 
 Filterable, alignable, and every row stands alone.
 
-## 6. Do not optimise for reading order
+## 7. Do not optimise for reading order
 
 The kb has no "read it from the top" use case. No setup, no transitions, no
 conclusions to round things off.
 
-## 7. Body text states only the current state; history goes to a "Revision history" at the end
+## 8. Body text states only the current state; history goes to a "Revision history" at the end
 
 The rule is the same as for design documents, but the **reason differs, and is
 harder**: retrieval serves the stale entry up **on its own**, with no context and
