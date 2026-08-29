@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:d2cf09eab6a1c26f389593e23182d295c9cb76d5836d7f4e7e131d6d028ee92c -->
+<!-- generated-from: rules/kb-discipline.md sha256:7f8995cf4d70a2cb54ef7aec93baeba487301c9d89f48debced88075a5e0eaa6 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -92,6 +92,29 @@ checker**. ⇒ Read literally, that criterion is always 0 and therefore
 ⇒ **The criterion**: substitute every number in the text with its defining sentence —
 does the sentence still read? If it does not, the citation drifted long ago, and the
 number hid the drift.
+
+**A registration site takes exactly two forms, and both must be explicit** — nothing is
+inferred from "the first column holds a number", because first columns are also used as
+row labels (`| D2 | node-internal parity overlaps with D2's variable-width… |`); inferring
+would make every one of those a false alarm:
+
+| Form | How it is written | Where the short name comes from |
+|---|---|---|
+| Registry table | a line of its own above the table: `<!-- doc-lint:registry name-col=2 -->` | column N of each row |
+| Registry heading | `## D1 Data mobility — settled` | after the number, before the `—` |
+
+A short name may not be empty, and is capped at 24 characters — **every citation has to
+carry it, and a name too heavy to carry is no name at all**. Domain terms (`RAID5`,
+`SHA256`) are shaped exactly like numbers and a machine cannot tell them apart; exempt
+them explicitly: `<!-- doc-lint:not-numbers RAID5 SHA256 -->`.
+
+**Which half the gate covers**: `scripts/doc-lint.sh` enforces the mechanically decidable
+half — one registration site per number, short names present and within the cap, every
+citation carrying a short name that matches the registration site verbatim, and **a number
+that recurs while having no registration site at all** (without that last one a kb that
+never registered anything comes out all green — and the kb where this went wrong was
+exactly that kind). The substitution criterion above is semantic and **can only be done by
+a person**: no machine judges whether a sentence "still reads".
 
 ## 6. Tables beat prose
 
