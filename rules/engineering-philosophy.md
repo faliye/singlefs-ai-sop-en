@@ -1,4 +1,4 @@
-<!-- generated-from: rules/engineering-philosophy.md sha256:ddabf92dc7ce0e6a23c59536e179bdda7816107521ee647584f191f409441093 -->
+<!-- generated-from: rules/engineering-philosophy.md sha256:21585a1984b87586574b1088278c16ed84a3a0c1d42a921933be762dcb828d6a -->
 <!-- doc-lint:rule-definition -->
 # Engineering Philosophy
 
@@ -65,14 +65,14 @@ information content):
 
 | Item | Why it stays |
 |---|---|
-| Naming | **A name is information, not decoration.** `fn f(a: u64, b: u64)` carries a whole layer of meaning less than `fn commit_txn(gen: Generation, root: Logical)`, and a model cannot recover it either. **Function names in detail: see below** |
+| Naming | **A name is information, not decoration.** `fn f(a: u64, b: u64)` carries a whole layer of meaning less than `fn commit_txn(gen: Generation, root: Logical)`, and a model cannot recover it either. **Function names in detail: see "Function names have no length cap, but no abbreviations either"** |
 | One responsibility per function | a function does one **independently verifiable** thing — that sets its length, not screen height |
-| **Bounded path count** | how many cases does exhaustive coverage of this code need? If you can state it and it is bounded → verifiable. **Note: path count, not nesting depth**, see below |
+| **Bounded path count** | how many cases does exhaustive coverage of this code need? If you can state it and it is bounded → verifiable. **Note: path count, not nesting depth**, see "Nesting depth itself is not capped" |
 | Consistent conventions | inconsistent conventions defeat mechanical checking — this is a different thing from "design uniformity"; do not conflate them |
 
 **The criterion is still the same one**: does this make verification easier, or
-does it only make things easier on the eye? All four above are the former, so
-they stay — **with their reasons rewritten in terms of verification and
+does it only make things easier on the eye? All four in the table make verification
+easier, so they stay — **with their reasons rewritten in terms of verification and
 information, no longer hung on "readability".**
 
 ### Function names have no length cap, but no abbreviations either

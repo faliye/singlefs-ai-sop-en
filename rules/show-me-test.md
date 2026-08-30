@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:54e43829e867e75b67a6209da3211ac53af0b89ba1e6d0e3a93e1f137def5ef4 -->
+<!-- generated-from: rules/show-me-test.md sha256:d39ce4a53b52a1ef3a0624057e4e9e00514b1d1834eaf48f994e300fce4a70ff -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -86,7 +86,7 @@ for a completion marker that could only have been produced by this run.
 
 > **Gate proves evidence requirements, not semantic correctness.**
 
-**This is the necessary counterweight to the epigraph above.** Without it, "the gate
+**This is the necessary counterweight to the epigraph "Make every submitted patch review-worthy".** Without it, "the gate
 is all green" gets read as "the code is correct" — which is precisely the kind of
 silent error this project most wants to avoid.
 

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:2e3da20e26d3eb6824d18b9f672f5e056dc13fd4e52b9ad9651197cfd46c2dc8 -->
+<!-- generated-from: rules/kb-discipline.md sha256:1d8125a8f951fad54282d53ed6f8b287250bb7a98a4a48937cfcadd6030801e7 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -16,9 +16,16 @@ is incidental, not the objective.
 A fact must still hold when retrieved alone, without the paragraph above it.
 
 **No dangling references** — "as stated above", "same as above", "see above",
-"mentioned earlier", "the aforementioned", "as described below". They are harmless
-when read through and break on the spot when retrieved; and **a model will not say
-"I do not follow" — it will fill in something.**
+"mentioned earlier", "the aforementioned", "as described below", and positional
+references such as "see below", "see the section below", "see the table above", "that
+table above". They are harmless when read through and break on the spot when retrieved;
+and **a model will not say "I do not follow" — it will fill in something.**
+
+"the previous entry" / "the next entry" are **outside the gate**: measured on a real
+corpus, false reds outweigh true ones — one registered short name is literally "residue
+of the previous timeline", and ordinary verb phrases like "note down one more item" hit
+too. Writers still must not use them to point at another entry, but that half is checked
+by people, not by the gate.
 
 **Self-references are equally forbidden** — "this entry", "this decision", "this
 experiment", "that decision", "this invariant", "this section", "this table", "this
@@ -158,8 +165,9 @@ That last one cannot be dropped: without it a kb that never registered anything 
 all green — no registration sites means the other checks have nothing to do — and the kb
 where this went wrong was exactly that kind.
 
-**The half only a person can do**: the substitution criterion above is a semantic judgement;
-no machine decides whether a sentence "still reads". Lowercase numbers (`o1`), citation
+**The half only a person can do**: the substitution criterion (does the sentence still
+read once every number is replaced by its defining phrase) is a semantic judgement;
+no machine decides that. Lowercase numbers (`o1`), citation
 forms other than putting the name in the link text, and whether a short name is a *good*
 name are all out of the gate's reach.
 

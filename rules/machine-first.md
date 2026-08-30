@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:478d5d7f3ab2a8b0f32a6ce169ed1439ccab9f163df77256bf8c9a2e378fcdb1 -->
+<!-- generated-from: rules/machine-first.md sha256:4f389a6d813a2344c8ec8a66736c2d9fe0a631f4c11ae5e866ed3f5b23c390e0 -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -27,8 +27,8 @@ and "everyone does it this way" is not one of them.
 "Machine capacity passed that line some time ago" is the foundation the whole
 methodology rests on. **It is a falsifiable empirical claim, not an article of
 faith.** So this section states the two premises it depends on, and what
-observation would overturn them — **to argue against this file, aim at these two
-premises, not at the tables below.**
+observation would overturn them — **to argue against this stance, aim at these two
+premises, not at the "relaxed" and "kept" tables.**
 
 ### Premise 1: context windows are now in the 2×10⁵ – 10⁶ token range
 
@@ -92,7 +92,7 @@ is a belief.
    remember", "people cannot read that much", or "review bandwidth is short", it
    most likely does not.
 3. **Ask whether it has a second reason.** Many rules happen to also solve a
-   problem that has nothing to do with humans (see the "kept" table below). If so →
+   problem that has nothing to do with humans (see the "kept" table). If so →
    keep it, **and rewrite its stated reason to that one.**
 4. **The rewritten reason must be able to land in the gate.** If it cannot, demote
    it to advice; do not write it as a rule.
