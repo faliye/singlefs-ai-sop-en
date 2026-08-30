@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-economy.md sha256:ed4df1ff3b078619e5ea6e227fe8320190e3d373c099067c1c43b82914d5ec4c -->
+<!-- generated-from: rules/writing-economy.md sha256:fff87640a3434a992e351932068f15a20d7f6aad94c7eb505654ffeabbd4dd64 -->
 <!-- doc-lint:rule-definition -->
 # Explanation length must match the weight of the change
 
@@ -9,6 +9,24 @@ you are writing something that should not be written.
 **Cutting it down to size is the job of whoever wrote the code, not of whoever
 reviews it.** However solid the argument, that is not a reason to write all of it out
 — the paragraph you feel is "load-bearing" is often exactly the one to cut.
+
+## As short as possible without losing content
+
+**The test: if this sentence goes, what does the reader no longer know?** If you cannot
+name what was lost, cut it — "it reads more smoothly" and "it looks more thorough" are
+not content.
+
+The cost of padding is not the space it takes, it is **dilution**: readers and retrieving
+models alike have to pick the one useful sentence out of the filler, and the odds of
+missing it rise with length. **Every padded sentence downweights the real content.**
+
+The three most common are none of them "wrote something new": restating a point already
+made in different words, prefacing an unchallenged conclusion with a run-up, and writing
+the same criterion once positively and once negatively.
+
+**But brevity may not be bought with content** — evidence, the basis behind a number, and
+the next step (`sop-first.md`'s `howto`) may none of them be dropped. What to keep is in
+"Hard data does not count against the ruler" and "Cut these categories".
 
 ## Hard data does not count against the ruler
 

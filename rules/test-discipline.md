@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:6844e91ffe5fdd113c7af891934b9ae76f66c8979ed2ae08500f3038b3e16ec7 -->
+<!-- generated-from: rules/test-discipline.md sha256:10bad76e2ab8023e1232d17c16beb3d1846ed97cb3889e32e496d4cb2ad15121 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -30,6 +30,28 @@ compare.
 there is no reference implementation to compare against — the convenience a porting
 project has, of "treat an existing tool's output as the right answer", does not exist
 here; it has to be built.
+
+## Before an experiment runs, the answer must not already exist
+
+**Do not presuppose a conclusion, and do not consult any existing conclusion while
+designing one** — this project's conclusion from last round, a settled result from
+elsewhere, your own intuitive expectation: none of them.
+
+The reason is mechanical: once the criterion is set to match the expected conclusion, it
+can only pass when the result matches expectation. **This is the same disease as "an
+experiment's failure clause must not make its conclusion unfalsifiable", with the lesion
+moved forward into design** — at that point there are no numbers yet, so editing the
+criterion leaves no trace and cannot be spotted afterwards.
+
+**What you must read is the definition, not the answer.** The basis, parameters and
+semantics of the thing under test have to be read verbatim (`verify-before-claiming.md`,
+"'Is it settled' and 'what does it actually say' are two different questions"), whereas
+"last round measured X" and "project Y says this way is faster" are answers, and reading
+one is handing yourself the answer key.
+
+**What to do**: pin down criteria, thresholds and discard clauses before the run, then go
+look at the existing conclusions. Where the two disagree, record both as they stand —
+never go back and edit the criterion. **Edit it and it is a new experiment: re-run.**
 
 ## An experiment's failure clause must not make its conclusion unfalsifiable
 

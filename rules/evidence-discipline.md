@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:52a3eb62e42bde1c7a8ce058beeac31579caf92ba812cc58f51661c27dfd7ccc -->
+<!-- generated-from: rules/evidence-discipline.md sha256:a00a02808edd8e2c6e5e3e5e680bc8b357eb01a310e1d64593f259369822edb0 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -58,6 +58,45 @@ The eventual agreement was three parties jointly inheriting the same error.
 check it yourself. What you cannot check, mark "unverified", so every party knows not
 to treat that line as a given.
 
+## How another project does it is a lead, not evidence
+
+**Never treat another project's implementation as direct evidence.** "XFS does it this
+way", "there is precedent in the kernel" proves only that someone has done it — not that
+doing it here is right.
+
+In between sits a whole set of unchecked premises: its workload, its on-disk format, its
+concurrency model, its compatibility baggage, the problem it was solving at the time.
+Miss on any one of them and the conclusion does not carry over. And those premises **are
+not cited along with the conclusion**; they are usually not written down in its code
+either, so reading the source will not hand them to you.
+
+⇒ An external implementation may enter in exactly two places: **raising a hypothesis**,
+and **pointing at which path to test**. It may not enter any of the three derivations
+(forward / backward / cross-check), and it may not serve as the cross-check path — it is
+not an independent path, it never touched this project's subject at all. To become
+evidence it must first be reproduced here as observable data; from then on you cite that
+data, not that implementation.
+
+**Separate the half you may cite from the half you may not**:
+
+| May | May not |
+|---|---|
+| **Facts**: "the constant `XLOG_CONTINUE_TRANS` exists", "that function is spread over 93 sites in 22 files" — checkable, re-runnable | **Argument**: "XFS does it this way, therefore doing it this way is right" |
+| **Counter-evidence**: a scheme that appears in **no** production implementation is a signal demanding an explanation | **Positive proof**: a scheme appearing in a production implementation does not make it fit for this project |
+| **Mechanism**: decompose what they did into a mechanism, then argue that mechanism holds under this project's premises | **Transplanting**: carrying the conclusion over together with the premises it never wrote down |
+
+⚠️ **"No production implementation takes path X" is one of the most valuable external
+signals this project has** — it does not prove X is wrong, but it shifts the burden of
+proof onto X's side: **to walk a path nobody has walked, you must say why nobody did.**
+
+⚠️ **When citing another implementation, you must also write down one known difference
+between it and this project.** If you cannot name a difference, you have not yet
+understood why that approach holds over there; the citation at that point is
+**transplanting**, not argument.
+
+**Cite it with its source and "not verified in this project"**
+(`kb-discipline.md`, "Every entry carries its source and status").
+
 ## A hypothesis must be refutable by observation, or it is not a hypothesis
 
 After writing a hypothesis down, **first ask "what phenomenon would overturn it".**
@@ -66,6 +105,36 @@ If you cannot answer, it has not taken shape yet — do not build an experiment 
 **To rule a hypothesis out you need either a falsifiable observation or an explicit
 statement that this is inference.** "I cannot think of another explanation" does not
 constitute ruling out.
+
+## Never pick the conclusion first and then build a model for it
+
+**Choosing the conclusion first and then building a model that yields it is the number
+one form this discipline exists to stop.** It does not show up as "fabricated data"; it
+shows up as **every step being reasonable, while those steps were selected by the
+conclusion**: which parameter, how deep to model, who serves as the opposing arm, which
+dimension to ignore — every one of them is a choice, and people only remember the most
+defensible of the choices they made.
+
+**Criteria (ask before writing the conclusion down; if you cannot answer, you are not
+done)**:
+
+| Ask | Cannot answer ⇒ conclusion came first |
+|---|---|
+| Did this model exist **before** my leaning did | You can say "when I built it I did not yet know which side it would come out on" |
+| Did I build an equally serious arm for **the other side** | You can say what the opposing arm's best form is, and whether you measured it |
+| Would I **accept** the opposite result | You can say "if the numbers came out the other way, here is how I would change the conclusion" — written down **before** the run |
+| Did I take readings at **only one point** | A multiple derived from one size, one parameter, one workload is not "worst case" |
+
+⚠️ **The moment of greatest danger is "overturning an old conclusion"**: by then you
+already have a new direction, and the thrill of overturning tilts every choice in the new
+model that way. **Overturning must be held to a stricter standard than establishing**,
+not a looser one.
+
+⚠️ **A straw-man opposing arm is this failure's signature product**: pick an
+implementation form for the other path that nobody would actually adopt ("one record per
+entry" and the like), measure how badly it does, then present that as the cost of that
+path. **Criterion**: is the opposing arm's form **the one its own proponents would
+recognize**.
 
 ## The backward-reasoning gap specific to filesystems
 
