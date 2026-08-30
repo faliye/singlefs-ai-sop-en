@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:9833d1f6961d01db8e586690f17035f65254fdcefd2b511da028b658de2f0175 -->
+<!-- generated-from: rules/kb-discipline.md sha256:2e3da20e26d3eb6824d18b9f672f5e056dc13fd4e52b9ad9651197cfd46c2dc8 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -19,6 +19,36 @@ A fact must still hold when retrieved alone, without the paragraph above it.
 "mentioned earlier", "the aforementioned", "as described below". They are harmless
 when read through and break on the spot when retrieved; and **a model will not say
 "I do not follow" — it will fill in something.**
+
+**Self-references are equally forbidden** — "this entry", "this decision", "this
+experiment", "that decision", "this invariant", "this section", "this table", "this
+file", "this document".
+
+A self-reference is sneakier than a dangling reference: a dangling reference at least
+points in a direction, while a self-reference points at **"here"** — and the item
+retrieval hands back **has no "here"**. It has already been lifted out of the file; the
+`## D22 How unit atomicity composes` heading above it does not travel with it. So when
+"this decision also rules that K may not be a format constant" comes back alone, not one
+word remains about whose decision that was.
+
+⇒ **Write the current location out as a name**:
+
+| Referring to | Write it as |
+|---|---|
+| A numbered entry | `D22 (how unit atomicity composes)` — the same shape as rule 5 |
+| A section | Its heading |
+| A document | Its filename |
+
+**This is the dual of rule 5, "A number can index a thing, it cannot name it".** Rule 5
+governs "citing another number without writing its short name"; this one governs "talking
+about yourself without even writing the number". Only together do they close — without
+this one, rewriting `D22 (how unit atomicity composes)` as "this decision" would *pass*
+the gate.
+
+**Not covered**: "this project", "this repository", "this round", "this machine" refer to
+the project, not to a location in a document. The trailing-character exclusions are set
+from real corpora (a kb really does contain "that node", "that condition", "this entry
+in the table"); without them they would be false reds.
 
 Enforced by `scripts/doc-lint.sh`.
 
