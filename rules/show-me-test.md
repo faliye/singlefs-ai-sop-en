@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:d39ce4a53b52a1ef3a0624057e4e9e00514b1d1834eaf48f994e300fce4a70ff -->
+<!-- generated-from: rules/show-me-test.md sha256:49a8f4026cac58978ca49d6e53508d3ecf63b48b4302195797a5ebf34f7c4982 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -55,6 +55,12 @@ put it back.** A test that cannot be shown to go red is the same as no test.
 Scripts cannot verify this step (they only see whether a test exists), so **state
 in the commit message how you confirmed it goes red** — which line you broke, which
 assertion you saw fail. If you cannot write that down, you did not do it.
+
+Where a mutation harness exists, go one step further: turn "break this → that assertion
+goes red" into a **checked-in mutation list** that the replay gate keeps re-running. The
+commit-message account is the fallback for repos without a harness, not the first
+choice — an account is read once, whereas a checked-in list re-proves itself on every
+replay.
 
 ## Turn traps you have hit into checks that fail, not into reminder sentences
 

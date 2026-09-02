@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:639c358813aa9b0719757d6e7a8d5ec9832ce095275b5870aa166d8b4634f800 -->
+<!-- generated-from: rules/session-wrapup.md sha256:9293d16e0dc85c2c2eaef44e2447ce93a47bc8071a5de5310f652f014dfcd342 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -54,3 +54,25 @@ that conclusion in substance overturns a sentence already written in `kb/decisio
 that is an overturn: record it on the spot, with the grounds.
 A verdict that lives only in the conversation while the decision file stays untouched
 leaves nobody, three months later, knowing why that sentence no longer holds.
+
+## 4. Is another session in flight in the same repository?
+
+When several sessions work concurrently, three default assumptions stop holding. Go
+through them before wrapping up:
+
+- **"Everything in the working tree is mine" no longer holds.** Before committing, sort
+  the changes into "this round" and "not this round" and commit only your own. Sweeping
+  another session's work-in-progress into your commit means publishing, on their behalf,
+  something they had not finished verifying.
+- **"The gate went red = I broke something" no longer holds.** On a red, first check
+  whether the files it names are part of this round's changes. If they are not, report
+  honestly "red, but not from this round" and do not fix it in passing — that is another
+  session's wrap-up, still unfinished.
+- **Shared numbering is first-come, first-served.** For history entry ordinals,
+  experiment numbers and the like, look up the highest existing number before taking
+  one. Edit shared files by targeted replacement only, never by rewriting the whole
+  file — a rewrite silently erases what a concurrent session has already written.
+
+If you collide on a number and it can be made into a check that goes red, make it one
+(`rules/show-me-test.md`, "turn traps you have hit into checks that fail"); on the
+project side, just follow the numbering shape the history files already use.

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:10bad76e2ab8023e1232d17c16beb3d1846ed97cb3889e32e496d4cb2ad15121 -->
+<!-- generated-from: rules/test-discipline.md sha256:30b92b57eb5559790979638a5ab28993743a96d2e61a427a6c0777e30e2b3656 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -7,6 +7,19 @@
 N≥5 rounds. To call it "pass" every round must pass; to call it "fail" every round
 must fail (**the thresholds are asymmetric**). If neither holds, report "unstable"
 honestly and draw no conclusion.
+
+**This applies only when the observation has an intrinsic source of variance** — real
+I/O, concurrency, timing, randomness; at least one must be present. With none of them
+the thing under test is a deterministic model: the same binary run N times is
+byte-identical by necessity, **N=1 and N=5 carry exactly the same information**, and
+writing "consistent across N rounds" merely dresses determinism up as stress-test-grade
+evidence. Observed: three pure-arithmetic experiments all wrote "byte-identical across
+N=5 rounds", and the whole batch was later struck down on review.
+
+⇒ For a deterministic experiment the only honest phrasing is "running N rounds proves
+there is no hidden state, not statistical stability"; its evidence strength comes from
+mutation testing and from assertions that pin down absolute values, not from the round
+count.
 
 ## Could not read ≠ read zero
 
@@ -114,6 +127,32 @@ arms were wrong **together**, who would notice". If you cannot answer, add one t
 pins down an absolute value. **This and "the positive control must run against every
 arm" are two sides of the same discipline** — that one is about every arm going through
 the gate, this one is about the gate itself not being relative.
+
+## Mutation testing proves the assertions can go red, not coverage
+
+Mutations only act on **the functions that already have assertions**. What it proves is
+"every piece of code with an assertion has been mutation-tested", **not** "every piece
+of code the conclusion rests on has been tested".
+
+⇒ Never write "zero blind spots"; write "all N mutations were caught" and nothing more.
+And once the conclusion is written, go back and ask: **is the arithmetic this conclusion
+comes from covered by an assertion?**
+Observed: an experiment claimed "all 9 mutations caught, zero blind spots" while the
+arithmetic its conclusion came from had zero unit tests and zero mutations — had it
+been wrong, nothing would have raised an alarm.
+
+Two pitfalls that silently disarm mutation testing:
+
+1. **Write constant assertions as addition, not subtraction.** In
+   `assert_eq!(A - B, 240)`, a mutation that enlarges one constant **overflows at
+   compile time** and gets recorded as an "invalid mutant" instead of "caught" — an
+   assertion that should have gone red is silently disarmed. Written as
+   `assert_eq!(A, B + 240)`, both sides survive to runtime.
+   Observed: two mutations recorded as invalid both went red after the rewrite.
+2. **An equivalent mutant is not a blind spot; account for it separately.** A mutation
+   that agrees with the original on every input can never be caught, and does not count
+   as a miss. When you judge one equivalent, pin the equivalence down as a test for the
+   record, then substitute a mutation that really changes behaviour.
 
 ## The checker is the specification
 
