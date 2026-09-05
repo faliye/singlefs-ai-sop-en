@@ -4,6 +4,13 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.28 — 2026-09-05
+
+**The item-count criterion now recognizes python f-strings.** Recognizing only shell's
+`$n` made every python-implemented stage a false positive — their success lines are
+formatted inside python (measured on two singlefs stages). Fixture `countpy`; `nocount`
+still goes red, so the criterion is not hollowed out.
+
 ## 0.0.27 — 2026-09-05
 
 **Fixes an infinite loop 0.0.26 introduced, and adds a timeout to selftest.**
