@@ -1,29 +1,32 @@
-# 不变量清单
+<!-- generated-from: templates/kb/invariants.md sha256:61cdf75db8550ec3b4edf6b0059d27abaac24744d47bdb6917777728dbe030d4 -->
+# Invariant list
 
-**checker 是 `invariants.md` 的可执行形式。** `invariants.md` 每加一条，checker 就要加一个检查。
-两者不同步的 commit 一律不收。
+**The checker is the executable form of `invariants.md`.** Every entry added here means
+a check added to the checker. A commit where the two disagree is not accepted.
 
-每条不变量必须写成**可判定**的形式——能对着一个镜像回答「成立/不成立」。
-写不成可判定形式的，说明还没想清楚，不许进 `invariants.md`。
+Every invariant must be written in a **decidable** form — answerable "holds / does not
+hold" against a single image. Something that cannot be written that way is not yet
+understood, and does not belong here.
 
-## I-1 <类别名>
+## I-1 <category name>
 
-**编号即索引，不是称呼**：每条不变量都要有简称，别处引用时写成 `<编号>（简称）`。
-由 `doc-lint.sh` 强制（`singlefs-ai-sop/rules/kb-discipline.md` 第 5 条）。
+**A number is an index, not a name**: every invariant has a short name, and every
+citation elsewhere is written `<number> (<short name>)`.
+Enforced by `doc-lint.sh` (`singlefs-ai-sop/rules/kb-discipline.md`, item 5).
 
 <!-- doc-lint:registry name-col=2 -->
 
-| ID | 简称 | 不变量 | checker 状态 |
+| ID | Short name | Invariant | Checker state |
 |---|---|---|---|
-| I-1.1 | <这一条的短名> | <可判定的陈述> | 未实现 |
+| I-1.1 | <the short name> | <decidable statement> | not implemented |
 
-## 待补
+## Still to write
 
-<在哪些决策定案前无法写出的类别。>
+<Categories that cannot be written until some decision is settled.>
 
 ---
 
-## 历史版本
+## Revision history
 
 ### YYYY-MM-DD
-- 建档。
+- Created.

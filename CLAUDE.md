@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:367e4fe94b069d2e85f501e43d2361e598a6de2cc21e1b1ca4937395875e7d51 -->
+<!-- generated-from: CLAUDE.md sha256:486d6196426c2e69eb62b59bc7a69bfbf427d082ea5eb3a10a7c27cfe6bd64e8 -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -7,25 +7,29 @@ It governs **how a project collaborates with AI**, not how a filesystem should b
 designed. singlefs is its only user.
 Work inside this repository is bound by these rules too.
 
-Changing `rules/` or `scripts/` **must bump `VERSION` in the same change**;
-otherwise the project's gate will report a version mismatch.
+Changing the spec proper **must bump `VERSION` in the same change**; otherwise
+the project's gate will report a version mismatch. **Which paths count as "the spec
+proper" is defined by `GOVERNED` in `scripts/version-discipline.sh`** — that is the
+only list, and it is not copied here.
 
 ## Language of collaboration
 
 **When working in this repository, conduct the conversation and produce all output in English.**
+Work in the language of the repository you installed; the reasoning and the list of
+editions live in [README](README.md) under "Pick the edition in your own language",
+not here.
 
-**Developers pick the edition in their own language.** Chinese, English and Japanese
-exist today, more are in progress, and English is the default. Work in the language of
-the repository you installed — someone working in English never has to read Chinese.
-**The AI does not have to translate a second time either**; one fewer restatement is
-one less loss of information.
-
-The rules must say the same thing in every edition. Where they read differently, the
-language does not decide — the actual behaviour of `scripts/` does.
+**Where editions read differently, the language does not decide — the actual
+behaviour of `scripts/` does.**
 
 **Changing a rule means changing every published edition and merging them together**;
 the person making the change is the one who guarantees they agree. The gate can only
 see that a hash does not match — not whether the editions say the same thing.
+
+**What gets translated and what gets copied verbatim** turns on one question: is there
+prose written for people in it? The two lists live in `scripts/manifest.sh`
+(`translated_paths` and `not_translated_re`). Anything in neither is stopped by the
+coverage check.
 
 ## Rules (always in force)
 
@@ -41,6 +45,7 @@ see that a hash does not match — not whether the editions say the same thing.
 @rules/verify-before-claiming.md
 @rules/command-safety.md
 @rules/writing-economy.md
+@rules/writing-style.md
 @rules/session-wrapup.md
 
 ## Where a thing belongs

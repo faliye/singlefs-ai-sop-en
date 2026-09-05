@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:49a8f4026cac58978ca49d6e53508d3ecf63b48b4302195797a5ebf34f7c4982 -->
+<!-- generated-from: rules/show-me-test.md sha256:dd2e7f18fb1211af58b60c208a4a1a636c69baa283e2c257fa515eb79a650240 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -42,7 +42,8 @@ lands depends on how solidly it is verified, not on who you are.
 too simple", no "I will add them in the next patch". Documentation and script
 changes are exempt.
 
-Enforced by `scripts/gate.sh`, not by good intentions.
+Enforced by `scripts/show-me-test.sh` (`gate.sh` runs it as one stage), not by
+good intentions.
 
 ## A new test must first be shown to go red
 
@@ -61,6 +62,11 @@ goes red" into a **checked-in mutation list** that the replay gate keeps re-runn
 commit-message account is the fallback for repos without a harness, not the first
 choice — an account is read once, whereas a checked-in list re-proves itself on every
 replay.
+
+**This also governs design argument**: for every hole an adversarial round finds, first
+build a world in the model that **must report non-zero**, then change the rule. Otherwise
+nothing can check whether the fix is right — it stays green afterwards, because that
+error was never under test in the first place.
 
 ## Turn traps you have hit into checks that fail, not into reminder sentences
 
@@ -87,6 +93,17 @@ and a failed round quietly passes off the previous round's output as its own —
 everything looks fine, only the numbers do not move. The criterion is "can this
 output prove it came from this round": delete old output before the run, and check
 for a completion marker that could only have been produced by this run.
+
+**Scanning zero items is not passing either.** Write the search scope of a criterion a
+little too narrowly and every object gets skipped at the first step — neither passing nor
+failing, and the tail still reports green with nobody able to tell.
+⇒ A check that scans a set of objects must report **how many items it checked** in its
+success line; `gate-lint.sh` enforces this.
+
+**Project-local stages follow the same rules as shared ones.** They reject submitters
+just like shared stages, so they are subject to `gate-lint` and `shell-lint` too —
+`gate.sh` hands `.claude/gate.d/` to both lints. (Until now it was in neither lint's
+scan; the first run over it produced 7 rejections with no way out.)
 
 # What the gate can and cannot prove
 
@@ -117,7 +134,8 @@ silent error this project most wants to avoid.
    and in sync with the code**; whether they are *right* is on humans.
 
 3. **The gate is a floor, not a ceiling** (`rules/sop-first.md`). It guarantees
-   nobody falls below a line; it guarantees nobody reaches correctness.
+   nobody falls below a line; it does **not** guarantee that anyone reaches
+   correctness.
 
 4. **Unimplemented stages stay explicitly listed.** A missing verification method
    means a whole class of errors that has never been looked at. `gate.sh` prints

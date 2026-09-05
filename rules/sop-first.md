@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:223d89daf707d7f3a2140da5b625d48975fa7ee4cfbef7de13d2c4de8a593a83 -->
+<!-- generated-from: rules/sop-first.md sha256:4247027091f87686a263f4b41508caf903fd01eb85154f20bc8b2ddd54889d07 -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -48,9 +48,18 @@ A failure message that only says "not acceptable" leaves "what would have been
 right" to guesswork — and people who can only guess will route around the gate, or
 simply not submit. **Both outcomes are worse than letting the patch through.**
 
-So: **when rejecting, use `howto` to state what to do next.**
-Enforced by `scripts/gate-lint.sh` — every non-summary `bad` must be followed by a
-`howto` within 4 lines, or the gate fails itself.
+So: **when rejecting, state what to do next.**
+Enforced by `scripts/gate-lint.sh`, which covers both shapes of rejection:
+
+| Shape | Where the remedy goes | Criterion |
+|---|---|---|
+| `bad` | the `howto` right after it | a `howto` within 5 lines counting the `bad` itself (comment lines do not count) |
+| `die` | **its own second argument** (`die "what blocked" "what to do"`) | a `die` carrying only one argument fails |
+
+The `die` row is not an afterthought: `die` is `bad` + `exit`, so it is a rejection
+too. For as long as the gate only recognised `bad`, a rejection as remedy-free as
+`die "unit tests failed"` sat right on the gate path, and 17 `die` sites were exempt
+as a group.
 
 When you cannot write the `howto`, **do not add the check yet**: if you cannot
 state the next step, the criterion behind the check is not clear to you either.

@@ -1,16 +1,18 @@
-# 避坑清单
+<!-- generated-from: templates/kb/pitfalls.md sha256:8911f09707e9983826dd81c27ceb40ca75ca53b9b5a4d48c70b5d705d8caf298 -->
+# Pitfall list
 
-**用法：每做一个设计决定，回来对一遍这张表。**
+**How to use it: come back to this table for every design decision.**
 
-坑的描述来自公开资料，**未在本工程验证**。「对策」一栏链接到 `decisions.md` 的对应决策。
+The pitfalls are described from public material and are **not verified in this project**.
+The "countermeasure" column links to the matching entry in `decisions.md`.
 
-| # | 坑 | 根因 | 对策 |
+| # | Pitfall | Root cause | Countermeasure |
 |---|---|---|---|
-| 1 | <坑> | <根因> | <D 编号或"未决"> |
+| 1 | <pitfall> | <root cause> | <D-number or "undecided"> |
 
 ---
 
-## 历史版本
+## Revision history
 
 ### YYYY-MM-DD
-- 建档。
+- Created.

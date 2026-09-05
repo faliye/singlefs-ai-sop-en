@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:a00a02808edd8e2c6e5e3e5e680bc8b357eb01a310e1d64593f259369822edb0 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:c690f818432e98e11d3534911e17d1e806c9bd9edf52d43ac8673e0abfaefc0c -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -124,6 +124,7 @@ done)**:
 | Did I build an equally serious arm for **the other side** | You can say what the opposing arm's best form is, and whether you measured it |
 | Would I **accept** the opposite result | You can say "if the numbers came out the other way, here is how I would change the conclusion" — written down **before** the run |
 | Did I take readings at **only one point** | A multiple derived from one size, one parameter, one workload is not "worst case" |
+| Does the **same artifact** hold a counterexample to the range I quoted | You can show the range covers every sampled point in the artifact — picking three points to report "1.25–1.5" while a 1.000 sits in that very same output |
 
 ⚠️ **The moment of greatest danger is "overturning an old conclusion"**: by then you
 already have a new direction, and the thrill of overturning tilts every choice in the new
@@ -135,6 +136,33 @@ implementation form for the other path that nobody would actually adopt ("one re
 entry" and the like), measure how badly it does, then present that as the cost of that
 path. **Criterion**: is the opposing arm's form **the one its own proponents would
 recognize**.
+
+⚠️ **When you cite an arm's number, carry its definition with it.** The arm is defined in
+the experiment write-up, the verdict takes only the number: same failure, one step
+downstream. The number is right; what is wrong is that it measures something other than
+what the verdict is asking. (The experiment-side form of `verify-before-claiming.md`'s
+"whether it is settled and what it actually says are two different questions".)
+
+## Quote an artifact by copying the line whole
+
+Paraphrase drifts, and it drifts one way — each retelling leans a little further toward
+what you wanted, and every single step still looks faithful. Measured: the same
+difference out of one artifact was misstated four rounds running — "identical" → "identical
+cell by cell" (three of the four cells were not) → "slightly less" (wrong direction) →
+"exactly 2 nodes" (extrapolating one saturated cell into a range). Nobody caught it.
+
+⇒ **Quote the artifact line whole, with its filename**; summarize only the one cell you
+computed yourself. The fix is not "be more careful" — care leaves no trace, copying does.
+
+## When you write a new criterion, sweep it back over the entries already on the books
+
+**A criterion applied to half the cases will be used by the next person on the lenient
+half.** Measured: "no invariant may enter whose gate has no input" kept a new invariant
+out, while four already-registered invariants in the same family had no input either —
+the author swung the ruler only at the newcomer.
+
+⇒ Once the criterion is written, ask: **what does it say about the entries already
+registered?** No answer means you are not done writing it.
 
 ## The backward-reasoning gap specific to filesystems
 

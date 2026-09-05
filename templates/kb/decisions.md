@@ -1,22 +1,27 @@
-# 设计决策记录
+<!-- generated-from: templates/kb/decisions.md sha256:c4c4e686926487e6c1623c3757b890ea955bccf89f21df97fdffcbcbdd23b3b7 -->
+# Design decision record
 
-每条决策的状态只有三种：**已定** / **半定**（方向定了，细节未定）/ **待定**。
-格式与硬要求见 `decide` skill。推翻某条决策时，直接改正文，把依据写进文末「历史版本」。
-
----
-
-## D1 <决策名，24 字以内> —— 待定
-
-<!-- 这行标题就是该编号的登记位：编号之后、「——」之前那段是它的简称。
-     别处引用一律写成 `<编号>（简称）`，不许只写编号。由 doc-lint.sh 强制。 -->
-
-<结论。半定要写清「未定」的是哪一条。>
-
-依据：<为什么。别家数字带来源与口径，标明未在本工程验证。>
+Each decision has exactly three states: **settled** / **half-settled** (direction fixed,
+details open) / **undecided**.
+The format and the hard requirements are in the `decide` skill. When overturning a
+decision, edit the body directly and put the basis into the closing "Revision history".
 
 ---
 
-## 历史版本
+## D1 <name, 24 characters or fewer> —— undecided
+
+<!-- This heading is the registration site for the number: the segment between the
+     number and the "——" is its short name. Every citation elsewhere is written
+     `<number> (<short name>)`; a bare number is not allowed. Enforced by doc-lint.sh. -->
+
+<The conclusion. If half-settled, say which detail is open.>
+
+Basis: <why. Numbers from elsewhere carry their source and measurement basis, and are
+marked as not verified in this project.>
+
+---
+
+## Revision history
 
 ### YYYY-MM-DD
-- 建档。
+- Created.

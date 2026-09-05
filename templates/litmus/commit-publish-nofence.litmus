@@ -1,14 +1,15 @@
 C commit-publish-nofence
+(* generated-from: templates/litmus/commit-publish-nofence.litmus sha256:36612e17783195285eacde277c48fc2aca78aeb9c6ee64935b0359cafde531f3 *)
 
 (*
- * commit-publish 的对照组：去掉屏障。
+ * The control case for commit-publish: the barrier removed.
  *
- * 它存在的唯一目的是**证明 commit-publish.litmus 有判别力**——
- * 如果这一份也判 Never，说明这个模式本来就撞不上，
- * 那么 commit-publish 判 Never 就什么都没证明。
+ * Its only purpose is to **prove commit-publish.litmus has discriminating power** —
+ * if this one also comes out Never, the pattern never had a chance to hit,
+ * and commit-publish coming out Never proves nothing.
  *
- * 按 rules/show-me-test.md：不能证明会红的检查等于没写。
- * 对照组就是这条规则在内存序上的形态。
+ * Per rules/show-me-test.md: a check that cannot be shown to go red is not written.
+ * The control case is that rule in its memory-ordering form.
  *
  * singlefs-expect: Sometimes
  *)

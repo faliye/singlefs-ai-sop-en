@@ -1,42 +1,53 @@
-# 实验记录
+<!-- generated-from: templates/kb/experiments.md sha256:6e50711dc72aae68335f519cb53285dc772218ae92f14c07bd53ab57c8f3116a -->
+# Experiment record
 
-每个实验回答一个问题。**判据、阈值、作废条款在跑之前写死**（`rules/test-discipline.md`
-「实验开跑之前，答案不许已经存在」），写完判据才许去看已有结论；
-跑完之后改判据 = 新实验，重跑。
+Each experiment answers one question. **Criteria, thresholds and voiding clauses are
+fixed before the run** (`rules/test-discipline.md`, "the answer must not already exist
+before the experiment runs"); only after they are written do you go and look at existing
+conclusions. Changing a criterion after the run makes it a new experiment — rerun.
 
 ---
 
-## E1 <实验名，24 字以内> —— 未跑
+## E1 <name, 24 characters or fewer> —— not yet run
 
-<!-- 这行标题就是该编号的登记位：编号之后、「——」之前那段是它的简称。
-     别处引用一律写成 `<编号>（简称）`，不许只写编号。由 doc-lint.sh 强制。 -->
+<!-- This heading is the registration site for the number: the segment between the
+     number and the "——" is its short name. Every citation elsewhere is written
+     `<number> (<short name>)`; a bare number is not allowed. Enforced by doc-lint.sh. -->
 
-**问题**：<一句话。它要推翻或确立哪条决策的哪一项，点名写出。>
+**Question**: <one sentence. Name which item of which decision it would establish or
+overturn.>
 
-**前置**：<缺哪个**具体输入**——哪个数、哪个字段表、哪条定案。
-不许写「欠某模块」：判据常常是纯算术，根本用不着那个模块，
-写粗了会把当天就能跑的实验挂起来。>
+**Prerequisites**: <which **concrete input** is missing — which number, which field
+table, which settled decision. Not "module X is owed": the criterion is often pure
+arithmetic and needs no such module, and writing it coarsely shelves an experiment that
+could have run today.>
 
-**判据**（先写死，再看任何已有结论）：
+**Criteria** (fixed first, before looking at any existing conclusion):
 
-| # | 判什么 | 阈值 | 作废条款 |
+| # | What is judged | Threshold | Voiding clause |
 |---|---|---|---|
 
-**对照**：
+**Controls**:
 
-- 阳性对照：<效应确凿存在的基线，对**每一条**臂都跑。测不出 → 实现有问题，整轮作废。>
-- 真实基线：<本工程实际打算实现的方案。测不出差异 → 合法结果，如实记录。>
-- 绝对值断言：<至少一条把绝对值钉死的断言，防「所有臂一起错」。>
+- Positive control: <a baseline where the effect is firmly established, run against
+  **every** arm. No difference measured → the implementation is broken, void the round.>
+- Real baseline: <the scheme this project actually intends to implement. No difference
+  measured → a legitimate result, record it as it is.>
+- Absolute-value assertion: <at least one assertion pinning an absolute number, to catch
+  "every arm is wrong together".>
 
-**变异**：<把被测代码改坏的清单，逐条记「改了哪里 → 哪条断言红」。>
+**Mutations**: <the list of ways the code under test was broken, one line each:
+what was changed → which assertion went red.>
 
-**复跑**：<一条命令 + 产物路径。>
+**Rerun**: <one command plus the output path.>
 
-**结论**：<跑完再写。数字带口径；「这个数说明了什么」是推论，要走该走的论证，不算观测。>
+**Conclusion**: <written after the run. Numbers carry their measurement basis; "what
+this number shows" is an inference and owes the argument it owes — it is not an
+observation.>
 
 ---
 
-## 历史版本
+## Revision history
 
 ### YYYY-MM-DD
-- 建档。
+- Created.

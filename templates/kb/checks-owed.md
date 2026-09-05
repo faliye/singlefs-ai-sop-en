@@ -1,24 +1,28 @@
-# 欠的检查清单
+<!-- generated-from: templates/kb/checks-owed.md sha256:264069c9878b2fb21c88d0ec6af91be0a46e60ab8642ecf81ff3e61e725da9e7 -->
+# Checks owed
 
-**`checks-owed.md` 放「已经知道要拦什么、但现在还拦不了」的检查。**
+**`checks-owed.md` holds checks we already know we want but cannot yet enforce.**
 
-与 `invariants.md` 的分界：不变量是**对着一个镜像**可判定的性质，checker 是它的可执行形式；
-`checks-owed.md` 放的是**代码路径的要求**——对着镜像判不出来，只能由门禁在跑的时候拦。
+The line against `invariants.md`: an invariant is a property **decidable against one
+image**, and the checker is its executable form; `checks-owed.md` holds requirements on
+**code paths** — undecidable from an image, enforceable only by the gate at run time.
 
-**写进来的门槛**：说得出「拦什么」「怎么拦会红」「现在缺什么前置」。
-三样缺一样就是还没想清楚，先别写（`singlefs-ai-sop/rules/sop-first.md`）。
+**The bar for writing one down**: you can state what it stops, how it goes red, and what
+prerequisite is missing. Missing any of the three means it is not thought through yet;
+do not write it (`singlefs-ai-sop/rules/sop-first.md`).
 
 <!-- doc-lint:registry name-col=2 -->
 
-| # | 简称 | 要拦什么 | 怎么拦（会红的形态） | 前置 | 出处 |
+| # | Short name | What it stops | How it goes red | Prerequisite | Source |
 |---|---|---|---|---|---|
-| C1 | <这条欠检查的短名> | <被拦的行为> | <什么情况下判红> | <缺什么才能实现> | <decisions.md 的哪一条> |
+| C1 | <short name for this owed check> | <the behaviour stopped> | <when it turns red> | <what is needed to implement it> | <which entry of decisions.md> |
 
-**编号即索引，不是称呼**：别处引用时写成 `<编号>（简称）`，由 `doc-lint.sh` 强制。
+**A number is an index, not a name**: cite it elsewhere as `<number> (<short name>)`,
+enforced by `doc-lint.sh`.
 
-**状态**：<还剩几条未实现，都在等什么>
+**State**: <how many remain unimplemented, and what each is waiting on>
 
-## 历史版本
+## Revision history
 
 ### <YYYY-MM-DD>
-- 建档。
+- Created.

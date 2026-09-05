@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:4f389a6d813a2344c8ec8a66736c2d9fe0a631f4c11ae5e866ed3f5b23c390e0 -->
+<!-- generated-from: rules/machine-first.md sha256:b98f678d8711173d5624c429dc46683f33a1808848c9f43d4a407b56ccadc849 -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -61,9 +61,11 @@ re-checkable answer.** That job now splits in two:
 
 **Calibration**: the tool is precise, the model is not. The tool answers only the
 litmus you wrote; nothing guarantees you did not omit a scenario that should have
-been asked. That is why `scripts/lkmm.sh` requires controls on both sides: with a
-Never and no Sometimes, you cannot tell whether the barrier held or whether the
-pattern never had a chance to hit.
+been asked. That is why `scripts/lkmm.sh` requires **every Never to have its own control**
+(same filename prefix, declared Sometimes): with a Never and no control paired to it,
+you cannot tell whether the barrier held or whether the pattern never had a chance to
+hit. However many Sometimes exist elsewhere does not count — they answer a different
+question.
 
 - **What it holds up**: "exhaustiveness is machine-checkable", and what follows
   from it — "prefer exhaustive explicit branches" and "a bounded path count means

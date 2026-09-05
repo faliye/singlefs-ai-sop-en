@@ -1,4 +1,4 @@
-<!-- generated-from: rules/design-doc-discipline.md sha256:11a5769b9d91edff33d7ba418ee08693619a1ddbabb985f3494675466a564361 -->
+<!-- generated-from: rules/design-doc-discipline.md sha256:962f3ded4ea41b3189ba68e75e77e8c59e0404c3017f7fca424cccf87e6154ed -->
 <!-- doc-lint:rule-definition -->
 # Design document discipline
 
@@ -32,6 +32,11 @@ compounds.
   "was X / now Y / what overturned it" at the end.
 - No `~~strikethrough~~`, `[deprecated]`, `(superseded by XX)` in the body.
 - Same for code comments: write "why it is this way now", not "how it used to be".
+  **Pitfall comments in checking code are the exception** — "this bypass measurably
+  got through, hence this check" records why the check **exists now**; delete it and
+  the next person deletes the check as redundant. The criterion is what it points at:
+  pointing at **why this code looks the way it does now** → keep;
+  pointing at **a version that no longer exists** → delete.
 
 `CLAUDE.md` and `rules/*.md` **keep no revision history section at all**; their
 history goes to `CHANGELOG.md` — they are read in full at the start of every session,
@@ -41,9 +46,8 @@ Enforced by `scripts/doc-lint.sh`.
 
 ## 2. Length must match the weight of the change
 
-However solid the argument, that is not a reason to write all of it out. The
-paragraph you feel is "load-bearing" is often exactly the one to cut.
-Details in `writing-economy.md`.
+The criterion and the yardstick are both in `writing-economy.md`; they are not
+copied here.
 
 ## 3. Where persuasion is needed, persuade properly
 

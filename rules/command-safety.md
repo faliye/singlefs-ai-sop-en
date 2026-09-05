@@ -1,6 +1,40 @@
-<!-- generated-from: rules/command-safety.md sha256:94a3aaf6271cf6f5381b02e1be5f49669c25736afb14c167ff1ea6b91f1782f4 -->
+<!-- generated-from: rules/command-safety.md sha256:a4fbf62c43e97df8c011a3730818929267671b22b53d9fc3395ef3d67a2f6847 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
+
+Four of these are failing checks now, not reminders — `scripts/shell-lint.sh` judges
+them: **killing processes by pattern match**, **carrying a value out of a subshell
+through a variable**, **git's undo commands inside a script**, and **`rm -rf` on an
+unguarded variable path**. The rest are still prose, because the criterion for
+checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
+can and cannot prove" — what is not done has to be said, not glossed over).
+
+## Before anything you cannot take back, think once more
+
+One question decides it: **after this step, can you get back?**
+
+Two kinds cannot, and they are handled differently:
+
+| Kind | Examples | What to do |
+|---|---|---|
+| **Throws away uncommitted work** | `git checkout <file>`, `git restore`, `git reset --hard`, `git clean` | `git stash` or `cp` a copy out first; use them only when you mean to discard *all* uncommitted changes to that file |
+| **Deletes data outright** | `rm -rf`, `> file`, `sed -i`, `rsync --delete`, `mkfs`, `dd` | Look at the target first (`ls` / `git status` / `lsblk`); guard variable paths with `${VAR:?}` |
+
+**Measured the hard way**: an attempt to undo one throwaway `sed` used
+`git checkout <file>` and took every uncommitted change to that file with it.
+That round was recovered from a just-amended commit still in the reflog — had that
+commit not existed, the work was gone.
+
+**So: run throwaway experiments on a copy**, not in the working tree.
+
+**Scripts must never contain git's undo commands.** While a script runs, nobody is
+watching `git status`, and these commands have no undo. To get to a clean state inside
+a script, `git stash` first, or copy the whole repository and work on the copy.
+
+**`rm -rf` on a variable path needs an empty-value guard.**
+`rm -rf "$d/x"` with `$d` empty becomes `rm -rf /x`; written `rm -rf "${d:?}/x"`, the
+shell errors out before `rm` runs. (`rm -rf "$d"` with nothing after it is fine: empty
+gives `rm -rf ""`, which `rm` refuses.)
 
 ## `pkill -f` / `killall` are forbidden outright
 
@@ -42,7 +76,14 @@ N results and emits N−1, and it must fail.
 In `rc="$(run_one ...)"`, any variable `run_one` assigns is **empty in the parent**.
 If result collection depends on that variable (a log path, say) it will collect zero
 results forever while the exit code stays 0 — green light, wrong answer.
-**Pass values through a file, not through a variable.**
+**Pass values through a file or an argument, not through a variable.**
+
+Under `set -u` it is worse: the reference is not an empty value, it is an immediate
+"unbound variable" that **takes the script down before it prints its diagnosis**.
+Measured in this repository's own QEMU harness — five failure branches never printed
+a single `howto`, and those branches are exactly where you need one when the harness
+is lying. A comment cannot stop this, so it is now a failing item in
+`scripts/shell-lint.sh`.
 
 ## After a script edits a file, read it back — a compiler warning is a free signal
 

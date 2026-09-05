@@ -1,15 +1,18 @@
-# 他家方案调研
+<!-- generated-from: templates/kb/prior-art.md sha256:0919bbb079b316c963d64c67fcfecc7a3255bab6010f4f9de7376e7a1e0d635d -->
+# Research into other implementations
 
-**全部为文档阅读所得，未在本工程验证。** 每条结论标注来源。
-引用的数字必须带口径（什么负载、什么硬件、含不含什么）。
+**All of it comes from reading documentation and is not verified in this project.**
+Every conclusion carries its source.
+Every number cited carries its measurement basis (which workload, which hardware, what
+is and is not included).
 
-## <主题>
+## <topic>
 
-<结论 + 来源链接 + 口径。>
+<Conclusion + source link + measurement basis.>
 
 ---
 
-## 历史版本
+## Revision history
 
 ### YYYY-MM-DD
-- 建档。
+- Created.

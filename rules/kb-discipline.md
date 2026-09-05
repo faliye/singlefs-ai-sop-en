@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:1d8125a8f951fad54282d53ed6f8b287250bb7a98a4a48937cfcadd6030801e7 -->
+<!-- generated-from: rules/kb-discipline.md sha256:0845b9ce38e46e9a6feb374ddb7b945832b1926a5d7054d2af038957e3e3480d -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -57,7 +57,14 @@ the project, not to a location in a document. The trailing-character exclusions 
 from real corpora (a kb really does contain "that node", "that condition", "this entry
 in the table"); without them they would be false reds.
 
-Enforced by `scripts/doc-lint.sh`.
+⚠️ **In this edition these two checks are not implemented.** They are word lists, and
+the only word list that exists is the Chinese one; inventing an English one would
+multiply the false-positive surface rather than reduce it. `scripts/doc-lint.sh`
+reports both as **unimplemented** for this language rather than passing silently
+(`show-me-test.md`: the gate must not pretend to pass). Until a word list exists,
+these two kinds of violation are not stopped — green does not mean they were checked.
+The structural checks (fences, the position of the revision-history section,
+numbering) are language-independent and do run.
 
 ## 2. Every entry carries its source and status
 
@@ -188,5 +195,6 @@ nothing to compare against; a model has no "I remember this changed last week" a
 takes it all at face value.
 
 Every kb document must close with a "## Revision history" section — keep the section
-even with no history yet, for later.
+even with no history yet, for later. `INDEX.md` is the exception: it is a signpost
+table, it carries no facts of its own, so it has no old conclusions to keep.
 Enforced by `scripts/doc-lint.sh`.

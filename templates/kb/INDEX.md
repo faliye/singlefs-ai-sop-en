@@ -1,13 +1,14 @@
-# kb 索引
+<!-- generated-from: templates/kb/INDEX.md sha256:fe8831a1346b9723cb3e83e752cc2728ece711928baad96a8306e84512e64b7c -->
+# kb index
 
-**规则不进 kb，进 [singlefs-ai-sop/rules/](../singlefs-ai-sop/CLAUDE.md)。**
-kb 只放事实、决策、调研、实测数据。
+**Rules do not go in kb; they go in [singlefs-ai-sop/rules/](../singlefs-ai-sop/CLAUDE.md).**
+kb holds only facts, decisions, research and measurements.
 
-| 文件 | 内容 |
+| File | Contents |
 |---|---|
-| [decisions.md](decisions.md) | 设计决策：定了什么、为什么、还没定什么 |
-| [experiments.md](experiments.md) | 实验记录：问题、先写死的判据、对照与变异、复跑命令 |
-| [invariants.md](invariants.md) | 不变量清单。checker 是它的可执行形式 |
-| [prior-art.md](prior-art.md) | 他家方案调研，含来源与口径 |
-| [pitfalls.md](pitfalls.md) | 避坑清单。每做一个设计决定回来对一遍 |
-| [checks-owed.md](checks-owed.md) | 欠的检查：知道要拦什么但还拦不了的，含前置 |
+| [decisions.md](decisions.md) | Design decisions: what is settled, why, what is not |
+| [experiments.md](experiments.md) | Experiments: the question, criteria fixed in advance, controls and mutations, the rerun command |
+| [invariants.md](invariants.md) | The invariant list. The checker is its executable form |
+| [prior-art.md](prior-art.md) | Research into other implementations, with sources and measurement bases |
+| [pitfalls.md](pitfalls.md) | The pitfall list. Come back to it for every design decision |
+| [checks-owed.md](checks-owed.md) | Checks owed: what we know to stop but cannot yet, with prerequisites |

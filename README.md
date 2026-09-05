@@ -28,8 +28,8 @@ decides the language of collaboration. One fewer restatement is one less loss of
 information. That is the whole reason the editions exist.
 
 In `I18N`, `this=` is this repository's language, `default=en` is the default edition,
-and `languages=` lists what has been published. The manifest and the gate scripts live
-in the Chinese repository.
+`languages=` lists what has been published, and `reference=` names the repository where
+the manifest and the gate scripts are maintained (the Chinese one today).
 
 **One contribution covers every published edition.** Whatever language a contributor
 writes in, a submission changes all of them and they are merged together. A submission
@@ -69,8 +69,15 @@ it was brought in step. Comparing it against the current `MANIFEST.sha256` in th
 Chinese repository — where the manifest and the scripts live — shows which files have
 fallen behind. The manifest covers `CLAUDE.md` and `rules/*.md` —
 `CLAUDE.md` is the body of the rules and also fixes the language of collaboration, so
-leaving it out would let the three editions quietly say different things. `VERSION` is identical across all three repositories;
-one bump bumps all three.
+leaving it out would let the editions quietly say different things. `VERSION` is
+identical across every language repository; one bump bumps them all.
+
+**This README is not a source of rules.** The rules proper are `CLAUDE.md` +
+`rules/`, reconciled through `MANIFEST.sha256` and traced per file into each
+translation. Each language repository keeps its own README as a front door: it points,
+it does not legislate. For anything you read here, the authoritative version is in the
+file it points at — including **which paths require a `VERSION` bump**, which is
+defined by `GOVERNED` in `scripts/version-discipline.sh` and nowhere else.
 
 ## Install
 

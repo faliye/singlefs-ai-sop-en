@@ -1,45 +1,58 @@
 ---
 name: decide
-description: 记录或变更 singlefs 的设计决策。定下一条决策、推翻一条旧决策、或发现某个选择会连锁影响其他决策时用它——包含决策记录的格式、状态机、以及和不变量清单/checker 的同步要求。
+description: Record or change a singlefs design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checker.
 ---
+<!-- generated-from: skills/decide/SKILL.md sha256:e5319864188635c2a370138bf795f4b4647ffcc3b14456684993eb59706caa27 -->
 
-# 记一条设计决策
+# Recording a design decision
 
-规则在 `rules/doc-discipline.md`，以及项目本地关于格式/结构演进的规则（若有）。
+The rule lives in `rules/doc-discipline.md`, plus whatever the project has locally
+about format and structure evolution.
 
-## 状态只有三种
+## Only three states
 
-| 状态 | 含义 |
+| State | Meaning |
 |---|---|
-| **已定** | 方向和细节都定了，可以据此写代码 |
-| **半定** | 方向定了、细节未定。**必须写清未定的是哪一条**，否则等同待定 |
-| **待定** | 没定。要写清「定它需要先回答什么」 |
+| **Settled** | Direction and details are both fixed; you can write code against it |
+| **Half-settled** | Direction is fixed, details are not. **Say which detail is open**, or it is merely undecided |
+| **Undecided** | Not decided. Say what has to be answered first |
 
-## 写进 `kb/decisions.md` 的格式
+## Format in `kb/decisions.md`
 
 ```markdown
-## D<n> <决策名> —— <状态>
+## D<n> <name> —— <state>
 
-<结论一句话，用祈使或断言，不要用「我们可能会」。>
+<The conclusion in one sentence, imperative or declarative. Not "we might".>
 
-依据：<为什么。别家的实测数字要带来源与口径，标明未在本工程验证。>
+Basis: <why. Numbers from elsewhere carry their source and measurement basis, and
+are marked as not verified in this project.>
 
-**未定**：<半定时必填，写清缺口。>
+**Open**: <required when half-settled: name the gap.>
 ```
 
-## 硬要求
+## Hard requirements
 
-1. **决策变更必须写推翻依据**，并把旧结论挪进文末「历史版本」——正文不留旧结论。
-2. **改格式必须同步更新 `kb/invariants.md` 和 checker。** 三者不同步的 commit 不收。
-3. **定一条决策前，先对一遍 `kb/pitfalls.md`**，确认没有踩回同一个坑。
-4. 决策之间有连锁的，在两条里**互相注明**，别只写一边。
-5. **定案后发现真正承重的理由变了，也是一次决策变更。** 实验常把「定案时给的理由」
-   换成另一条决定性的；把正文依据换成实测那条并记进变更史，状态不动也要记。
-   正文只留定案那句的话，三个月后没人知道真正撑着它的是哪一条。
+1. **A changed decision must state what overturned it**, and the old conclusion moves
+   into the closing "Revision history" — no old conclusions in the body.
+2. **Changing the format means updating `kb/invariants.md` and the checker in the same
+   change.** A commit where the three disagree is not accepted.
+3. **Before settling a decision, go through `kb/pitfalls.md`** and confirm you are not
+   walking back into the same trap.
+4. Where decisions cascade, **note it on both**, not just one.
+5. **Finding that the reason that actually carries a settled decision has changed is
+   itself a decision change.** Experiments routinely replace "the reason given when we
+   settled it" with a different, decisive one; swap the basis in the body for the
+   measured one and record the change — even when the state does not move.
+   Leave only the original sentence and, three months on, nobody knows what is
+   actually holding it up.
+6. **Touch a clause a person settled, and you owe an open entry in `kb/checks-owed.md`.**
+   A "pending review" note in the body guarantees nothing will ever look at it again —
+   and the person who settled it does not know their ruling changed. Name the decision
+   and the item in the entry; clear it only once the review has happened.
 
-## 什么时候该定，什么时候该拖
+## When to settle and when to wait
 
-判据是：**这条决策会不会改变「第一段代码长什么样」。**
+The criterion: **does this decision change what the first piece of code looks like?**
 
-会 → 现在定。拖着做会返工。
-不会 → 可以拖，标为待定并写清「定它需要先回答什么」。
+Yes → settle it now. Dragging it out means rework.
+No → it can wait; mark it undecided and say what has to be answered first.
