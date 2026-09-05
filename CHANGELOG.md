@@ -4,6 +4,20 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.27 — 2026-09-05
+
+**Fixes an infinite loop 0.0.26 introduced, and adds a timeout to selftest.**
+
+- When `gate-lint` strips arithmetic expansion, the closing `))` is now sought only
+  **after** the `$((`. Searching the whole line for the first `))` hangs: on a line like
+  `if ((okc)); then …; pass=$((pass+1)); fi` the first `))` sits before the `$((`, so the
+  remainder still contains `$((` and never gets shorter. Real prose triggered it at once —
+  nine minutes without finishing, neither red nor green. Fixture `arith2` must run to
+  completion and be green.
+- Both fixture-execution points in `selftest` gain a `timeout` (60s default, override with
+  `SELFTEST_TIMEOUT`). **A hung check is more dangerous than a red one**: in the gate's
+  output it is nothing at all, it simply never comes back.
+
 ## 0.0.26 — 2026-09-05
 
 **Project-local stages come under the gate's own governance, plus three disciplines
