@@ -4,6 +4,34 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.33 — 2026-09-06
+
+**`install.sh` learns to tell "the project has taken this file over" from "the project is
+behind upstream".** It used to judge only "differs from the upstream template", and the two
+look identical under that test. But the kb skeleton and the skill stubs exist to be edited
+by the project — so **any project that touches its own kb can never refresh its version
+stamp again** after the first install, and gate stage 0 stays red forever. Measured on
+singlefs: all 12 "behind" files were the project's own edits (`.claude/kb/INDEX.md` carries
+36 lines of the project's own wording).
+
+A project lists the files it has taken over in `$ROOT/.claude/install-owned`, one entry per
+line, `<relative path>  # why`. **The reason is mandatory**: taking a file over means
+upstream changes to it will never reach you again, and the reason column is where that gets
+faced head-on. The list is always reported in the output — quietly skipping a few
+comparisons looks exactly like this guard never having been implemented.
+
+Two things go red: no reason given; and a path `install.sh` does not lay down at all (such
+an entry does nothing, while leaving people believing that file is already exempt). **A
+broken list blocks on the spot**; the version stamp is not refreshed past it.
+
+The `README.md` line claiming the version stamp "refreshes every time" was wrong and is
+fixed here — it had long since parted ways with what `install.sh` actually does.
+
+Five mutations run one at a time. One of them exposed a blind spot: deleting the "a broken
+list blocks" branch left both existing fixtures **green together** — they also had content
+behind upstream, and that was the path making them red. It took a fixture with nothing else
+behind to isolate it. Self-test 182 → 188.
+
 ## 0.0.32 — 2026-09-06
 
 **gate-lint gains the third rejection shape: a printed `✗`.** Until now it recognized only
