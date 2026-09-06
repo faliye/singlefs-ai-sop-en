@@ -4,6 +4,16 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.29 — 2026-09-06
+
+**The "superseded by X" pattern now fires only on the numbering schemes this SOP governs**
+(`D` decisions / `E` experiments / `C` owed checks / `I` invariants / `A` premises / `O` oracles).
+Measured false positive: a sentence about on-disk bytes — "to rebuild U1 you need U2's original
+bytes — already overwritten by U9" — was reported as an in-place "superseded by" annotation.
+There the word means bytes being written over, not a clause being overturned. The two senses
+collide in one word, and the only thing that separates them is whether the thing doing the
+overwriting is a numbered clause.
+
 ## 0.0.28 — 2026-09-05
 
 **The item-count criterion now recognizes python f-strings.** Recognizing only shell's
