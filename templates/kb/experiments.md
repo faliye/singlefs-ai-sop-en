@@ -8,7 +8,7 @@ conclusions. Changing a criterion after the run makes it a new experiment — re
 
 ---
 
-## E1 <name, 24 characters or fewer> —— not yet run
+## E1 <experiment name, 24 characters or fewer> —— not yet run
 
 <!-- This heading is the registration site for the number: the segment between the
      number and the "——" is its short name. Every citation elsewhere is written

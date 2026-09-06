@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:c690f818432e98e11d3534911e17d1e806c9bd9edf52d43ac8673e0abfaefc0c -->
+<!-- generated-from: rules/evidence-discipline.md sha256:fce253e96ed7b2b2532fb8c3d317e9b4c4a56e85ab260ea36493db2f58741a0d -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -57,6 +57,26 @@ The eventual agreement was three parties jointly inheriting the same error.
 **What to do**: before writing "implementation X works like this" into the brief,
 check it yourself. What you cannot check, mark "unverified", so every party knows not
 to treat that line as a given.
+
+## Evidence kept verbatim must not be edited afterwards
+
+The prompt you sent to a model, the raw output it produced, the log as it was written —
+each of these corresponds one-to-one with an artifact. **Change one character and the
+artifact no longer corresponds to its input**, and nothing on the outside shows it: the
+file is still there, the date is still there, only the sentence "this output came from
+this input" has quietly stopped being true.
+
+So a prompt can only be edited together with a re-run. To add an explanation, open a
+separate file; leave the original alone.
+
+⇒ **The gate has to steer around these directories too.** A check that demands someone
+go back and edit the original forces one of two outcomes: the evidence chain breaks, or
+the check gets bypassed wholesale — both worse than not checking at all.
+`scripts/doc-lint.sh` reads that list from `.claude/doc-lint-exclude` at the project
+root, one entry per line, **each with its reason written out**. An entry pointing at a
+directory that does not exist, or one that excludes no file at all, goes red: an
+exclusion that does nothing leaves people believing those files are already steered
+around.
 
 ## How another project does it is a lead, not evidence
 

@@ -4,6 +4,33 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.30 — 2026-09-06
+
+**The gate in the en and ja repos goes green again.** Two holes, both left by copying one
+set of rules into several language repos:
+
+- `doc-lint`'s fixtures are written in Chinese, while `scripts/` is copied byte-for-byte
+  into every language repo. In the en repo those fixtures were then judged against
+  `## Revision history` — 44 cases red at once, with nothing wrong in doc-lint itself.
+  Language is a property **of the fixtures**, not of the repo: `selftest` now pins it with
+  `DOC_LINT_LANG=zh`. That knob can swap the criteria out, so setting it **prints a line**,
+  and a self-test case watches that the line is still there. The hole dates from 0.0.25,
+  when the criteria became language-dependent; en and ja have been red ever since.
+- The en repo translated the placeholder short names of both D1 and E1 in `templates/kb/`
+  as `<name, 24 characters or fewer>`, colliding with "no short name may be shared by two
+  numbers". Each now carries its own noun; zh and ja already had them apart.
+
+**doc-lint gains an exclusion list: evidence kept verbatim must not be edited afterwards.**
+Directories like `research/prompts/` hold the prompts as they were sent to the model; they
+correspond one-to-one with the artifacts, and changing one character means the artifact no
+longer corresponds to its input. A project declares them in `.claude/doc-lint-exclude`, one
+entry per line, **each with its reason written out**. An entry pointing at a directory that
+does not exist, or one that excludes no file at all, goes red — an exclusion that does
+nothing leaves people believing those files are already steered around. Every exclusion is
+reported in the output: quietly skipping two hundred files looks exactly like the check
+never having been implemented. Rule in `rules/evidence-discipline.md`; seven fixtures,
+including a control that carries no exclusion file.
+
 ## 0.0.29 — 2026-09-06
 
 **The "superseded by X" pattern now fires only on the numbering schemes this SOP governs**
