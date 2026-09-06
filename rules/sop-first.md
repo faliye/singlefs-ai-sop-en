@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:4247027091f87686a263f4b41508caf903fd01eb85154f20bc8b2ddd54889d07 -->
+<!-- generated-from: rules/sop-first.md sha256:dd68bd2779e0e24df982a1ae9b00f9c5fa4f00c7c87f63102187ffa27ec8dff2 -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -55,11 +55,25 @@ Enforced by `scripts/gate-lint.sh`, which covers both shapes of rejection:
 |---|---|---|
 | `bad` | the `howto` right after it | a `howto` within 5 lines counting the `bad` itself (comment lines do not count) |
 | `die` | **its own second argument** (`die "what blocked" "what to do"`) | a `die` carrying only one argument fails |
+| a printed `✗` (an `echo`, or a `print` in embedded python) | the `→` line before the next rejection | no `→` in between fails |
 
 The `die` row is not an afterthought: `die` is `bad` + `exit`, so it is a rejection
 too. For as long as the gate only recognised `bad`, a rejection as remedy-free as
 `die "unit tests failed"` sat right on the gate path, and 17 `die` sites were exempt
 as a group.
+
+The third row covers **a project's own local stages**. Most of them do not source
+`lib.sh`; they `echo "  ✗ …"` directly, or put the criterion inside embedded python:
+`print('  ✗ …')` — neither of the first two rows reaches them. Measured on singlefs's
+local stages: 46 such rejections, all exempt until now, 14 of them with no next step
+at all.
+
+The window is not 5 lines here: python often prints one `✗`, then loops through the
+offending items, and only then gives the remedy — 5 lines would misjudge the whole
+batch. So the criterion is "the remedy appears **before the next rejection**". Both
+exemptions must be **written out explicitly**; nothing gets guessed. A per-item line
+inside a loop carries `# gate-lint:detail` (its remedy lives on the summary), and a
+summary line carries `# gate-lint:summary`.
 
 When you cannot write the `howto`, **do not add the check yet**: if you cannot
 state the next step, the criterion behind the check is not clear to you either.

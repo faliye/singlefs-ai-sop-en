@@ -4,6 +4,37 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.32 — 2026-09-06
+
+**gate-lint gains the third rejection shape: a printed `✗`.** Until now it recognized only
+`lib.sh`'s `bad` and `die`, while **a project's own local stages mostly do not source
+`lib.sh`** — they `echo "  ✗ …"` directly, or put the criterion inside embedded python:
+`print('  ✗ …')`. That whole class of rejection had never been checked.
+
+Measured on singlefs's local stages: 46 such rejections, all exempt; with the check in
+place, **14 of them have no next step at all** (`15-research-build.sh`'s "no cargo",
+`70-citations.sh`'s "cannot find $S" — both `exit 1` without telling anyone what to do).
+Rejections covered by gate-lint: 125 → 170.
+
+Two parts of the criterion were calibrated on the real corpus:
+
+- **The window is not 5 lines; it runs to the next rejection.** Python often prints one
+  `✗`, then loops through the offending items, and only then gives the remedy — a 5-line
+  window misjudges that whole batch (fixture `printrejok` watches this).
+- **Heredoc bodies are not read as code, except interpreter heredocs.** The `print` inside
+  `python3 - <<'PY'` really is shown to the submitter; skipping it as before would leave
+  python-implemented stages blind as a group (fixture `printrejpy` watches this).
+
+Both exemptions must be written out explicitly; nothing gets guessed. A per-item line
+inside a loop carries `# gate-lint:detail`, a summary line carries `# gate-lint:summary`.
+
+`rules/sop-first.md` gains a third row in its table of rejection shapes. Four fixtures,
+four mutations run one at a time, each caught by exactly one case. Self-test 178 → 182.
+
+⚠️ **This turns singlefs's gate red in 14 places**, all inside its own `.claude/gate.d/`.
+The three upstream repos are unaffected — the shared package has no printed rejections at
+all; everything goes through `bad`.
+
 ## 0.0.31 — 2026-09-06
 
 **New rule `rules/pushback-discipline.md`: a proposal is not exempt because of who made
