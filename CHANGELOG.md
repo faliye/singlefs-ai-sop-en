@@ -4,6 +4,43 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.31 — 2026-09-06
+
+**New rule `rules/pushback-discipline.md`: a proposal is not exempt because of who made
+it.** A plan the user proposes goes through the same gate as a plan from anywhere else.
+When it contradicts measured data, or a fact already checked, three things get said
+*before* anything is touched: which item it contradicts (with its source), what goes
+wrong if you follow it (and what observation would show that happening), and whether a
+third path exists. If they restate it, do it and stop arguing — but **the warning gets
+recorded**. **Finding the mismatch only after the work is done changes nothing: say so, and
+withdraw the whole thing if that is what it takes** — cost is the user's to carry, code
+answers for correctness, and "we already built this much" is not a reason to continue.
+Among code changes nothing cannot be taken back: reverting used to cost human time, that
+part is the machine's work now, and tens of thousands of lines is not a different order of
+magnitude from a few hundred. What genuinely cannot be taken back — `git checkout`,
+`rm -rf`, permanent outward commitments — is `command-safety.md`'s business.
+
+**Warnings live in `.claude/warnings/<date>.md`**, one file per date, one `##` section per
+warning, all four items present: Proposal / Objection / Known risk / Outcome. Everywhere
+else links here and copies nothing (`kb-discipline.md` §4). One file per date exists so
+that **no old file ever has to be edited** — a warning, once written, is the record of
+that day. `install.sh` lays the directory out in the project.
+
+**Two new doc-lint checks**:
+
+- Files under `.claude/warnings/` must be named `YYYY-MM-DD.md`, and every `##` section
+  must carry all four items. The item names are taken per language and all three run:
+  the check recognizes fixed item names rather than guessing semantics from a
+  character blacklist, so it does not fall into the "no word list, not implemented" tier.
+- `rules/*.md` and the `@rules/` references in `CLAUDE.md` must match item for item. Both
+  directions fail silently: an unreferenced rule never enters the context yet looks
+  exactly like one in force, and a reference to a missing file simply does not expand,
+  leaving CLAUDE.md reading as complete. This one is what this round itself needed —
+  adding a rule file and forgetting to list it in CLAUDE.md went red nowhere.
+
+Seven fixtures; five mutations run one at a time, each caught by exactly one case.
+Self-test 171 → 178 cases.
+
 ## 0.0.30 — 2026-09-06
 
 **The gate in the en and ja repos goes green again.** Two holes, both left by copying one
