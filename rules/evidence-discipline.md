@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:fce253e96ed7b2b2532fb8c3d317e9b4c4a56e85ab260ea36493db2f58741a0d -->
+<!-- generated-from: rules/evidence-discipline.md sha256:68e528bc661a84c34fd4c022d3db500213b50c05e14ee8c0a3473cc6fd6ffc55 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -174,6 +174,27 @@ cell by cell" (three of the four cells were not) → "slightly less" (wrong dire
 ⇒ **Quote the artifact line whole, with its filename**; summarize only the one cell you
 computed yourself. The fix is not "be more careful" — care leaves no trace, copying does.
 
+### After a re-run, check the prose back against it — a green replay does not mean the prose is right
+
+Re-run an artifact and every number the prose quotes from it has to be checked back, one by
+one. **A green replay does not constitute "the numbers in the prose are right"**: the replay
+pins which range the conclusion lands in, and the wider that range, the further the prose can
+drift inside it — and it drifts toward the number the writer happened to remember.
+
+Measured (2026-09-06): an experiment's prose said "durable semantics is 1.475× slower",
+"durable ÷ nosync = 22.33×", "the injected 5 ms came back as 5 123 506 ns", while its own
+kept artifact says, verbatim, 1.625× / 30.36× / 5 199 857 ns. All three sit inside the
+replay's range assertions ([1.15, 2.10], [10, 500], [4.5 ms, 5.5 ms]) — **the gate was all
+green**.
+
+⇒ The same governs **claims a single command could count**: "N unit tests", "M mutations",
+"K lines of artifact". They look decorative; they are in fact the measurement basis of how
+strong the evidence is, and nothing says a word when they drift. Five such claims were found
+disagreeing with the source or the artifact in one repository on one day (unit-test count off
+by 1, mutation count off by 3, line counts off by 6 and 9). **A number a single command can
+count should be counted by that command**, not left to the writer to remember to come back
+and fix it.
+
 ## When you write a new criterion, sweep it back over the entries already on the books
 
 **A criterion applied to half the cases will be used by the next person on the lenient
@@ -183,6 +204,29 @@ the author swung the ruler only at the newcomer.
 
 ⇒ Once the criterion is written, ask: **what does it say about the entries already
 registered?** No answer means you are not done writing it.
+
+### Withdrawing a number or a conclusion also means sweeping for who cites it
+
+Same discipline, with the object swapped for a value or a clause that has been withdrawn
+or rewritten. It hides better than the case above: whoever withdrew it usually did sweep
+a few places, so they have every reason to believe they finished, and the one they missed
+does not surface for days.
+
+**Criterion**: after withdrawing, ask "**who else in this repository still uses this
+number**". You are done only when you can produce that list. The scope is the whole
+repository, not "the places I remember" — memory hands you exactly the easy ones.
+
+Measured (2026-09-06): when the width of a location entry was rewritten, the decision text
+itself said "this item settles a number that never went through the decision process and
+had already been consumed", and it named and swept **two** downstream derived numbers.
+Three days later a third citation in another document still carried the old value, was
+copied into the background material of a three-way argument, and **all three legs
+inherited it** — every argument resting on that number was voided for the whole round.
+The one who withdrew it swept two places, missed one, and did not know it.
+
+⇒ This and "background material fed to a multi-party argument must itself be checked
+first" are two ends of one hole: at one end the citer did not re-check, at the other the
+withdrawer did not sweep clean. **Both ends have to be plugged.**
 
 ## The backward-reasoning gap specific to filesystems
 

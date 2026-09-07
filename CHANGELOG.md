@@ -4,6 +4,74 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.35 — 2026-09-06
+
+**`rules/show-me-test.md`, in "turn traps you have hit into checks that fail", gains a
+subsection on reach: a check standing inside one apparatus does not govern the next one.**
+Assertions and mutation testing only take effect inside the apparatus they live in; stand
+up a second apparatus, model the same thing again from scratch, and that check will not say
+a word.
+
+Measured in singlefs (2026-09-06): a counting model took the "capacity × fill rate" budget
+for the number of objects of one kind and added a second kind on top of it, which is 126%
+of a disk's worth of objects; fixed the same day, with an assertion left behind to go red.
+Hours later another model made the same mistake (135%), and that assertion, living in
+another apparatus, said nothing — the new apparatus had its own unit tests green, every
+mutation caught, the gate green, while the two models reported numbers 1.5× apart for the
+same physical quantity with nothing comparing them, and the wrong number went into a
+settled clause.
+
+The criterion therefore changes from "was this trap turned into a check that goes red" to
+"**which layer is this trap on**": a trap in the behaviour of one piece of code takes a
+check next to that code; a trap in the **measurement basis** (how the same quantity is to
+be computed) takes a **cross-apparatus** check that forces the two onto the same number.
+The quick criterion is "stand up a second apparatus and do it again from scratch — would
+you step into it twice?" The section also names where whoever fixes the trap stops most
+easily: they really did turn it into a check that goes red, the evidence is complete and
+the gate is green, so they never ask again how far that check reaches.
+
+**`rules/evidence-discipline.md`, in "quote an artifact by copying the line whole", gains a
+subsection: after a re-run, check the prose back against it — a green replay does not mean
+the prose is right.** The replay pins which range the conclusion lands in, and the wider
+that range, the further the prose can drift inside it. Measured: an experiment's prose said
+1.475× / 22.33× / 5 123 506 ns while its own kept artifact says, verbatim, 1.625× / 30.36×
+/ 5 199 857 ns; all three sit inside the range assertions and the gate was green. The same
+subsection governs claims a single command could count — "N unit tests", "M mutations", "K
+lines of artifact" — five of which were found disagreeing with the source or the artifact
+in one repository on one day.
+
+Both are rule text only, with no new gate stage: a cross-apparatus check first needs a
+machine-readable annotation on artifacts saying which quantity a number is, and this
+package has none; the machine-checkable place for counting claims is each project's own
+local stages.
+
+## 0.0.34 — 2026-09-06
+
+**`rules/evidence-discipline.md`, in the section on sweeping a new criterion back over the
+entries already on the books, gains a subsection: withdrawing a number or a conclusion
+also means sweeping for who cites it.** Same discipline, different object, and it hides
+better — whoever withdrew it usually did sweep a few places, so they have every reason to
+believe they finished, and the one they missed surfaces days later.
+
+Measured in singlefs (2026-09-06): when the width of a location entry was rewritten, that
+decision's own text said "this item settles a number that never went through the decision
+process and had already been consumed", and it named and swept two downstream derived
+numbers. Three days later a third citation in another document still carried the old
+value, was copied into the background material of a three-way argument, all three legs
+inherited it, and every argument resting on that number was voided for the whole round.
+Two places swept, one missed, and the one who swept did not know it.
+
+The criterion is written as: you have finished withdrawing only when you can produce the
+list of everything in the repository still using that number. The scope is stated as the
+whole repository rather than memory, because memory hands you exactly the easy ones. The
+section also states that this and the existing "background material fed to a multi-party
+argument must itself be checked first" are two ends of one hole, and that both ends have
+to be plugged.
+
+Rule text only, no new gate stage: there is no machine-checkable form today, since
+deciding that a number was withdrawn needs a withdrawal registry and this package has
+none. A consumer that wants the check should put it in its own local stages.
+
 ## 0.0.33 — 2026-09-06
 
 **`install.sh` learns to tell "the project has taken this file over" from "the project is

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:dd2e7f18fb1211af58b60c208a4a1a636c69baa283e2c257fa515eb79a650240 -->
+<!-- generated-from: rules/show-me-test.md sha256:1a0f7bb6997017a680b046601ebaa71de1f8bdd64df9a8ccecf7c658df7c9051 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -75,6 +75,36 @@ that refuses to run at that moment does.** When a new trap is found, the first
 reaction is "how does this become a red line in the gate", not "which document does
 this go in".
 
+### But first ask which layer the trap is on: inside one apparatus, or in the measurement basis
+
+**A check standing inside one apparatus does not govern the next one.** Assertions and
+mutation testing only take effect inside the apparatus they live in; stand up a second
+apparatus, model the same thing again from scratch, and that check will not say a word.
+
+Measured (2026-09-06): a counting model took the "capacity × fill rate" budget for the
+number of objects of one kind, then added a second kind on top of it — 126% of a disk's
+worth of objects. It was fixed the same day, with an assertion left behind to go red.
+**Hours later another model made the same mistake** (135% this time), and that assertion,
+living in a different apparatus, said nothing: the new apparatus had its own unit tests
+green, every mutation caught, the gate green. Two models reported numbers 1.5× apart for
+**the same physical quantity** and nothing anywhere compared them. The wrong number went
+into a settled clause.
+
+⇒ **The criterion is not "was this trap turned into a check that goes red", it is "which
+layer is this trap on"**:
+
+| Where the trap is | Where the check goes |
+|---|---|
+| in the behaviour of one piece of code | next to that code is enough |
+| **in the measurement basis of the model** (how the same quantity is to be computed, whether the boundary counts, what the unit is) | **between apparatuses**: when two of them compute the same quantity, a check must force them onto the same number, and go red when they disagree |
+
+**Quick criterion**: stand up a second apparatus, do the same thing from scratch — would
+you step into it again? Yes ⇒ the trap is in the measurement basis, and only a
+cross-apparatus check helps.
+⚠️ This is where whoever fixes the trap stops most easily: they really did turn it into a
+check that goes red, **the evidence is complete and the gate is green**, so they never ask
+again how far that check reaches.
+
 ## The final criterion is QEMU/KVM stress testing
 
 Unit tests and model-based differential testing are fast feedback. **They are not
@@ -121,6 +151,8 @@ silent error this project most wants to avoid.
 | the litmus declaration is itself wrong | declared Sometimes, measured Sometimes → "matches". **Without a control case** that proves nothing |
 | the invariant itself is wrong | the checker will faithfully check a wrong rule, all green |
 | the covered path is not the one that breaks | coverage is not correctness |
+| the number in the prose disagrees with its own artifact | the replay's **range** assertion pins only which band the conclusion lands in, not the number in the prose: the wider the range, the further the prose can drift (measured: the prose said 1.475×, the kept artifact says 1.625×, the range is [1.15, 2.10] — all green) |
+| two apparatuses compute different numbers for the same quantity | assertions and mutations take effect **inside one apparatus**; across apparatuses nothing is comparing anything |
 | the design is wrong | the gate cannot reach this layer at all |
 
 ## Corollaries
