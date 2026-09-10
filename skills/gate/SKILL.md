@@ -2,7 +2,7 @@
 name: gate
 description: Run singlefs's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:d8dfc227593ec167b91970931e06b400853b9bc2f9c980a4ecd1879c6a6c3469 -->
+<!-- generated-from: skills/gate/SKILL.md sha256:786e9e234520fcd537261a43d8490e2d2dc6a31410bfbc05b33d93782b554cad -->
 
 # The acceptance gate
 
@@ -26,9 +26,10 @@ GATE_BASE=<commit> bash .claude/scripts/gate.sh   # pick the diff base
 | Gate self-check | Some rejection gives no way out (a `bad` with no `howto`, or a `die` carrying one argument) |
 | Gate discriminating power | A fixture was judged against expectation — **the gate itself is broken**; fix that before anything else |
 | Shell discipline | A script kills processes by pattern match, or carries a value out of a subshell through a variable |
-| Document discipline | History statements in body text, or a kb number cited without its short name. See `rules/doc-discipline.md` |
+| Document discipline | History statements in body text, a kb number cited without its short name, or a CLAUDE.md that does not `@` every rule. See `rules/writing-discipline.md` |
+| Naming discipline | A name we declare in a `.rs` file is a single letter or a common abbreviation, or `.claude/abbreviations` / `.claude/naming-lint-exclude` is malformed. See `rules/code-discipline.md` |
 | Show me test | `crates/*/src` changed with no test. **This one is not to be bypassed**; see `rules/show-me-test.md` |
-| Build and unit tests | Genuinely broken, or cargo is missing |
+| Build and unit tests | Genuinely broken, or cargo is missing. clippy runs with `-D warnings`, and a `_ =>` arm on an enum that is a closed set is refused as well |
 | Project-local stages | Some local check in `.claude/gate.d/` failed, or could not be read |
 | LKMM | A litmus verdict disagrees with its declaration, or a Never has no paired control |
 

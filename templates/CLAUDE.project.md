@@ -1,4 +1,4 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:64d43f9ae51f9eb8988adbeab22381e802f7aef2d69bcb6e772709910e7939d5 -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:0344edca522bad91dc47e1b1471194004a25d7ea7463b5b3498fdf88111a3cd3 -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
@@ -10,15 +10,15 @@ the singlefs main line. No longer.>
 @.claude/singlefs-ai-sop/rules/sop-first.md
 @.claude/singlefs-ai-sop/rules/show-me-test.md
 @.claude/singlefs-ai-sop/rules/machine-first.md
-@.claude/singlefs-ai-sop/rules/doc-discipline.md
+@.claude/singlefs-ai-sop/rules/code-discipline.md
+@.claude/singlefs-ai-sop/rules/writing-discipline.md
 @.claude/singlefs-ai-sop/rules/design-doc-discipline.md
 @.claude/singlefs-ai-sop/rules/kb-discipline.md
 @.claude/singlefs-ai-sop/rules/test-discipline.md
 @.claude/singlefs-ai-sop/rules/evidence-discipline.md
 @.claude/singlefs-ai-sop/rules/verify-before-claiming.md
+@.claude/singlefs-ai-sop/rules/pushback-discipline.md
 @.claude/singlefs-ai-sop/rules/command-safety.md
-@.claude/singlefs-ai-sop/rules/writing-economy.md
-@.claude/singlefs-ai-sop/rules/writing-style.md
 @.claude/singlefs-ai-sop/rules/session-wrapup.md
 
 **Rules specific to filesystem design** (transactions, crash consistency, on-disk
@@ -57,6 +57,7 @@ bash .claude/scripts/lkmm.sh          # memory ordering (herd7 + litmus/)
 bash .claude/scripts/qemu.sh --selftest    # QEMU harness self-test
 bash .claude/scripts/gate-lint.sh     # the gate itself: does every rejection give a next step
 bash .claude/scripts/shell-lint.sh    # shell discipline: pattern-matched kills, values carried out of subshells
+bash .claude/scripts/naming-lint.sh   # naming discipline: single-letter names and common abbreviations in .rs
 bash .claude/scripts/env.sh           # environment check
 ```
 

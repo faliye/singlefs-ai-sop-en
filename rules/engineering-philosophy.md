@@ -1,4 +1,4 @@
-<!-- generated-from: rules/engineering-philosophy.md sha256:6e4b27f7fc6dc5810f8942cfca38a5fe31c81584dcab3ecaf64c2f0c522aa973 -->
+<!-- generated-from: rules/engineering-philosophy.md sha256:0be2426b15bd92d9b142e18142e0abb13d0154de08fc9725202faa29df1fc588 -->
 <!-- doc-lint:rule-definition -->
 # Engineering Philosophy
 
@@ -37,7 +37,7 @@ one premise in two places and the two places will eventually disagree.
 So this project's stance toward established best practice is to **follow it
 critically, not by default.** Each rule gets re-asked: what problem did it
 originally solve, and does that problem still exist? The procedure is in
-`machine-first.md`.
+`machine-first.md`; what it concluded is in `code-discipline.md`.
 
 ## What each axis optimises for
 
@@ -65,104 +65,18 @@ information content):
 
 | Item | Why it stays |
 |---|---|
-| Naming | **A name is information, not decoration.** `fn f(a: u64, b: u64)` carries a whole layer of meaning less than `fn commit_txn(gen: Generation, root: Logical)`, and a model cannot recover it either. **Function names in detail: see "Function names have no length cap, but no abbreviations either"** |
+| Naming | **A name is information, not decoration**: meaning left out of a name is meaning a model cannot recover, even by reading the implementation |
 | One responsibility per function | a function does one **independently verifiable** thing — that sets its length, not screen height |
-| **Bounded path count** | how many cases does exhaustive coverage of this code need? If you can state it and it is bounded → verifiable. **Note: path count, not nesting depth**, see "Nesting depth itself is not capped" |
+| **Bounded path count** | how many cases does exhaustive coverage of this code's control flow need? If you cannot state it, or it is unbounded, it cannot be verified. **It is path count, not nesting depth** — and it is a necessary condition for verifiability, not a sufficient one |
 | Consistent conventions | inconsistent conventions defeat mechanical checking — this is a different thing from "design uniformity"; do not conflate them |
 
 **The criterion is still the same one**: does this make verification easier, or
 does it only make things easier on the eye? All four in the table make verification
 easier, so they stay — **with their reasons rewritten in terms of verification and
 information, no longer hung on "readability".**
-
-### Function names have no length cap, but no abbreviations either
-
-The length cap is dropped for the same reason "keep functions short" was relaxed:
-it measured line width and human short-term memory. Ten more characters for one
-more layer of meaning is always a good trade on the machine's side.
-
-**An abbreviation is pure loss**: it saves characters and drops meaning, and the
-model cannot recover it — worse, it will fill it in. `cnt` means block count in
-one place and retry count in another, and the model that retrieves one of them
-will not say "I can't tell"; it will proceed on the most common reading.
-There is exactly one exception: domain abbreviations that have an entry in the
-glossary (`lba`, `crc`) — those are **proper names**, and the criterion is
-"is there one authoritative definition", not "will everyone recognise it".
-
-**The criterion: stripped of comments and of the call site, does the name alone
-say what it does — and what it does not do?**
-
-A good name also carries **context constraints** — putting preconditions and
-scope into the name lifts part of the contract up into the signature:
-
-| Name | What it constrains |
-|---|---|
-| `write_node` | nothing: where it writes, whether it was verified, whether it can be cut short by a crash — all of it requires reading the implementation |
-| `append_verified_node_to_journal` | appends rather than overwrites, the argument is already verified, the destination is the journal — three preconditions stated in the name |
-
-**Constraints the type system can express go into types; those it cannot go into
-names — neither belongs in a comment.** Comments drift away from the
-implementation; names and types do not.
-
-This one cannot be checked mechanically, so it is a review criterion, not a gate
-item (`show-me-test.md`, "What the gate can and cannot prove"). **Failing to
-produce such a name usually means the function's job is not yet pinned down.**
-
-### Nesting depth itself is not capped
-
-Rules like "no more than three levels of nesting" measure the wrong thing. What
-actually determines verifiability is **path count**:
-
-| | Paths | Testable? |
-|---|---|---|
-| 12 nested `for` loops over a 12-dimensional structure | **1** | fully testable; depth does not matter |
-| 12 nested independent `if/else` | **2¹²** | not testable |
-| 3 nested independent `if/else` | 8 | barely |
-
-**Loop nesting adds almost no paths; conditional nesting multiplies them
-exponentially.** The old rule capped both together because both are equally hard
-on a human to read — that is a human constraint, not a verification constraint.
-
-So: **any depth is fine, provided (1) the path count is statable and bounded, and
-(2) the meaning of each level is explicit.** The second means each level's
-iteration target has a name and a type, not `a[i][j][k][l]` — the problem with
-that form is not that it is deep, it is that it **carries no information**, which
-is the same rule as "a name is information".
-
-### An example: where the meaning should live
-
-Three ways to write the same thing, worst to best:
-
-```rust
-// 1. Meaning in a comment — the traditional form, and the worst
-// dim0: ethnicity  dim1: gender  dim2: age band
-pop[i][j][k]
-
-// 2. Meaning in the names — long-winded by old taste, but machines like it
-num_china_people[han][woman][teenager_18_to_24]
-
-// 3. Meaning in the types — best; getting a dimension wrong will not compile
-num_china_people[Ethnicity::Han][Gender::Woman][AgeBand::T18to24]
-```
-
-The first is **compression done so it would fit in a human head**: names cut to
-the shortest, meaning moved into a comment. In the human era that was reasonable —
-line width was limited, screens were limited. But **a comment can drift from the
-code; a name cannot**, because the name *is* the code.
-
-The second used to draw "too long — you can see it is a 3-D array, why spell it
-out". That is human taste. To a machine it is pure gain: every dimension is
-self-describing, and **you can judge whether an access is correct without any
-context**.
-
-The third pushes the information from "readable" to "checkable" — **swap two
-dimensions and it will not compile**. This is the same rule as `machine-first.md`'s
-"prefer types that make invalid states unrepresentable over comments explaining
-constraints", and it shares a root with this project's newtype discipline
-(logical address / physical address / generation are each their own type).
-
-**Criterion**: does this piece of meaning live in a comment, in a name, or in a
-type? **Later is better, because later is harder to drift from the implementation.**
+**How this lands in code is spelled out in `code-discipline.md`**: no length cap on names,
+no abbreviations, no single letters; no cap on nesting depth, but a bounded path count;
+meaning goes into a type when it can, into a name when it cannot, and never into a comment.
 
 ## Corollary: where human attention should go
 
@@ -195,6 +109,6 @@ semantic correctness.** Below it is the implementation axis; above it, review.
 
 | Axis | Lands in |
 |---|---|
-| Implementation | `machine-first.md`, `kb-discipline.md`, plus each project's own design discipline |
+| Implementation | `machine-first.md`, `code-discipline.md`, `kb-discipline.md`, plus each project's own design discipline |
 | Review | the howto requirement in `show-me-test.md`, `design-doc-discipline.md`, the basis requirement for decision records |
 | The line | `show-me-test.md`, "what the gate can and cannot prove" |

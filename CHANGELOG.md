@@ -4,6 +4,68 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.41 — 2026-09-10
+
+**New `rules/code-discipline.md`: how machine-first lands in code.** There is one principle: past best
+practice does not get to decide for us. `machine-first.md` said why the old rules need re-examining and
+how to examine them, but not how to write code afterwards; the naming point (no length cap on names, no
+abbreviations) lived in `engineering-philosophy.md` as a review criterion, not a rule. The new file turns
+these into rules: names, branches, types, errors, functions and nesting, comments — plus a table grouped
+by source: 85 popular practices in 10 groups from *Clean Code*, SOLID, *Refactoring*, *The Pragmatic
+Programmer*, the Rust API Guidelines, the Linux kernel coding style and others, each with a disposition
+and how we write it. The code-level conclusions moved over from the other two files, which keep only the
+philosophy and the design- and process-level tables; the abbreviated names in the moved examples
+(`dev`, `m`, `Lba`, `commit_txn`, `num_`) are spelled out.
+
+The same version tightens six statements after review: path count measures control flow only and is not
+the whole of verification difficulty — a loop's iteration bound, cross-iteration state and early exits
+must be stated separately; the ban on wildcard arms applies to closed sets, and where the semantics allow
+unknown values, "unknown" becomes an explicit variant and the `match` stays exhaustive; the unit of "one
+concept, one name" is the semantic concept, not the word; a name that stands without its module path is
+stated as a deliberate choice to carry namespace information in the name; `as_` / `to_` / `into_` are
+conventions, not guarantees, with the C-CONV table as the authority; error variants are split by the
+decision the caller must make, not expanded one per underlying cause. "A bounded path count means it can
+be verified" in `engineering-philosophy.md` and `machine-first.md` becomes a necessary condition
+accordingly.
+
+**New gate stage "Naming discipline" (`scripts/naming-lint.sh`).** It scans the names we declare in
+every `.rs` in the project and flags single letters and common abbreviations (a list of 144, each with
+what to write instead). A project registers domain abbreviations in `.claude/abbreviations` — and may
+register its own numbers as a class (`e<数字>`) — and declares directories or single files not to scan
+in `.claude/naming-lint-exclude` (when sweeping old code, list files one by one and delete a line as
+each is fixed); both need a reason. The in-line exemption is
+`// naming-lint:external <reason>`. Method names in trait implementations, `extern` blocks and file
+names fixed by Cargo are not judged. Names in shell scripts are not yet a check; `gate.sh` lists it
+among the unimplemented stages.
+12 fixture sets; 39 mutations applied to a copy (removing one exemption, one kind of declaration site,
+one step of stripping comments or strings) were all caught by the fixtures.
+A dry run on singlefs's research code (119 files, 16792 names, no abbreviations registered) reported
+7246 hits; sampling each kind of hit found two kinds of false positive, both fixed: `lib.rs`, whose name
+Cargo fixes, and the English article `a` in the middle of a name.
+
+**`scripts/check.sh` runs clippy with seven more code-discipline lints**: `wildcard_enum_match_arm`,
+`allow_attributes_without_reason`, `cast_possible_truncation`, `cast_sign_loss`, `cast_possible_wrap`,
+`undocumented_unsafe_blocks`, `shadow_unrelated`. Measured on a sample crate: with one violation of each
+planted, all seven went red; the version written per the rules passed all four steps — format, clippy,
+build, unit tests.
+
+**`doc-discipline.md`, `writing-economy.md` and `writing-style.md` are merged into
+`rules/writing-discipline.md`.** All three govern text written for people (who it is for, how long, how
+it is said). The merged text was compared line by line: no sentence of the three bodies was lost; only
+the sentences pointing from one of the three files to another were dropped. Everything that referenced
+them now points at the new file.
+
+**doc-lint's rule-list check extends to the template and to projects.** It used to check only that the
+SOP repository's `CLAUDE.md` and `rules/` match item for item; now `templates/CLAUDE.project.md`, and a
+project's `CLAUDE.md` against its installed copy, are checked by the same criterion.
+Two measured gaps forced this: the template has never referenced `pushback-discipline` since it was
+added in 0.0.31; singlefs's `CLAUDE.md` has never `@`-referenced `engineering-philosophy`, `sop-first`,
+`pushback-discipline` or `writing-style`, so those four were never loaded into context in singlefs
+sessions. The template is now complete.
+
+`GLOSSARY.md` revises the notes on "abbreviation" and "path count" and adds "abbreviation registry" and
+"wildcard arm".
+
 ## 0.0.40 — 2026-09-10
 
 **New gate stage "CHANGELOG continuity" (`scripts/changelog-lint.sh`): every version gets its

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/design-doc-discipline.md sha256:962f3ded4ea41b3189ba68e75e77e8c59e0404c3017f7fca424cccf87e6154ed -->
+<!-- generated-from: rules/design-doc-discipline.md sha256:4711d347e35efac603f0bef8ed2a2ad58de58fca5bd2f33f39a528424c0923c1 -->
 <!-- doc-lint:rule-definition -->
 # Design document discipline
 
@@ -46,8 +46,8 @@ Enforced by `scripts/doc-lint.sh`.
 
 ## 2. Length must match the weight of the change
 
-The criterion and the yardstick are both in `writing-economy.md`; they are not
-copied here.
+The criterion and the yardstick are both in the "Length must match the weight of the
+change" section of `writing-discipline.md`; they are not copied here.
 
 ## 3. Where persuasion is needed, persuade properly
 

@@ -2,11 +2,11 @@
 name: decide
 description: Record or change a singlefs design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checker.
 ---
-<!-- generated-from: skills/decide/SKILL.md sha256:b1fc2afb7ea3e8c795b4bb4bc68ed0b40c7ccca72fa60782745b1e291e4b5040 -->
+<!-- generated-from: skills/decide/SKILL.md sha256:6496997e3ab634f94b12e927cb3f35da6960b395c09e61058196d28a4944e6ba -->
 
 # Recording a design decision
 
-The rule lives in `rules/doc-discipline.md`, plus whatever the project has locally
+The rule lives in `rules/kb-discipline.md`, plus whatever the project has locally
 about format and structure evolution.
 
 ## Only three states

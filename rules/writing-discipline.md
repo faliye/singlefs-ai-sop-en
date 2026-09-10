@@ -1,6 +1,29 @@
-<!-- generated-from: rules/writing-economy.md sha256:2af558e3574ccb016b80d85981c0cfd214604dcf922356530adb23d889807e48 -->
+<!-- generated-from: rules/writing-discipline.md sha256:ddd3ebe829c3aef9c1a6af13a7d16ddb64c1da223f28dcae649a505cfe55b5f2 -->
 <!-- doc-lint:rule-definition -->
-# Explanation length must match the weight of the change
+# Writing discipline
+
+This covers everything written for people to read: rules, README, design notes, the kb,
+commit messages, code comments, gate failure messages. Three things: first work out who
+it is for, make the length match the weight of the change, and write plainly.
+
+## First work out who this is for
+
+**Mixing them serves neither.** Three kinds of document, three ways of writing:
+
+| Kind | Who uses it | Goal | Rule |
+|---|---|---|---|
+| **Design docs** | humans read them through | make people **agree** and **get started** | `design-doc-discipline.md` |
+| **Engineering kb** | model retrieval | keep the model from **making things up** | `kb-discipline.md` |
+| **Rules** | execution | must be turnable into a check that fails | `rules/`, see `sop-first.md` |
+
+Before writing, ask: will this be read start to finish by a person, or pulled out
+one item at a time by a model? Different answers, different writing.
+
+**The one rule common to all three**: body text states only the current state;
+history goes to the end. But the *reason* differs for each kind, and is stated in
+each rule.
+
+## Length must match the weight of the change
 
 **The ruler: for a change of a few to a few dozen lines, the commit body caps at two
 paragraphs and new code comments cap at one line.** If it will not fit, first suspect
@@ -10,7 +33,7 @@ you are writing something that should not be written.
 reviews it.** However solid the argument, that is not a reason to write all of it out
 — the paragraph you feel is "load-bearing" is often exactly the one to cut.
 
-## As short as possible without losing content
+### As short as possible without losing content
 
 **The test: if this sentence goes, what does the reader no longer know?** If you cannot
 name what was lost, cut it — "it reads more smoothly" and "it looks more thorough" are
@@ -53,7 +76,7 @@ Three forms of going too far, each defensible as "well, it is shorter":
 - Forward: if I **delete** this sentence, what does the reader know less? Cannot say → delete it.
 - Reverse: if I **keep** this sentence, what does the reader know more? Can say → it stays, however short you wanted to be.
 
-## Hard data does not count against the ruler
+### Hard data does not count against the ruler
 
 Core measurements provided for review do not count toward the length: a reviewer can
 take them and verify for themselves. They are evidence, not "please take my word".
@@ -66,7 +89,7 @@ take them and verify for themselves. They are evidence, not "please take my word
 
 **Include only the few decisive numbers**; the full record stays in `kb/` or `records/`.
 
-## Cut these categories
+### Cut these categories
 
 1. **Subjective assessment.** Reporting your impression is not an argument; replace it
    with a checkable fact.
@@ -83,3 +106,51 @@ take them and verify for themselves. They are evidence, not "please take my word
 7. **Quoted source code.** The reader has the source tree. Same for logs and dumps:
    state the conclusion. The exception is decisive evidence the reader could not
    verify without it.
+
+## Write plainly
+
+**Write in plain modern English. Say it straight; don't circle around it.**
+
+### Four things not to write
+
+| Don't | What it looks like | Instead |
+|---|---|---|
+| **Bureaucratic padding** | "in the event that", "with respect to", "it is the case that", "perform an analysis of", "make use of" | "if", "about", drop it, "analyse", "use" |
+| **Archaic or literary register** | "hereinafter", "thus it follows", "whereupon", "one might posit" | Say what it is and what follows |
+| **Concessions that concede nothing** | "While X, however Y" where X and Y do not actually conflict | Keep only the half you mean |
+| **Over-explaining** | "as is well known", "needless to say", "it goes without saying"; stating a conclusion and then restating its negation | Say it once |
+
+### The test
+
+**Read it out loud.** Would you say this sentence to a colleague? If not, rewrite it.
+
+Three concrete questions:
+
+- Do people use this word when talking? If not, swap it.
+- Is this sentence explaining the previous one? If the previous one was already clear,
+  delete this one.
+- Does this "however" actually reverse anything? If the two halves agree, drop it.
+
+### Don't overcorrect
+
+**Plain does not mean vague.** Terms, measurement bases, numbers and commands stay
+exact — "block size 16 KiB" must not become "blocks aren't big" in the name of
+readability.
+
+**Plain does not mean opinion-free either.** "This shouldn't be settled yet", "this
+approach is wrong" — write exactly that. Saying it straight includes **stating the
+conclusion first**.
+
+### Which half the gate handles
+
+`scripts/doc-lint.sh` checks **the fixed phrasings in a word list** — the common
+padding and archaic constructions. A hit turns red and suggests the replacement.
+
+**What it cannot check**: whether a sentence flows, whether a concession is redundant,
+whether an explanation is bloated. Those need a person to read it aloud. So a green
+word list does not mean this rule is being kept; it only means the most obvious traps
+were avoided.
+
+The word list is Chinese. In this edition the check reports **unimplemented** rather
+than passing silently — inventing an English word list would add false positives, not
+remove them (`show-me-test.md`: the gate must not pretend to pass).
