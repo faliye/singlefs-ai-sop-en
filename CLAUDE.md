@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:edb9e9137bfd57cb766fcd0d69fbe430e88ce200f90ac801796dd2da33e12223 -->
+<!-- generated-from: CLAUDE.md sha256:f210a793326df955839a6faa645e0cd7f52b10d5053715166391540fd1d59850 -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -11,6 +11,8 @@ Changing the spec proper **must bump `VERSION` in the same change**; otherwise
 the project's gate will report a version mismatch. **Which paths count as "the spec
 proper" is defined by `GOVERNED` in `scripts/version-discipline.sh`** — that is the
 only list, and it is not copied here.
+A bump comes with a section for that version at the top of `CHANGELOG.md` — one section per
+version, no gaps — judged by `scripts/changelog-lint.sh`.
 
 ## Language of collaboration
 

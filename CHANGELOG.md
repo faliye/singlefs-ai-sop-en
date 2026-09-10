@@ -4,6 +4,24 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.40 — 2026-09-10
+
+**New gate stage "CHANGELOG continuity" (`scripts/changelog-lint.sh`): every version gets its
+own section, and the newest section is `VERSION`.** Version discipline only asks whether the
+spec proper changed without a `VERSION` bump; it never asked whether the CHANGELOG kept up.
+Measured: in 0.0.39 `VERSION` went from 0.0.35 to 0.0.39 while the CHANGELOG in all three
+language repositories skipped 0.0.36, so that version's two changes were recorded nowhere —
+every gate was green, and it took a paragraph-by-paragraph read of the diffs to see it.
+
+It judges the whole file, not a diff window: second-level headings may only be
+`## x.y.z — YYYY-MM-DD`, and the last one may be an undated tail such as "x.y.z and earlier";
+the newest section equals `VERSION`; each pair of adjacent sections must be immediate
+successors (patch +1, minor +1 with patch reset, or major +1 with the rest reset) — a gap, a
+duplicate or a reversed pair is red, and so is having no section at all. It runs only in the
+SOP repository itself, and each language repository judges its own CHANGELOG. `CLAUDE.md` gains
+one sentence on its first screen, and `skills/gate/SKILL.md` adds it to the stages that run
+only in the SOP repository.
+
 ## 0.0.39 — 2026-09-10
 
 **`rules/verify-before-claiming.md` gains a section: you checked the narrow claim and

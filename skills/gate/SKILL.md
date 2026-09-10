@@ -2,7 +2,7 @@
 name: gate
 description: Run singlefs's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:ddb124d130221b00203a98a87694cc171b7a11b8bc2293ed1afc007bc8e579f7 -->
+<!-- generated-from: skills/gate/SKILL.md sha256:d8dfc227593ec167b91970931e06b400853b9bc2f9c980a4ecd1879c6a6c3469 -->
 
 # The acceptance gate
 
@@ -32,8 +32,8 @@ GATE_BASE=<commit> bash .claude/scripts/gate.sh   # pick the diff base
 | Project-local stages | Some local check in `.claude/gate.d/` failed, or could not be read |
 | LKMM | A litmus verdict disagrees with its declaration, or a Never has no paired control |
 
-**Two stages run only in the SOP repository itself** (invisible to consuming projects):
-cross-language sync, and version discipline.
+**Three stages run only in the SOP repository itself** (invisible to consuming projects):
+cross-language sync, version discipline, and CHANGELOG continuity.
 
 "Rule manifest" runs on both sides but asks different questions: inside the SOP repo it
 asks whether the manifest is in step with the rules; inside a project it compares
