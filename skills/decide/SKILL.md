@@ -2,7 +2,7 @@
 name: decide
 description: Record or change a singlefs design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checker.
 ---
-<!-- generated-from: skills/decide/SKILL.md sha256:e5319864188635c2a370138bf795f4b4647ffcc3b14456684993eb59706caa27 -->
+<!-- generated-from: skills/decide/SKILL.md sha256:b1fc2afb7ea3e8c795b4bb4bc68ed0b40c7ccca72fa60782745b1e291e4b5040 -->
 
 # Recording a design decision
 
@@ -49,6 +49,19 @@ are marked as not verified in this project.>
    A "pending review" note in the body guarantees nothing will ever look at it again —
    and the person who settled it does not know their ruling changed. Name the decision
    and the item in the entry; clear it only once the review has happened.
+
+7. **An open item's question must have exactly one reading.**
+   Test: write out each reading of the question separately — do they get the same answer?
+   If not, the question is not finished. **Settle the question before arguing the
+   rationale**, or the argument lands entirely on the rationale while the slot is
+   somewhere else.
+
+   Measured: one slot sat stuck for three days across two rounds of argument. The real
+   cause was that the question "does it need integrity equal to X" had two readings (the
+   thing's **own bytes**, or the **target it points at**); the rationale withdrawn earlier
+   answered the first, while the wording asked the second, so no verdict on "does that
+   rationale hold" could ever land on that slot. Once the question was pinned down, the
+   slot closed on the spot — **what needed settling was the question, not the rationale**.
 
 ## When to settle and when to wait
 

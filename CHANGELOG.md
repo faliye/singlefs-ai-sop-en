@@ -4,6 +4,135 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.39 — 2026-09-10
+
+**`rules/verify-before-claiming.md` gains a section: you checked the narrow claim and
+then stated the broad one.**
+
+The file previously covered two things: check external state before stating it, and
+"is it settled" versus "what does it actually say". Both assume the failure mode is
+**not having checked**. This section covers the other one — **you checked and it still
+failed**: you did run the command, you did read the file, you are holding a verified
+proposition, and **the error is that the sentence you then said is wider than it**.
+
+The test: the sentence you are about to say — are its subject and scope exactly the
+ones you just checked? You checked "this path is blocked", so you may say "this path is
+blocked", not "it cannot be done". You checked "this file does not say it", so you may
+say that, not "nothing in the repo says it". What to do: take the broad sentence as a
+proposition to be proved, ask "what cases would I have to rule out for this to be
+true", and rule them out one by one; if you cannot finish, shrink the sentence back to
+the range you actually finished.
+
+Measured in singlefs (2026-09-10, twice on the same day by the same person):
+(1) checked "`sudo` is blocked by the sandbox" ⇒ wrote "root is unavailable, so this
+observation cannot be made", while another path in the same repo **does not need that
+privilege** and the docs say word for word that it was measured working ⇒ a whole round
+with zero observations, and the recorded reason was false.
+(2) checked "this object is not listed in that class rule's enumeration" ⇒ wrote
+"nothing in the repo covers this cell" and framed an entire experiment on it, while
+**the class membership is stated in two other files** and the class rule covered it all
+along ⇒ the framing was void and the same owed-check entry got written wrong twice.
+
+⇒ The section closes with one more note: "is this object covered by a clause" is
+especially prone to this, because **a clause can live elsewhere and cover it by class**
+while the object's own section says nothing; before judging, grep its name across the
+whole repo and see whether it has been placed in some existing class.
+
+## 0.0.38 — 2026-09-10
+
+**Two additions, each folded into an existing section; both belong to the family
+"the clause is still there but has stopped doing anything".**
+
+**`rules/evidence-discipline.md`, under "After a re-run, check the prose back against it",
+gains a second form: it is not the number that drifted, it is the qualifier that went
+missing.** That section used to cover numeric drift only — the prose says 1.475x while
+the artifact says 1.625x, and the interval assertion cannot catch it. But prose and
+artifact can disagree another way: **every number is true, and the conclusion is wider
+than the artifact supports**, because the table in the prose dropped a whole parameter
+dimension. When a number drifts you still have two numbers to lay side by side; when
+the qualifier is gone **there is nothing to compare against**. The test: when a
+conclusion says "only A buys you this", go read the artifact for **the non-A arm at
+every parameter point**; if the table in the prose has no column for that parameter,
+the word "only" does not hold.
+
+Measured in singlefs (2026-09-09): an experiment's prose said "the one thing only
+clustering buys is the reclaim cell … neither other arm can free a single segment",
+while in the same stored artifact another arm was **identical cell for cell** at the
+non-interleaved point; the table in the prose had no interleave-step column. **The
+harness's assertion scope had been right all along** — the unit test pinned that
+parameter and said so in the assertion message — what shed the scope was the prose.
+The rerun was byte-identical and **the gate was green**. That conclusion had already
+been inherited in three downstream places, one of them the very decision item it settled.
+
+**`rules/test-discipline.md`, under "a failure clause must not make the conclusion
+unfalsifiable", gains the converse: the antecedent can be written backwards, and once
+it is, it never fires.** The main rule covers "the clause makes the conclusion
+impossible to overturn"; this one covers "the clause itself can never be triggered".
+Written backwards does not look like **wrong**, it looks like **did not fire** — and in
+a round report, "this clause did not fire" is indistinguishable from "this clause was
+checked and the conclusion is fine". What to do: **after writing each failure clause,
+immediately write one sentence saying what observation would trigger it**; if you
+cannot, you wrote it backwards or you wrote it empty.
+
+Measured in singlefs (2026-09-09): a pre-registered clause said "if some arm's benefit
+appears only on the **non-interleaved** workload ⇒ record the condition as unknown",
+while that round's finding was that the benefit appears only on the **interleaved**
+one ⇒ the antecedent was identically false, it never fired once, and it should have.
+The person who wrote the clause self-reviewed twice without seeing it; another leg
+caught it by checking the antecedent word for word.
+
+## 0.0.37 — 2026-09-09
+
+**`rules/evidence-discipline.md`, under "Never pick the conclusion first and then build a model
+for it", gains a section: an arm's definition is nailed down before the run too, and there is
+exactly one admissible path when a failure clause fires.**
+
+The existing text gave only prohibitions — criteria, thresholds and void clauses are fixed
+before the run, "do not go back and change the criteria", "do not loosen the rule afterwards
+and then declare victory" — but **no admissible path**. So when a failure clause actually
+fires, only two options remain: pretend it did not, or throw the whole round away. And when
+an arm is loosely worded, the attack hits **its weakest reading**; "clarifying" the arm into
+the strong reading and declaring it the winner changes no criterion on paper and is post-hoc
+modelling in substance.
+
+The three steps added: **record the loss** under the weakest reading, **tighten only** (the
+new form must be judged at least as harshly by the original criteria), and **state where it
+tightened** (if you cannot say what it demands more of, it is a loosening). It also points out
+that the first step is the one people skip, and that once skipped, an honest tightening and a
+"loosen it, then declare victory" read identically on the page.
+
+Measured in singlefs (2026-09-09): in a three-way round, a backward-reasoning leg ruled an arm
+out under the failure clause written before the run, on the grounds that it did not cover field
+order. On checking, the arm as registered had never said it projected scalars only — what was
+hit was its weakest reading. The verdict followed the three steps, and the tightened form went
+into that decision's write-up.
+
+## 0.0.36 — 2026-09-09
+
+**`rules/evidence-discipline.md` gains the converse of "Withdrawing a number or a conclusion
+also means sweeping for who cites it": a withdrawal's rationale collapsing does not bring the
+withdrawn conclusion back.** A withdrawal is a verdict; its rationale collapsing only means that
+verdict lost its grounds, not that the opposite holds, and bringing the original back takes a
+fresh argument. And after a withdrawal the slot usually already has another rationale holding it
+up, which you miss entirely if you stare only at the withdrawn one. What to do: ask three
+questions in order — which rationale holds the slot today, does it stand up on its own, and has
+the re-argument for reviving the withdrawn one actually been done.
+
+**`skills/decide/SKILL.md` gains item 7: an open item's question must have exactly one
+reading.** Write out each reading separately; if they get different answers, the question is
+not finished — settle the question before arguing the rationale.
+
+Measured in singlefs (2026-09-09), both from the same slot: a rationale was withdrawn on
+2026-09-06 for being "mutually exclusive with X", X was cancelled the next day, and the asker
+asked for a re-judging, pointing toward revival. The three things the backward-reasoning leg of
+a three-way argument hit have nothing to do with whether the exclusivity still holds: another
+document had left a replacement rationale that does not depend on it that same day; each of that
+replacement's two supports is broken; and the slot is not even asking what the withdrawn
+rationale answered — its question, "does it need equal integrity", had two readings (the thing's
+own bytes, or the target it points at), the withdrawn rationale answered the first and the
+wording asked the second. The slot sat stuck for three days across two rounds of argument, and
+closed on the spot once the question was pinned down.
+
 ## 0.0.35 — 2026-09-06
 
 **`rules/show-me-test.md`, in "turn traps you have hit into checks that fail", gains a

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:68e528bc661a84c34fd4c022d3db500213b50c05e14ee8c0a3473cc6fd6ffc55 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:d41b9ce41762f0aece8c94528801f7c09f1133975ae49659beb5776ea0984ae1 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -163,6 +163,31 @@ downstream. The number is right; what is wrong is that it measures something oth
 what the verdict is asking. (The experiment-side form of `verify-before-claiming.md`'s
 "whether it is settled and what it actually says are two different questions".)
 
+### An arm's definition is nailed down before the run too — what to do when a failure clause fires
+
+What gets nailed down before a run is not only the criteria, the thresholds and the void
+clauses — it is also **what each arm actually is**. Leave an arm loosely worded and the
+attacking leg will hit **its weakest reading**, while the person who wrote it had a different
+reading in mind. "Clarifying" the arm into the strong reading and then declaring it the
+winner changes no criterion on paper, and is post-hoc modelling in substance.
+
+⇒ **Only three steps are admissible; skip one and it is a new experiment — re-run it**:
+
+| Step | What it means |
+|---|---|
+| **Record the loss** | Write down the failure clause's verdict as it stands under the **weakest reading**: this arm did lose that cell, and to whom |
+| **Tighten only** | The new form must be judged **at least as harshly by the original criteria**. Not one word looser |
+| **State where it tightened** | Say what the new form **demands more of** than the old one. If you cannot say, it is a loosening |
+
+Measured (2026-09-09): a backward-reasoning leg ruled an arm out under the failure clause
+written before the run, on the grounds that it did not cover field order. On checking, the
+arm as registered had never said it projected scalars only — **what was hit was its weakest
+reading**. The verdict followed the three steps: record that the weakest reading did lose,
+tighten the arm to "must carry row order", and state that the new form demands one more
+thing and nothing less.
+⚠️ **The first step is the one people skip**, and once it is skipped an honest tightening
+and a "loosen it, then declare victory" **read identically on the page**.
+
 ## Quote an artifact by copying the line whole
 
 Paraphrase drifts, and it drifts one way — each retelling leans a little further toward
@@ -194,6 +219,24 @@ disagreeing with the source or the artifact in one repository on one day (unit-t
 by 1, mutation count off by 3, line counts off by 6 and 9). **A number a single command can
 count should be counted by that command**, not left to the writer to remember to come back
 and fix it.
+
+⚠️ **Prose disagreeing with its artifact has a second shape, harder to catch than a drifting
+number: the number is not wrong, the qualifier is gone.** A drifting number at least leaves you
+two numbers to lay side by side; a missing qualifier **leaves nothing to compare against** —
+every number at the citing site is true, and what is wrong is that the conclusion claims a wider
+range than the artifact supports.
+
+Measured (2026-09-09): an experiment's prose said "the one thing only A really buys is the
+reclaim cell … B and C cannot free a single one", while its own kept artifact gives, for B at one
+parameter setting, **exactly the same numbers as A**; the table in the prose **has no column for
+that parameter**. **The harness's assertion was scoped correctly all along** — the unit test
+pinned that parameter, and the assertion message carried the qualifier — the prose is what shed
+the scope. Replay was byte-identical and **the gate was all green**. Three downstream sites had
+already inherited that sentence, one of them the very decision item that was settled on it.
+
+⇒ **Test**: when a conclusion says "only A buys it / unique to A / only A can", go to the
+artifact and read **the non-A arms at every parameter setting**; if the table in the prose
+**has no column for that parameter**, the scope has been shed and the "only" does not hold.
 
 ## When you write a new criterion, sweep it back over the entries already on the books
 
@@ -227,6 +270,43 @@ The one who withdrew it swept two places, missed one, and did not know it.
 ⇒ This and "background material fed to a multi-party argument must itself be checked
 first" are two ends of one hole: at one end the citer did not re-check, at the other the
 withdrawer did not sweep clean. **Both ends have to be plugged.**
+
+### A withdrawal's rationale collapsing does not bring the withdrawn conclusion back
+
+This is the mirror image of the section above, and it is easier to fall for, because it
+looks like you are correcting an error.
+
+When a conclusion is withdrawn, the rationale written down at the time is often just the
+one that was easiest to write. Days later that rationale collapses on its own — a premise
+changed, or a decision it depended on was rewritten — and it is tempting to conclude "then
+the withdrawal no longer holds, the original should come back." **It does not follow.** A
+withdrawal is a verdict; its rationale collapsing only means that verdict lost its
+grounds, not that the opposite is true. Bringing the original back requires **arguing it
+again**, and that argument may land the other way.
+
+**There is a more valuable step still**: after a withdrawal, that slot usually already has
+a different rationale holding it up. Staring only at the withdrawn one makes you miss the
+replacement entirely — and the replacement is what is actually load-bearing today.
+
+⇒ **When you find a withdrawal's rationale has collapsed, ask three questions in order**:
+
+| Ask | If you cannot answer, stop here |
+|---|---|
+| Which rationale is holding this slot up today | You can name the file and the passage it lives in |
+| Does that rationale itself stand up | Check each of its supports; do not just read its conclusion sentence |
+| Has the re-argument for reviving the withdrawn one actually been done | Not done is not done — "the rationale collapsed" is not a substitute |
+
+Measured (2026-09-09): a rationale was withdrawn on 2026-09-06 for being "mutually
+exclusive with X", and X was cancelled the next day. The asker wrote down "this withdrawal
+needs re-judging," pointing toward revival. The backward-reasoning leg of a three-way
+argument hit three things: ① another document had already swept it that same day and left
+a replacement rationale that **does not depend on that exclusivity**, whose text says
+verbatim "switching back to the original one requires arguing it again; that was not
+done"; ② each of the replacement's two supports is broken, one of them a dangling citation
+— the sentence it cites was deleted along with a different decision; ③ and the slot is not
+even asking the question the withdrawn rationale answered.
+⇒ None of the three has anything to do with whether the exclusivity still holds.
+**Following "the premise is gone, so the withdrawal is void" touches none of them.**
 
 ## The backward-reasoning gap specific to filesystems
 

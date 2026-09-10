@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:d0cb001cae2da4cffb15354abf1461b10b056544ddd82ef3c4d0fa5144ec9519 -->
+<!-- generated-from: rules/test-discipline.md sha256:b86982f7aa3de7f6da29463df773fe8ec7f8b626627049b7b5a41c22742d8512 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -85,6 +85,24 @@ Keep the two apart, and **run both controls**:
 Without the positive control, "no advantage" cannot be told apart from a broken
 implementation. Without the real baseline you are measuring "does this mechanism exist"
 rather than "what does this mechanism buy over what we already have".
+
+⚠️ **The mirror image of the same discipline, and it has to be written down too: a failure
+clause's antecedent can be written backwards, and once it is, the clause can never fire.**
+Written backwards it does not look like *wrong*, it looks like **not triggered** — and in a
+round's report "this clause did not fire" is **indistinguishable** from "this clause was checked
+and the conclusion is fine".
+
+Measured (2026-09-09): a clause pinned before the run said "if an arm's benefit appears **only
+under the non-interleaved load**, record it as condition-unknown", while that round's finding was
+that the benefit appears **only under the interleaved load** ⇒ the antecedent is permanently false, the
+clause never fired, **and it should have**. The person who wrote it self-checked twice without noticing;
+another leg caught it by reading the antecedent word for word.
+
+⇒ **Every time you pin a failure clause, write the next sentence: "what observation would make
+this fire".** If you cannot write that sentence, the clause is either backwards or vacuous, and
+both amount to having no clause. This is the same thing as this section's main point seen from
+the other end: the main point governs "the clause makes the conclusion unfalsifiable", this one
+governs "the clause itself can never be triggered".
 
 ## The positive control must run against **every** arm under test
 

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:997261544c93ba38111760e7d88019a634c79dfbffb49f54a56fc573ea94ae95 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:df39d09a9deb0ca812aeb4d77d6dedb301026099a61a3b2bfe4e6555576d6c17 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -39,6 +39,41 @@ status column got checked, the definition never got read.
 **What to do**: before using a decision in any derivation, paste its defining sentence
 verbatim into your notes or experiment comments. If you cannot paste it, you were
 working from memory.
+
+## You checked the narrow claim and then stated the broad one
+
+This one is the hardest to catch yourself, because **the "check now" step really did
+happen**: you ran the command, you read the file, you are holding a proposition you
+genuinely verified. **The error is that the sentence you then said is wider than it.**
+
+**Observed twice (2026-09-10, same day, same person)**:
+
+| What was checked (narrow, true) | What was stated (broad, false) | Cost |
+|---|---|---|
+| "`sudo` is blocked by the sandbox" | "root is unavailable, so this observation cannot be made" | Another path in the same repo **does not need that privilege**, and the docs say word for word that it was measured working ⇒ **a whole round with zero observations, and the recorded reason was false** |
+| "this object is not listed in that class rule's enumeration" | "nothing in the repo covers this cell" | **The class membership is stated in two other files**, so the class rule covered it all along ⇒ an entire experiment's framing was void, and the same owed-check entry **got written wrong twice** |
+
+Both have the same shape: **what was verified is one path / one file; what was asserted
+is all paths / the whole repo.**
+
+⇒ **The test: the sentence you are about to say — are its subject and scope exactly the
+ones you just checked?**
+
+- You checked "this path is blocked" ⇒ you may say "this path is blocked", **not "it
+  cannot be done"**.
+- You checked "this file does not say it" ⇒ you may say "this file does not say it",
+  **not "nothing in the repo says it"**.
+
+⇒ **What to do**: take the broad sentence as a proposition to be proved and ask
+**"what cases would I have to rule out for this to be true"**, then rule them out one
+by one. If you cannot finish, shrink the sentence back to the range you actually
+finished — **a narrowed sentence is still useful; a wide false one becomes the
+foundation of the whole round.**
+
+⚠️ "Is this object covered by a clause" is especially prone to it: **a clause can live
+elsewhere and cover it by class**, while its own section says nothing at all. ⇒ Before
+judging, **grep its name across the whole repo** and see whether it has been placed in
+some existing class — **the class rule answers for it.**
 
 ## Putting it into practice
 
