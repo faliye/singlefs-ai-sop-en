@@ -67,7 +67,10 @@ wrong, not that it is improving.
 `SOURCE-MANIFEST.sha256` is this repository's copy of the manifest as of the last time
 it was brought in step. Comparing it against the current `MANIFEST.sha256` in the
 Chinese repository — where the manifest and the scripts live — shows which files have
-fallen behind. The manifest covers `CLAUDE.md` and `rules/*.md` —
+fallen behind. Nobody copies it by hand: `bash scripts/i18n-sync.sh --update`, run in the Chinese
+repository, refreshes it from the current manifest once every translated file's provenance stamp
+matches, and refuses — naming the files — while any of them is still a translation of an older source.
+The manifest covers `CLAUDE.md` and `rules/*.md` —
 `CLAUDE.md` is the body of the rules and also fixes the language of collaboration, so
 leaving it out would let the editions quietly say different things. `VERSION` is
 identical across every language repository; one bump bumps them all.

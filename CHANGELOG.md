@@ -4,6 +4,20 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.43 — 2026-09-11
+
+**`i18n-sync.sh --update` refreshes each translation repo's `SOURCE-MANIFEST.sha256` itself; nobody copies it by
+hand any more.** When 0.0.42 went out, `--update` was rejected as "behind" because en / ja still held the old
+manifest, so none of the shared files were synced — that step used to rely on someone remembering to copy zh's
+`MANIFEST.sha256` across. Now, when `--update` finds SOURCE-MANIFEST behind or missing, it first checks every
+translation's provenance stamp: if all of them match the current source it refreshes SOURCE-MANIFEST from this
+repository's manifest and reads it back; if any file is missing, unstamped or translated from an older source, it
+does not copy and names those files. The per-file check is now a single function, `stale_articles`, shared by this
+step and the existing check 5. The two howto lines that told people to copy by hand now say to run `--update`, and
+the three READMEs say the same. `selftest.sh` gains 5 cases: after retranslating and stamping it copies and the copy
+matches the manifest byte for byte; without retranslation it does not copy and SOURCE-MANIFEST is untouched; a
+missing one gets created.
+
 ## 0.0.42 — 2026-09-11
 
 **Pushing now checks and pushes every language repo together.** 0.0.41 was pushed for zh only, leaving en and ja
