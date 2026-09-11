@@ -4,6 +4,28 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.42 — 2026-09-11
+
+**Pushing now checks and pushes every language repo together.** 0.0.41 was pushed for zh only, leaving en and ja
+two commits behind: the remote carried three languages stating different versions of the rules, and nothing
+complained, because the gate runs locally and cannot see the remote. New `scripts/push-all.sh` and the git hook
+`scripts/githooks/pre-push`: set `core.hooksPath` once in each language repo, and from then on pushing any of
+them first checks every language repo (on master, clean working tree, same VERSION, its own gate green); only
+when all pass does it push the other language repos and then let this one through. If anything fails, nothing
+is pushed; if a push is rejected halfway, it reports which repos already went out. When you push from a git worktree,
+git gives the hook an absolute `GIT_DIR` for this repo, which overrides `git -C`, so the script clears it
+first — otherwise checking and pushing the other language repos would land on this one (pushing from an
+ordinary clone, the hook sees no such variable). `selftest.sh` gains 10 cases that go through a real
+`git push` → hook path with local bare repos as remotes. `CLAUDE.md` says how to enable it.
+
+**Four rule additions, from traps hit in singlefs this round.** `command-safety.md` gains "a script with a gate hands
+over its output only after judging it": output first and judge later, and the caller's redirect file keeps an output
+judged void that looks just like a valid one. `evidence-discipline.md` gains two: when an arm's definition says both how
+it is done and what that achieves, the first must imply the second, or the legs judging by different sentences are
+judging two different arms; and an extreme from a sweep that lands on the sweep's endpoint is not a measured number and
+can only be written as "≤ endpoint". `session-wrapup.md` item 4 goes from three assumptions to four: creating a new file
+may overwrite another session's freshly written uncommitted file, so create new files exclusively.
+
 ## 0.0.41 — 2026-09-10
 
 **New `rules/code-discipline.md`: how machine-first lands in code.** There is one principle: past best

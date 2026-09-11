@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:85f86389c82db356c984945a8a6b90bbd6d198a91a30e1bf8f3022050bae3917 -->
+<!-- generated-from: rules/session-wrapup.md sha256:b349e2044864f2d5b1d127cfcd787415e959ccf8486633f61a33d2ad3ccdadd7 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -58,7 +58,7 @@ leaves nobody, three months later, knowing why that sentence no longer holds.
 
 ## 4. Is another session in flight in the same repository?
 
-When several sessions work concurrently, three default assumptions stop holding. Go
+When several sessions work concurrently, four default assumptions stop holding. Go
 through them before wrapping up:
 
 - **"Everything in the working tree is mine" no longer holds.** Before committing, sort
@@ -73,6 +73,13 @@ through them before wrapping up:
   experiment numbers and the like, look up the highest existing number before taking
   one. Edit shared files by targeted replacement only, never by rewriting the whole
   file — a rewrite silently erases what a concurrent session has already written.
+- **"Creating a new file overwrites no one" no longer holds.** Another session may have taken the same number
+  minutes ago and written an uncommitted file with the same name, and a tool that writes whole files overwrites it
+  silently — something that never went into git is gone once overwritten. Create new files exclusively
+  (`set -o noclobber`, `open(path, 'x')`), and look up the number in the same command that writes the first file;
+  where the tool layer can stop it (a pre-write hook that refuses to overwrite untracked files), stop it there.
+  Measured (2026-09-12): one whole-file write overwrote another session's freshly written pre-run registration, which
+  was restored word for word only by replaying that session's conversation transcript.
 
 If you collide on a number and it can be made into a check that goes red, make it one
 (`rules/show-me-test.md`, "turn traps you have hit into checks that fail"); on the

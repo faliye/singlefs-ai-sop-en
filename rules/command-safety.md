@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:a4fbf62c43e97df8c011a3730818929267671b22b53d9fc3395ef3d67a2f6847 -->
+<!-- generated-from: rules/command-safety.md sha256:90398c0d08ad2547a234d6d5000fcca1191dcac92d4fa7c9bbc07fb9795aaaba -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -70,6 +70,22 @@ not "something failed".
 emitted; the collector compares the count and discards the round on a mismatch.
 That gate must itself be proven to go red first — feed it a fake program that claims
 N results and emits N−1, and it must fail.
+
+## A script with a gate hands over its output only after judging it
+
+When one script both produces a result and decides whether that result is usable, **the output goes to the caller only
+after the verdict**. Print the result to stdout first and run the gate afterwards, and the caller's redirect file already
+holds an output that was judged void — the file name was chosen by the caller and looks exactly like a valid artifact.
+The exit code reported the error, but the file stays, and the next person browsing the directory will not go back to
+check what the exit code was.
+
+Measured (2026-09-12): a script that fetches a model's answer `print`ed the body first and then ran a garbled-text gate;
+on red it exited 5 and saved a separate void copy, yet the caller's `> …-output-s1.md` file still held that same body,
+differing from the void copy by a single newline.
+
+**What to do**: write the result to a temporary file first and output it only once the gate passes; on red, stdout stays
+empty. This gate must be shown to go red as well: change the script back to "output first, judge later", and the
+self-test must go red.
 
 ## Assignments inside a subshell do not travel back to the parent
 

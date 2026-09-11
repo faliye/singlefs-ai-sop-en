@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:d41b9ce41762f0aece8c94528801f7c09f1133975ae49659beb5776ea0984ae1 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:1499c7f88ad8e88875bed212224c5277279a31b90f40281093e98a704a17d971 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -188,6 +188,20 @@ thing and nothing less.
 ⚠️ **The first step is the one people skip**, and once it is skipped an honest tightening
 and a "loosen it, then declare victory" **read identically on the page**.
 
+⚠️ **When an arm's definition states both "how it is done" and "what that achieves", first show that the first implies
+the second.** Read separately, both sentences make sense; together they can contradict each other. Each leg then judges
+by one of the two sentences and reaches the opposite verdict, and the author of the definition cannot see that they have
+in fact written two arms.
+
+Measured (2026-09-12): a candidate arm read "always make the new value durable on every disk (at most 7 publishes), so
+the residue is always 5 + 5c". Durability takes only 6 or 7 publishes, and with 6 the residue is 5 + 4c — the first
+sentence does not imply the second. The forward leg implemented "make it durable" and judged it to fail seed for seed
+like an arm already knocked out; the backward leg read "always do all 7" and judged that it passes when nothing fails.
+Both verdicts were right; they were verdicts on two different arms.
+
+⇒ When writing an arm, treat "what that achieves" as a proposition to be proven: if it cannot be derived, delete it, or
+change the method to one it can be derived from.
+
 ## Quote an artifact by copying the line whole
 
 Paraphrase drifts, and it drifts one way — each retelling leans a little further toward
@@ -237,6 +251,21 @@ already inherited that sentence, one of them the very decision item that was set
 ⇒ **Test**: when a conclusion says "only A buys it / unique to A / only A can", go to the
 artifact and read **the non-A arms at every parameter setting**; if the table in the prose
 **has no column for that parameter**, the scope has been shed and the "only" does not hold.
+
+### An extreme found by a sweep that lands on the sweep's endpoint is not a measured number
+
+When you sweep a parameter and report a "minimum viable value" or a "maximum safe value", and that value is exactly an
+endpoint of the swept range, it only says "viable up to the endpoint"; the real boundary lies outside the range and was
+not measured. Writing "the minimum viable value is X" turns the starting point of the sweep into a measurement.
+
+Measured (2026-09-12): an experiment swept the reserve pool from "pre-run formula − 6" to "pre-run formula + 8" and
+reported, for two arms, "the smallest reserve pool that does not deadlock", with the prose saying "both are smaller than
+the pre-run formula". For one arm both numbers were exactly the lower edge of the sweep (formula − 6), and that arm's
+reserve formula was not pinned by any criterion — how much it actually needs, this round said nothing about. The backward
+leg caught it while checking where the sweep started.
+
+⇒ Before reporting an extreme found by a sweep, check whether it is an endpoint. If it is, write "≤ endpoint (lower edge
+of the sweep; boundary not measured)"; otherwise widen the range and re-run until the extreme falls inside it.
 
 ## When you write a new criterion, sweep it back over the entries already on the books
 
