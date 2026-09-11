@@ -4,6 +4,13 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.45 — 2026-09-11
+
+**`gate.sh --staged` cleans up its temporary worktree when interrupted.** A Ctrl-C used to leave the worktree registered
+in the repository, needing a manual `git worktree prune`; the worktree is now removed by an INT / TERM trap before exiting.
+selftest gains a case: a project stage that sleeps 20 seconds gets INT sent to its whole group mid-run, and afterwards the
+repository must hold exactly one worktree registration; with the trap removed the case goes red.
+
 ## 0.0.44 — 2026-09-11
 
 **`gate.sh --staged`: run the whole gate on HEAD plus the index only.** When several sessions share a repository,
