@@ -4,6 +4,20 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.44 — 2026-09-11
+
+**`gate.sh --staged`: run the whole gate on HEAD plus the index only.** When several sessions share a repository,
+the working tree mixes in other sessions' unfinished changes and untracked files, and a red gate on the working tree
+cannot say whose it is — `session-wrapup.md` item 4 could only ask you to check file by file. The gate now applies
+`git diff --cached` onto HEAD in a temporary worktree and runs the whole gate there: other sessions' uncommitted changes
+and untracked files stay out, and whatever goes red is what this commit brings in. An untracked SOP copy is copied into
+the worktree as-is, and sibling upstream repositories are still looked up from the original project root. It came from a
+singlefs wrap-up on 2026-09-11: the working-tree gate went red in five stages, three of them from another session, and
+only a hand-built worktree told them apart. selftest gains three cases: an unstaged violation does not count under
+`--staged`; without `--staged` the same violation must count (proving the stage would go red — without this case a green
+`--staged` cannot tell "left out" from "never red"); a staged violation counts. `session-wrapup.md` item 4, second
+bullet, gains a sentence on how to use it.
+
 ## 0.0.43 — 2026-09-11
 
 **`i18n-sync.sh --update` refreshes each translation repo's `SOURCE-MANIFEST.sha256` itself; nobody copies it by

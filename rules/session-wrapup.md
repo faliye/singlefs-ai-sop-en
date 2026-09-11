@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:b349e2044864f2d5b1d127cfcd787415e959ccf8486633f61a33d2ad3ccdadd7 -->
+<!-- generated-from: rules/session-wrapup.md sha256:154f1b625663e5a3f0c5bd543f76c422f0b4ac0eb5e595498eb1c5399502451b -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -69,6 +69,9 @@ through them before wrapping up:
   whether the files it names are part of this round's changes. If they are not, report
   honestly "red, but not from this round" and do not fix it in passing — that is another
   session's wrap-up, still unfinished.
+  When you cannot tell, run `bash .claude/scripts/gate.sh --staged`: it runs the whole gate
+  in a temporary worktree on HEAD plus the index only, so other sessions' unstaged changes
+  and untracked files stay out — whatever goes red there is what this commit brings in.
 - **Shared numbering is first-come, first-served.** For history entry ordinals,
   experiment numbers and the like, look up the highest existing number before taking
   one. Edit shared files by targeted replacement only, never by rewriting the whole
