@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:79c581ae395c51d70708ccc6885d6ff5f4aee4d08d3ad93e421a1b1417c6cdd6 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:e7667534faabe3f5d9e32baae729a67af3aee0888528f85a8fcd4c7db52cf1ba -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -287,7 +287,7 @@ pinned that parameter, and the assertion message carried the qualifier — the p
 the scope. Replay was byte-identical and **the gate was all green**. Three downstream sites had
 already inherited that sentence, one of them the very decision item that was settled on it.
 
-⇒ **Test**: when a conclusion says "only A buys it / unique to A / only A can", go to the
+⇒ **Criterion**: when a conclusion says "only A buys it / unique to A / only A can", go to the
 artifact and read **the non-A arms at every parameter setting**; if the table in the prose
 **has no column for that parameter**, the scope has been shed and the "only" does not hold.
 

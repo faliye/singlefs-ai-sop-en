@@ -24,8 +24,8 @@ pure code-logic derivation, arithmetic.
 
 ## "Is it settled" and "what does it actually say" are two different questions
 
-Checking the status column and confirming a decision is "settled" does not mean you
-know what it settled on. Before using a decision to build a model, write a check, or
+Checking the status column and confirming a decision is "settled" **does not mean you
+know what it settled on**. Before using a decision to build a model, write a check, or
 overturn some other conclusion, **you must read its definition word for word** — not
 model it from memory.
 
@@ -89,5 +89,5 @@ count first (`grep -c`, `| wc -l`), and read the contents once the count matches
   gives a wrong statement a fresh timestamp.
 - If you cannot say "this is the command I learnt it from", the sentence must be
   written as **conjecture**, not as fact.
-- Factual corrections offered by the user **also get checked** — neither accepted
+- Factual corrections from someone else **also get checked** — neither accepted
   wholesale nor argued with; check, then state the result plainly.

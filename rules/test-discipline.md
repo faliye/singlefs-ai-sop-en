@@ -125,7 +125,7 @@ un-gated arms that ends up producing the conclusion.
 
 Observed: an experiment had two rule arms; the positive control was run against only
 the first. Once run against the second, **it failed on the very control workload** —
-by the experiment's own failure clause it should have been discarded on the spot, but
+by the experiment's own discard clause it should have been discarded on the spot, but
 its numbers had already been written into a decision document.
 
 **What to do**: the control loop must iterate over the full set of arms, not "just run

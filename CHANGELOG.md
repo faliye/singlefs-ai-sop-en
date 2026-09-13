@@ -4,6 +4,22 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.47 — 2026-09-13
+
+**Three-way consistency check on 0.0.46, fixing 4 translation issues and 1 drift in the zh source itself.**
+Four agents each did a paragraph-by-paragraph semantic check of the zh / en / ja versions of
+`evidence-discipline.md`, `show-me-test.md`, `test-discipline.md`, and `verify-before-claiming.md`
+(show-me-test came back clean). Fixes: `verify-before-claiming.md`'s English had dropped a bold emphasis
+("does not mean you know what it settled on"); the same file's "factual corrections from someone else"
+had been narrowed to "the user" / "利用者" in both English and Japanese, inconsistent with
+`pushback-discipline.md`'s rendering of the identical zh sentence ("someone else" / "他人") — restored to
+match; `test-discipline.md`'s English had conflated "作废条款" (discard clause) with "失败条款" (failure
+clause) at one site — restored to "discard clause"; `evidence-discipline.md`'s Japanese rendered "门禁" as
+both "門番" and "ゲート" in different places — unified to "ゲート"; the English "判据" had drifted to
+"Test" at one site — restored to "Criterion". Also found a drift in the zh source itself: the self-check
+table had grown to 6 rows over past additions while the body text still said "这四条" (these four) —
+corrected to "这六条" (these six).
+
 ## 0.0.46 — 2026-09-13
 
 **Seven lessons measured on 2026-09-13 added to four rules; the gate is unchanged.** `evidence-discipline.md`: the
