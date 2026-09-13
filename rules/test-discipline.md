@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:b86982f7aa3de7f6da29463df773fe8ec7f8b626627049b7b5a41c22742d8512 -->
+<!-- generated-from: rules/test-discipline.md sha256:f0f68a10da14e664d5aee90b673633e6f1e19d8066a7725c4d49de0391f5d34a -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -104,6 +104,19 @@ both amount to having no clause. This is the same thing as this section's main p
 the other end: the main point governs "the clause makes the conclusion unfalsifiable", this one
 governs "the clause itself can never be triggered".
 
+### Do not write a criterion as a conjunction; a threshold must not be a tautology of the arm's definition
+
+The same discipline has two quieter failures; one experiment on 2026-09-13 hit each of them once:
+
+| Form | Measured | Consequence |
+|---|---|---|
+| **Two quantities folded into one true / false** | The pre-run criterion said "peak doubles **and** runs never increase ⇒ sensitive"; one half held and the other half went the opposite way | The artifact reported a single `false`, and what each half said could only be recovered by going back through the grid rows — the conjunction erased the most informative cell |
+| **The threshold is the definition of the arm under test** | The criterion said "≤ 3 segments per directory ⇒ locality holds", while that arm is defined as "home segment + overflow segment + at most one fallback" = 3 segments | That cell is **always true** for that arm; it was the only `true` of the round, and it proved nothing. Only against the other arm does it have any discriminating power |
+
+⇒ **One line per quantity, each with its own verdict**; leave the conjunction to people. Before writing a threshold,
+put the definition of the arm under test beside it: a cell whose threshold follows straight from the definition does not
+count as a criterion.
+
 ## The positive control must run against **every** arm under test
 
 When an experiment has N arms, running the positive control on just one of them means
@@ -145,6 +158,23 @@ arms were wrong **together**, who would notice". If you cannot answer, add one t
 pins down an absolute value. **This and "the positive control must run against every
 arm" are two sides of the same discipline** — that one is about every arm going through
 the gate, this one is about the gate itself not being relative.
+
+## An endpoint is not a trajectory: a quantity a clause feeds into a predicate must be reported as a trajectory
+
+If some clause uses a quantity as the input of a stop / start / admission predicate, an experiment that reports only its
+**end-of-run value** is not enough: an end value of 0 and "never positive" are two different sentences, and they call for
+two different fixes.
+
+Measured (2026-09-13): a placement experiment reported the end value of "the number of fully empty segments" — 0 in all
+40 cells — and the debt line concluded from that "this quantity is never positive; the predicate can only be fed by
+compaction". The second run reported the trajectory instead — a peak of 2, positive in 5% of 2000 rounds — and the truth
+was "it does read positive; the foreground just consumes it on the spot", so the fix changed from "find the predicate
+another input" to "stop the foreground from eating it". Reading the endpoint as the trajectory erred in exactly the more
+hopeless direction.
+
+⇒ A quantity consumed by a predicate is reported with at least three numbers: **the peak after the initial supply is
+used up, the number of rounds it was positive, and the end value**. A report that gives only the end value may not use
+trajectory words such as "never" or "always" in its body text.
 
 ## Mutation testing proves the assertions can go red, not coverage
 

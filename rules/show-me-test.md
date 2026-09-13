@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:1a0f7bb6997017a680b046601ebaa71de1f8bdd64df9a8ccecf7c658df7c9051 -->
+<!-- generated-from: rules/show-me-test.md sha256:592c83437f0fdeaf0601a416aea1f0ea2b67f5f194882627853652278ad9243b -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -104,6 +104,16 @@ cross-apparatus check helps.
 ⚠️ This is where whoever fixes the trap stops most easily: they really did turn it into a
 check that goes red, **the evidence is complete and the gate is green**, so they never ask
 again how far that check reaches.
+
+⚠️ **A cross-apparatus check may pin only the value, not the quantity.** Measured (2026-09-13): a format constant had
+the same name and the same value, 78, in four apparatuses, and the check comparing the kb's registered value with each
+apparatus's source stayed green. Two of the apparatuses used it as the whole record header; the other two used it as the
+header's ten fields and added three later-settled increments themselves to get 95 — two quantities, one name, one value.
+The registered value happened to be the smaller quantity, so the two apparatuses that treated it as the whole header
+undercounted by 17 bytes all along, and nothing raised an alarm.
+⇒ **A cross-apparatus check must pin "which quantity this name refers to"**: two quantities get two registered names,
+each pinned to its own value; a check that only asks "is the value right" stays silent when one name is used for two
+quantities (the other side of "one semantic concept, one name across the repo" in `code-discipline.md`).
 
 ## The final criterion is QEMU/KVM stress testing
 

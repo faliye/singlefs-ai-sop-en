@@ -4,6 +4,22 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.46 — 2026-09-13
+
+**Seven lessons measured on 2026-09-13 added to four rules; the gate is unchanged.** `evidence-discipline.md`: the
+self-check table under "Never pick the conclusion first and then build a model for it" gains a row (is this number a
+function of some parameter that was never swept); "An arm's definition is nailed down before the run too" gains a
+paragraph — revising an arm or a criterion before the artifact runs is legitimate, but the pre-run registration must state
+what changed, which unit-test reading it rests on, and that the moment was before the artifact; a new section "A criterion
+can be written wrong too: when it fires, first decide which kind it is" lists three forms (the hit does not tell the arms
+apart, the discriminator cannot be observed, the hit is filed under the wrong criterion) and the three questions to ask
+first. `test-discipline.md`: a new subsection under the failure-clause section, "Do not write a criterion as a
+conjunction; a threshold must not be a tautology of the arm's definition", and a new section "An endpoint is not a
+trajectory: a quantity a clause feeds into a predicate must be reported as a trajectory". `show-me-test.md`: a
+cross-apparatus check may pin only the value, not the quantity — two quantities get two registered names, each pinned to
+its own value. `verify-before-claiming.md`: truncated output is a narrow claim too; before saying "only these places",
+do not truncate — count first.
+
 ## 0.0.45 — 2026-09-11
 
 **`gate.sh --staged` cleans up its temporary worktree when interrupted.** A Ctrl-C used to leave the worktree registered

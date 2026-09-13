@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:1499c7f88ad8e88875bed212224c5277279a31b90f40281093e98a704a17d971 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:79c581ae395c51d70708ccc6885d6ff5f4aee4d08d3ad93e421a1b1417c6cdd6 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -145,6 +145,7 @@ done)**:
 | Would I **accept** the opposite result | You can say "if the numbers came out the other way, here is how I would change the conclusion" — written down **before** the run |
 | Did I take readings at **only one point** | A multiple derived from one size, one parameter, one workload is not "worst case" |
 | Does the **same artifact** hold a counterexample to the range I quoted | You can show the range covers every sampled point in the artifact — picking three points to report "1.25–1.5" while a 1.000 sits in that very same output |
+| Is this number a function of **some parameter that was never swept** | You can say which knobs in the apparatus this arm's cost / benefit depends on, and that each of them was swept — before an arm's cost goes into the body text, ask "which parameter is it a function of". Measured (2026-09-13): an arm's "commit-intrinsic blocks drop 99%" was written up as "a number, not a way of sampling"; the backward leg swept a parameter that had never been swept (the number of overflow segments), and on half the cells that number was 0 |
 
 ⚠️ **The moment of greatest danger is "overturning an old conclusion"**: by then you
 already have a new direction, and the thrill of overturning tilts every choice in the new
@@ -201,6 +202,44 @@ Both verdicts were right; they were verdicts on two different arms.
 
 ⇒ When writing an arm, treat "what that achieves" as a proposition to be proven: if it cannot be derived, delete it, or
 change the method to one it can be derived from.
+
+**Revising an arm or a criterion before the artifact runs is legitimate, but it must leave a record.** Seeing where the
+first arm is weak once the unit tests have run but the artifact has not run even once, and adding a stronger arm or a
+segment-granularity criterion, is a different thing from "changing it after seeing the artifact" — the former has no
+number in any cell yet. The legitimate way: state in the pre-run registration **what changed, which unit-test reading it
+rests on, and that the moment was before the artifact**; keep the original criterion as written and judge the two arms
+each on its own. Without that passage in the registration, nobody can tell afterwards whether it was added after seeing
+the numbers.
+Measured (2026-09-13): a "follow the member" hint arm already showed in unit tests to be almost as scattered as the
+subtrahend arm; before the artifact ran, the "home fixed" arm and the segment-granularity criterion were added and
+written into the registration. The backward leg checked it against the three steps above (record the loss, tighten only,
+state where it tightened) and ruled it compliant — had that passage been missing from the registration, it would have
+been struck down as after-the-fact modelling.
+
+### A criterion can be written wrong too: when it fires, first decide which kind it is
+
+A criterion nailed down before the run stops "change the criterion after seeing the result", but the criterion itself
+can be wrong, and that usually shows only at the moment it fires. Three forms:
+
+| Form | What it looks like | What to do |
+|---|---|---|
+| **The hit does not tell the arms apart** | One cell knocks every arm out at once; the cause lies in a premise all arms share | Do not use it to judge the arms: open a separate item for that shared premise and fix it first; judge the arms only on the cells that tell them apart. When writing a clause like "all out ⇒ fall back to one arm", also write how to record a cell that knocks every arm out |
+| **The discriminator cannot be observed** | The criterion asks the system under judgement to tell two situations apart, but what that system can see at the moment it decides is identical, item for item, in both | Two criteria that demand different outcomes for those two situations contradict each other; any design can satisfy only one. Change the criterion — and a changed criterion is a new round |
+| **The hit is filed under the wrong criterion** | A leg reports "criterion X fires", while what happened belongs, by the wording, to another criterion with a different threshold | Check word by word which clause of which criterion the hit satisfies; filing it wrong knocks an arm out under the wrong threshold |
+
+Measured (2026-09-13, two rounds of three-way argumentation on one design question, one of each):
+① a flaw in administrator rollback knocked all three candidate arms out on the correctness criterion (zero faults),
+while the clause written before the run said "the other two both out ⇒ back to the third" — the third was hit too, so
+following the letter meant falling back to an arm that was just as out;
+② a first-round criterion asked recovery to tell "the rollback's first root was never written" from "it was written and
+later went bad", and those two situations are identical on disk, item for item;
+③ a leg reported "a confirmed rollback gets undone" (the durability criterion, whose threshold counts faults) as a hit on
+the correctness criterion (which does not count faults); only when the judging side checked the criteria word by word did
+it find that one more step (the abandoned units being scrubbed first) is needed to really land in the correctness cell.
+
+⇒ **When a criterion fires, ask three questions first**: does it tell the arms apart? Can the system under judgement
+actually see, at that moment, what it is asked to tell apart? Which clause of the criterion's wording does it satisfy?
+Only when all three pass, judge by the clauses written before the run.
 
 ## Quote an artifact by copying the line whole
 

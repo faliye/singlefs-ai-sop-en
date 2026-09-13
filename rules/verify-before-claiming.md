@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:df39d09a9deb0ca812aeb4d77d6dedb301026099a61a3b2bfe4e6555576d6c17 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:672e8e2d3bba54b250ad1873876df7b852003bff03939b91512e9e5f7bc30eb8 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -74,6 +74,13 @@ foundation of the whole round.**
 elsewhere and cover it by class**, while its own section says nothing at all. ⇒ Before
 judging, **grep its name across the whole repo** and see whether it has been placed in
 some existing class — **the class rule answers for it.**
+
+⚠️ **Truncated output is a narrow claim too**: `grep … | head -12` shows the first 12 lines, not every match.
+Measured (2026-09-13): to find which sources define a format constant, a search ran over the docs directory and the
+source directory together and was cut at 12 lines; only one source file surfaced in those 12 lines, so the edit went
+ahead as if it were the only one — the same-named constant in three more source files sat past the cut.
+⇒ **Before saying "only these places" or "these are all the matches", do not truncate the output**; if it is long,
+count first (`grep -c`, `| wc -l`), and read the contents once the count matches.
 
 ## Putting it into practice
 
