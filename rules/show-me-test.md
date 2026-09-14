@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:592c83437f0fdeaf0601a416aea1f0ea2b67f5f194882627853652278ad9243b -->
+<!-- generated-from: rules/show-me-test.md sha256:5df567894d900a76dd95add54abdb94e20ce9d183a84a8461a0adab617dd02e4 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -121,11 +121,23 @@ Unit tests and model-based differential testing are fast feedback. **They are no
 the acceptance criterion.** The acceptance criterion is running a real workload plus
 crash injection under QEMU/KVM, with the checker all green afterwards.
 
+How many disks to attach, which binary to put in, how to capture results, how to record on the
+device side — all of it is bound to the thing under test, so **the VM harness and its gate stages
+live in the project; the shared gate carries none**. The rules the harness itself must keep are in
+`command-safety.md`. A stage that runs the real workload declares `# gate-covers: QEMU 真实负载` in its
+header (keys are copied literally from `gate.sh`); one that also does crash injection and ends with
+the checker all green declares `# gate-covers: QEMU 崩溃注入` as well. Only when that stage ran and
+passed this round does `gate.sh` move the item from the unimplemented list to "covered by which stage".
+
 ## The gate must not pretend to pass
 
 Unimplemented gate stages must be **reported explicitly as unimplemented**, never
 silently skipped. A green gate that quietly did not run the crash tests is far more
 dangerous than a red one.
+
+**A project-local stage with nothing to judge this round exits 77**: `gate.sh` records it as "not run
+this time" — not a pass, and not coverage. A skip that exits 0 looks exactly like "judged and passed"
+in the summary, and the gate cannot tell the two apart; that half rests on whoever writes the stage.
 
 Likewise: **batch scripts must not swallow per-round failures** (`|| true` and
 friends), and output paths must not be reused across rounds. Put those two together
@@ -182,7 +194,8 @@ silent error this project most wants to avoid.
 4. **Unimplemented stages stay explicitly listed.** A missing verification method
    means a whole class of errors that has never been looked at. `gate.sh` prints
    that list every time precisely so "it passed" is not mistaken for "it was
-   verified".
+   verified". When a project stage declares coverage of an item (`# gate-covers:`),
+   the item leaves the list only if that stage ran and passed this round.
 
 ## Why this rule
 

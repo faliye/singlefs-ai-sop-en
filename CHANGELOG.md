@@ -4,6 +4,46 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.48 — 2026-09-14
+
+**singlefs's `crates/` now has code, so the LKMM and QEMU gates change with it.**
+
+LKMM (`scripts/lkmm.sh`):
+- **Controls are recognised by content**, no longer by filename alone: with comments and the first line
+  stripped, a control may only drop barrier lines from its Never, or relax `smp_store_release` /
+  `smp_load_acquire` to `WRITE_ONCE` / `READ_ONCE`, at least once. By filename alone, a "control" with a
+  different `exists` or reader passed; with colliding prefixes (`a` and `a-b`), `a-b`'s control was also
+  counted as `a`'s.
+- **Every Never must be bound to code**: its header states `singlefs-models: <path>::<function>`; the gate
+  checks the file exists, the `fn` exists, and some `.rs` under `crates/` spells out the litmus filename.
+  One that models no code writes `none — <reason>`. herd7 judges only the shape in the litmus, so if the code
+  changed its order and the litmus did not, the verdict stayed Never. The template `commit-publish.litmus`
+  is marked `none`.
+- New `--static-only`: runs only the checks that need no herd7 and exits 3 even when they all pass. selftest
+  feeds its fixtures through it, so their verdicts no longer depend on whether the machine has herd7.
+
+QEMU:
+- **Removed the shared `scripts/qemu/run.sh` and the gate stage "QEMU harness self-test" (`GATE_QEMU`).**
+  It attached no disk, took only shell scripts and captured no results; singlefs wrote its own VM harness for
+  that reason, and gate stage 55 uses that one — the shared harness's self-test proved something nobody used.
+  The VM harness belongs to the project; the rules it must keep remain in `rules/command-safety.md`.
+- `install.sh` no longer lays down `.claude/scripts/qemu.sh`; an untouched old wrapper left in a project is
+  named, and the version stamp is not refreshed until it is removed.
+
+`gate.sh`:
+- **Projects declare coverage of the unimplemented list**: a local stage's header states
+  `# gate-covers: <item>`; only when it ran and passed this round does the item become "covered by which stage".
+  A key not on the list is red. The list splits "QEMU crash injection" (the final acceptance criterion) from
+  "QEMU real workload". Before, the list was hard-coded: singlefs ran crash-point replay and the real-device
+  stage on every gate run, and the summary still printed "nothing under test" and "crash consistency is not
+  yet in the gate".
+- A local stage exiting 77 is recorded as "not run this time" — not a pass, and not coverage.
+
+Rules follow: `show-me-test.md` (the VM harness belongs to the project, coverage declarations, exit 77) and
+`machine-first.md` (controls by content, litmus bound to code); the `crash-test` and `gate` skills and the
+project template follow as well. The `gate` skill also gains the "Unimplemented stages" section the zh source
+has carried since the first version and this translation had been missing.
+
 ## 0.0.47 — 2026-09-13
 
 **Three-way consistency check on 0.0.46, fixing 4 translation issues and 1 drift in the zh source itself.**

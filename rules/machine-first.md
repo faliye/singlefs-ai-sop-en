@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:73ac75e329ac3eda1dda68f8747ff93bc73ecd54aadb3f599c641bc84d3cf7e5 -->
+<!-- generated-from: rules/machine-first.md sha256:fe25a05f9bc995efa3c23d66199761f3691965fdfb7eb281fc5556b395fa5d3e -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -62,10 +62,16 @@ re-checkable answer.** That job now splits in two:
 **Calibration**: the tool is precise, the model is not. The tool answers only the
 litmus you wrote; nothing guarantees you did not omit a scenario that should have
 been asked. That is why `scripts/lkmm.sh` requires **every Never to have its own control**
-(same filename prefix, declared Sometimes): with a Never and no control paired to it,
-you cannot tell whether the barrier held or whether the pattern never had a chance to
-hit. However many Sometimes exist elsewhere does not count — they answer a different
-question.
+(same filename prefix, declared Sometimes, and its content is that litmus with the barriers removed):
+with a Never and no control paired to it, you cannot tell whether the barrier held or whether
+the pattern never had a chance to hit. However many Sometimes exist elsewhere does not count, and
+neither does a "control" with a different reader or `exists` — they answer a different question.
+
+**Between the litmus and the code sits one more translation step, and the model does that one too.**
+If the code changes its order and the litmus does not follow, herd7 still says Never.
+So every Never states which code it models (`singlefs-models`), and `crates/` must hold a test that
+reads it and compares it against the order the code actually issues today. `lkmm.sh` checks that
+both exist; whether the test checks the right thing is for a person to judge.
 
 - **What it holds up**: "exhaustiveness is machine-checkable", and what follows
   from it — "prefer exhaustive explicit branches" and "only a bounded control-flow

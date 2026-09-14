@@ -1,4 +1,4 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:0344edca522bad91dc47e1b1471194004a25d7ea7463b5b3498fdf88111a3cd3 -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:dc968fc6666a7150e3c25cf114f2c07e430a3e20c0812fc944fbc5c6c3157485 -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
@@ -50,11 +50,9 @@ came from; it sorts them into those carrying evidence and those not.
 
 ```bash
 bash .claude/scripts/gate.sh          # the acceptance gate; mandatory before submitting
-GATE_QEMU=1 bash .claude/scripts/gate.sh   # plus the QEMU harness self-test
 
 bash .claude/scripts/check.sh         # fast feedback (format/lint/build/unit tests)
-bash .claude/scripts/lkmm.sh          # memory ordering (herd7 + litmus/)
-bash .claude/scripts/qemu.sh --selftest    # QEMU harness self-test
+bash .claude/scripts/lkmm.sh          # memory ordering (herd7 + litmus/; every Never needs a control and a binding to code)
 bash .claude/scripts/gate-lint.sh     # the gate itself: does every rejection give a next step
 bash .claude/scripts/shell-lint.sh    # shell discipline: pattern-matched kills, values carried out of subshells
 bash .claude/scripts/naming-lint.sh   # naming discipline: single-letter names and common abbreviations in .rs

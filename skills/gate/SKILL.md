@@ -2,7 +2,7 @@
 name: gate
 description: Run singlefs's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:786e9e234520fcd537261a43d8490e2d2dc6a31410bfbc05b33d93782b554cad -->
+<!-- generated-from: skills/gate/SKILL.md sha256:95ad91a20bc28e169480ecce8d6cd1249d30bfe126ec7f7bdbd6f475f9d34644 -->
 
 # The acceptance gate
 
@@ -30,8 +30,8 @@ GATE_BASE=<commit> bash .claude/scripts/gate.sh   # pick the diff base
 | Naming discipline | A name we declare in a `.rs` file is a single letter or a common abbreviation, or `.claude/abbreviations` / `.claude/naming-lint-exclude` is malformed. See `rules/code-discipline.md` |
 | Show me test | `crates/*/src` changed with no test. **This one is not to be bypassed**; see `rules/show-me-test.md` |
 | Build and unit tests | Genuinely broken, or cargo is missing. clippy runs with `-D warnings`, and a `_ =>` arm on an enum that is a closed set is refused as well |
-| Project-local stages | Some local check in `.claude/gate.d/` failed, or could not be read |
-| LKMM | A litmus verdict disagrees with its declaration, or a Never has no paired control |
+| Project-local stages | Some local check in `.claude/gate.d/` failed, or could not be read; a red "覆盖声明（…）" (coverage declaration) means a `# gate-covers:` line names an item that is not on the list |
+| LKMM | A litmus verdict disagrees with its declaration, a Never has no control whose content matches, or it is not bound to code (`singlefs-models` and a test that reads it). See `skills/crash-test/SKILL.md` |
 
 **Three stages run only in the SOP repository itself** (invisible to consuming projects):
 cross-language sync, version discipline, and CHANGELOG continuity.
@@ -40,12 +40,29 @@ cross-language sync, version discipline, and CHANGELOG continuity.
 asks whether the manifest is in step with the rules; inside a project it compares
 **the copy you installed** — a modified or partial copy turns this red.
 
+## Unimplemented stages
+
+Every run, `gate.sh` lists the verification methods the shared gate **does not implement**:
+model-based differential testing, crash-point replay, QEMU real workload, QEMU crash injection,
+and naming discipline for shell scripts. The first four need the thing under test's own write
+stream, image and checker, so only the project can wire them in, under `.claude/gate.d/`.
+A stage that does declares `# gate-covers: <item>` in its header (keys copied literally from
+`gate.sh`); only when it ran and passed this round does the item move under "covered by
+project-local stages".
+
+**This is not noise; it is a precondition for reading the result**: an all-green gate says only
+"documents comply + tests exist + unit tests pass", plus whatever the stages listed under
+"covered by project-local stages" each verified. While no stage covers crash-point replay, any
+claim that "the write path is verified" is false; when a stage does cover it, the claim reaches
+only as far as the write paths that stage enumerated.
+
 ## Common false failures
 
 | Symptom | Real cause |
 |---|---|
 | Show me test says "nothing to judge" | The working tree matches the base. **Neither a pass nor a failure**; make a change and rerun, or set `GATE_BASE=<ref>` |
 | "Upstream freshness not checked" | The upstream repository is not a sibling directory. This item **could not run** and is listed separately in the summary — do not read it as a pass |
+| You wired in a stage, yet the unimplemented list still shows the item | That stage's header lacks `# gate-covers:`, or this round it exited 77 or went red. Only a stage that ran and passed moves the item |
 | Build stage reports cargo missing | Environment problem. Run `env.sh` for the full picture, install the toolchain, rerun |
 | doc-lint flags a rule document itself | That file is missing `<!-- doc-lint:rule-definition -->` |
 | Show me test says no tests, but you wrote some | The tests sit in `crates/*/src/` without `#[cfg(test)]`/`#[test]`, so the script cannot see them |

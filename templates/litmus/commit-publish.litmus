@@ -1,5 +1,5 @@
 C commit-publish
-(* generated-from: templates/litmus/commit-publish.litmus sha256:92dbb6cf8bffde98d1dc7ebc6abeb709995af663f2406e3ed7c9d4c61272cd21 *)
+(* generated-from: templates/litmus/commit-publish.litmus sha256:15d1491bb05768658df3fc4dc55bbc20232a2c332e228bc4a23b17140717c6e6 *)
 
 (*
  * Publication order for a transaction commit: write the new block's contents first,
@@ -14,6 +14,9 @@ C commit-publish
  * P0 = the writer (committing a transaction); P1 = the reader (mount or concurrent read).
  *
  * singlefs-expect: Never
+ * singlefs-models: none — template: shows how a Never is paired with its control; it models no code.
+ *   Once the project has code implementing this order, replace this line with <repo path>::<function name>
+ *   and write a test that reads this file.
  *)
 
 {}
