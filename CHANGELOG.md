@@ -4,6 +4,37 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.49 — 2026-09-14
+
+**Four gate gaps found while wrapping up 0.0.48, fixed together.**
+
+- `gate.sh --staged` leaked its temporary worktree whenever the inner gate went red: the outer script ran
+  "inner; rc=$?" under the `set -e` from lib.sh, so a red inner gate made the outer one exit on that line and
+  cleanup never ran — and red is exactly when you want the result. Measured on fresh repos: worktree
+  registrations went 1 → 1 on a pass and 1 → 2 on a failure. The exit code is now taken inside an `if`.
+- `project_root` only recognised a `.git` directory, while a git worktree's `.git` is a file; nine scripts use
+  `${1:-$(project_root)}`, so run without arguments inside a worktree they walked up to `/` and exited 1 with no
+  output under `set -e`. A `.git` file now counts, and when no root is found it says so and gives a way out.
+- "Copy matches upstream" reported "copy behind upstream" even when the copy was newer, which pointed the wrong
+  way (re-copy the copy, and get the old version back). It now splits by direction: an older upstream is reported
+  as such, and the way out is to update upstream.
+- `install.sh` re-seeded templates a project had deleted (`put` only refuses to overwrite existing files). A file
+  listed in install-owned and deleted by the project is no longer laid down again.
+
+selftest: 267 cases (+7: --staged cleanup on red, finding the root inside a worktree, saying so when there is no
+root, the two version directions, and not re-seeding an owned-and-deleted file plus its read-back). Each of the five
+fixes, reverted one at a time, turns red on the case written for it.
+
+Two measured lessons another session had left uncommitted in the zh working tree are folded into this version as well
+(they had no version bump, no manifest refresh and no translation):
+- `command-safety.md`: `pgrep -f` inside a wait loop matches the loop's own command line and never exits; wait on the
+  literal pid (`kill -0`) or with `wait`. The S3 check in `shell-lint.sh` extends to command position after `if` /
+  `while` / `until` / `!` (`CMD_POS` in `lib.sh` is the one definition), with the fixture `pgrepwait`.
+- `evidence-discipline.md`, "A criterion can be written wrong too", gains a fourth form: the remedies a pre-run clause
+  offers do not reach the cells that were hit; the three questions to ask after a hit become four.
+
+selftest gains one more case for this: 268 in total.
+
 ## 0.0.48 — 2026-09-14
 
 **singlefs's `crates/` now has code, so the LKMM and QEMU gates change with it.**

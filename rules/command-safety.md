@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:90398c0d08ad2547a234d6d5000fcca1191dcac92d4fa7c9bbc07fb9795aaaba -->
+<!-- generated-from: rules/command-safety.md sha256:923b9d8b27581e5c02e4aa48b63b068a9ba2d12acb744619a1490c2e965c988f -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -44,6 +44,17 @@ shell.**
 To stop a process: `ps` first, look at it, then kill by **literal pid** in a separate
 second command. For counting, use structured criteria from `/proc` and exclude your
 own process tree.
+
+**The same pattern string inside a wait loop is another form: it kills nothing, it spins forever.**
+With a wait like `until ! pgrep -f "X"; do sleep 5; done`, the pattern matches the shell command line the
+loop itself runs in, so `pgrep` always finds a match and the loop never exits — and nothing reports an error;
+from outside it just looks like "still waiting".
+Measured (2026-09-13): a loop waiting for a background experiment to finish matched the binary name with
+`pgrep -f`, waited a whole round without exiting, and stopped only when it was killed by its literal pid.
+⇒ To wait for a process to end, use its **literal pid**: `until ! kill -0 "$pid" 2>/dev/null; do sleep 5; done`;
+for a background job you started yourself, use `wait`; for things like VMs, write the pid to a file and wait on that.
+The S3 check in `scripts/shell-lint.sh` turns `pgrep -f` in a script red (after `if` / `while` / `until` / `!`
+also counts as command position); it cannot reach command lines typed by hand, which is why this is written here too.
 
 ## QEMU virtual machines must write their pid to a file
 

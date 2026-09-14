@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:e7667534faabe3f5d9e32baae729a67af3aee0888528f85a8fcd4c7db52cf1ba -->
+<!-- generated-from: rules/evidence-discipline.md sha256:b1497af9b106ff877318dc5bf1af8c50d20476695d7c671ebde5467eee498556 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -219,13 +219,14 @@ been struck down as after-the-fact modelling.
 ### A criterion can be written wrong too: when it fires, first decide which kind it is
 
 A criterion nailed down before the run stops "change the criterion after seeing the result", but the criterion itself
-can be wrong, and that usually shows only at the moment it fires. Three forms:
+can be wrong, and that usually shows only at the moment it fires. Four forms:
 
 | Form | What it looks like | What to do |
 |---|---|---|
 | **The hit does not tell the arms apart** | One cell knocks every arm out at once; the cause lies in a premise all arms share | Do not use it to judge the arms: open a separate item for that shared premise and fix it first; judge the arms only on the cells that tell them apart. When writing a clause like "all out ⇒ fall back to one arm", also write how to record a cell that knocks every arm out |
 | **The discriminator cannot be observed** | The criterion asks the system under judgement to tell two situations apart, but what that system can see at the moment it decides is identical, item for item, in both | Two criteria that demand different outcomes for those two situations contradict each other; any design can satisfy only one. Change the criterion — and a changed criterion is a new round |
 | **The hit is filed under the wrong criterion** | A leg reports "criterion X fires", while what happened belongs, by the wording, to another criterion with a different threshold | Check word by word which clause of which criterion the hit satisfies; filing it wrong knocks an arm out under the wrong threshold |
+| **The remedy does not reach the cells that were hit** | A reverse-acceptance clause written before the run says "hit ⇒ choose between remedy A and remedy B", and one of the remedies is still hit on exactly the cells that were hit | When writing the clause, state for each remedy which cell it fixes; after a hit, check each remedy against the hit cells first, and when handing over one that is still hit, write "does not work on these cells" — leave that out and choosing it keeps the misjudgement in place |
 
 Measured (2026-09-13, two rounds of three-way argumentation on one design question, one of each):
 ① a flaw in administrator rollback knocked all three candidate arms out on the correctness criterion (zero faults),
@@ -237,9 +238,16 @@ later went bad", and those two situations are identical on disk, item for item;
 the correctness criterion (which does not count faults); only when the judging side checked the criteria word by word did
 it find that one more step (the abandoned units being scrubbed first) is needed to really land in the correctness cell.
 
-⇒ **When a criterion fires, ask three questions first**: does it tell the arms apart? Can the system under judgement
+Measured (2026-09-14, the third round on another design question, the fourth form): a clause written before the run
+said "a misjudgement written on the new arm ⇒ let the user choose between 'tighten the new arm once more' and
+'hard-code that the publication writing the row does not take the new instance's own transactions'". Of the three
+cells hit, one misjudged a unit of an abandoned instance, and the other two had no carried-over transaction at all —
+the second remedy did nothing for any of the three, so handing it over as written would have offered an empty choice.
+
+⇒ **When a criterion fires, ask four questions first**: does it tell the arms apart? Can the system under judgement
 actually see, at that moment, what it is asked to tell apart? Which clause of the criterion's wording does it satisfy?
-Only when all three pass, judge by the clauses written before the run.
+Is each remedy the pre-run clause offers still hit on the cells that were hit? Only when all four pass, judge by the
+clauses written before the run.
 
 ## Quote an artifact by copying the line whole
 
