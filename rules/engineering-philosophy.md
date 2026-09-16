@@ -1,4 +1,4 @@
-<!-- generated-from: rules/engineering-philosophy.md sha256:0be2426b15bd92d9b142e18142e0abb13d0154de08fc9725202faa29df1fc588 -->
+<!-- generated-from: rules/engineering-philosophy.md sha256:2418a48eb7d03a4083d95e9595ea9aa9da6dae10fde6b37f0c3091e6dcb02e7e -->
 <!-- doc-lint:rule-definition -->
 # Engineering Philosophy
 
@@ -70,8 +70,8 @@ information content):
 | **Bounded path count** | how many cases does exhaustive coverage of this code's control flow need? If you cannot state it, or it is unbounded, it cannot be verified. **It is path count, not nesting depth** — and it is a necessary condition for verifiability, not a sufficient one |
 | Consistent conventions | inconsistent conventions defeat mechanical checking — this is a different thing from "design uniformity"; do not conflate them |
 
-**The criterion is still the same one**: does this make verification easier, or
-does it only make things easier on the eye? All four in the table make verification
+**The criterion is still the one in `machine-first.md`**: does this rule make the code easier
+to verify mechanically, or only easier on the human eye? All four in the table make verification
 easier, so they stay — **with their reasons rewritten in terms of verification and
 information, no longer hung on "readability".**
 **How this lands in code is spelled out in `code-discipline.md`**: no length cap on names,
@@ -110,5 +110,5 @@ semantic correctness.** Below it is the implementation axis; above it, review.
 | Axis | Lands in |
 |---|---|
 | Implementation | `machine-first.md`, `code-discipline.md`, `kb-discipline.md`, plus each project's own design discipline |
-| Review | the howto requirement in `show-me-test.md`, `design-doc-discipline.md`, the basis requirement for decision records |
+| Review | the howto requirement in `sop-first.md`, `design-doc-discipline.md`, the basis requirement for decision records |
 | The line | `show-me-test.md`, "what the gate can and cannot prove" |

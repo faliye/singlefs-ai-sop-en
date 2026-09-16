@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:f0f68a10da14e664d5aee90b673633e6f1e19d8066a7725c4d49de0391f5d34a -->
+<!-- generated-from: rules/test-discipline.md sha256:7faba254f1d4d9bb01f9d9fd4b7286e4dc8d1addb24a9bf28b158dda8cf0cbbc -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -58,7 +58,7 @@ criterion leaves no trace and cannot be spotted afterwards.
 
 **What you must read is the definition, not the answer.** The basis, parameters and
 semantics of the thing under test have to be read verbatim (`verify-before-claiming.md`,
-"'Is it settled' and 'what does it actually say' are two different questions"), whereas
+"whether it is settled and what it actually says are two different questions"), whereas
 "last round measured X" and "project Y says this way is faster" are answers, and reading
 one is handing yourself the answer key.
 
@@ -100,9 +100,9 @@ another leg caught it by reading the antecedent word for word.
 
 ⇒ **Every time you pin a failure clause, write the next sentence: "what observation would make
 this fire".** If you cannot write that sentence, the clause is either backwards or vacuous, and
-both amount to having no clause. This is the same thing as this section's main point seen from
-the other end: the main point governs "the clause makes the conclusion unfalsifiable", this one
-governs "the clause itself can never be triggered".
+both amount to having no clause. This is the same thing as "an experiment's failure clause must not
+make its conclusion unfalsifiable" seen from the other end: that rule governs "the clause makes the
+conclusion unfalsifiable", this one governs "the clause itself can never be triggered".
 
 ### Do not write a criterion as a conjunction; a threshold must not be a tautology of the arm's definition
 
@@ -216,6 +216,25 @@ otherwise finding none may only mean nothing was scanned.
 
 After writing a check, ask: if the thing under test really were broken, would this go
 red? If you cannot answer, it is not finished.
+
+## Which half the gate handles
+
+**Exactly one item in this rule is a check**: change `crates/*/src/` and you must bring
+tests, judged by `scripts/show-me-test.sh`. Three more sit on the unimplemented list that
+`gate.sh` prints every time: model-based differential testing, crash-point replay and the final criterion.
+Model-based differential testing needs an ideal model of the thing under test, crash-point replay needs its own recorded write stream and checker, and the final criterion
+is set by the project (`show-me-test.md`), so only the project can wire them up in `.claude/gate.d/` and
+declare `# gate-covers:`.
+
+**Everything else runs on people, and there is no plan to make it a check for now**:
+whether the round count is enough, how a deterministic experiment is written, whether the
+criteria were pinned before the run, whether both controls ran, whether a failure clause can
+ever fire, whether an assertion pinning an absolute value sits beside the cross-arm one,
+whether a quantity a clause feeds into a predicate was reported as a trajectory, whether a
+mutant is equivalent, whether the checker has discriminating power, whether a negative
+result proves the path really executed. All of these judge **semantics**, out of a machine's
+reach; it is written here so that "the gate is all green" is not read as "this rule was
+kept".
 
 ## A negative result must be separable from "the code never ran"
 

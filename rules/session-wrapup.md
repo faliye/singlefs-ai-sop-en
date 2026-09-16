@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:154f1b625663e5a3f0c5bd543f76c422f0b4ac0eb5e595498eb1c5399502451b -->
+<!-- generated-from: rules/session-wrapup.md sha256:c1cbbd31e15430b9a3bb02508f8a161d6f7ee79d5479408f12c3d5edd23147f3 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -72,6 +72,10 @@ through them before wrapping up:
   When you cannot tell, run `bash .claude/scripts/gate.sh --staged`: it runs the whole gate
   in a temporary worktree on HEAD plus the index only, so other sessions' unstaged changes
   and untracked files stay out — whatever goes red there is what this commit brings in.
+  Conversely, when you run without `--staged` and the working tree changes while the gate runs (you are still editing,
+  or another session is), the stages do not all read the same version and the red/green summary corresponds to no version
+  at all; `gate.sh` fingerprints the working tree at the start and at the end and goes red when they differ.
+  **Wait until the edits stop, or use `--staged`.**
 - **Shared numbering is first-come, first-served.** For history entry ordinals,
   experiment numbers and the like, look up the highest existing number before taking
   one. Edit shared files by targeted replacement only, never by rewriting the whole
@@ -83,6 +87,9 @@ through them before wrapping up:
   where the tool layer can stop it (a pre-write hook that refuses to overwrite untracked files), stop it there.
   Measured (2026-09-12): one whole-file write overwrote another session's freshly written pre-run registration, which
   was restored word for word only by replaying that session's conversation transcript.
+- **"Commit only these paths" is not `git commit -- <path>`.** A commit given paths commits what those paths hold in the **working tree**, not in the index — when the same file also carries another session's uncommitted edits, they ride along.
+  And the index itself is shared: another session can put its files into it at any moment. So before staging, confirm `git diff --cached --name-only` is empty; after staging and before committing, check the list and each file's cached diff once more, then `git commit` with no paths.
+  Measured (2026-09-12), the second kind: only explicit paths were `git add`ed and the commit was made without paths, yet a version-stamp file another session had staged in the meantime went into the commit.
 
 If you collide on a number and it can be made into a check that goes red, make it one
 (`rules/show-me-test.md`, "turn traps you have hit into checks that fail"); on the

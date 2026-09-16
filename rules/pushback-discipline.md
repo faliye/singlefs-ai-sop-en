@@ -103,7 +103,7 @@ months later**: when new data lands, whoever left the record knows which item to
 to, while without one there is only a decision of unknown parentage and the whole argument
 gets had again. Write it as a neutral fact, not as "I told you so".
 
-## Which half the gate covers
+## Which half the gate handles
 
 **The conversation half is invisible to the gate.** The proposal is in the conversation
 and so is the objection; no script reads a word of it.

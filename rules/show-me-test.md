@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:5df567894d900a76dd95add54abdb94e20ce9d183a84a8461a0adab617dd02e4 -->
+<!-- generated-from: rules/show-me-test.md sha256:8dde3dc33b250f059d95dca7f161e883333d76a2bf1fd9054de7a1a94b0b7f52 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -115,19 +115,19 @@ undercounted by 17 bytes all along, and nothing raised an alarm.
 each pinned to its own value; a check that only asks "is the value right" stays silent when one name is used for two
 quantities (the other side of "one semantic concept, one name across the repo" in `code-discipline.md`).
 
-## The final criterion is QEMU/KVM stress testing
+## The final criterion is set by the project
 
 Unit tests and model-based differential testing are fast feedback. **They are not
-the acceptance criterion.** The acceptance criterion is running a real workload plus
-crash injection under QEMU/KVM, with the checker all green afterwards.
-
-How many disks to attach, which binary to put in, how to capture results, how to record on the
-device side — all of it is bound to the thing under test, so **the VM harness and its gate stages
-live in the project; the shared gate carries none**. The rules the harness itself must keep are in
-`command-safety.md`. A stage that runs the real workload declares `# gate-covers: QEMU 真实负载` in its
-header (keys are copied literally from `gate.sh`); one that also does crash injection and ends with
-the checker all green declares `# gate-covers: QEMU 崩溃注入` as well. Only when that stage ran and
-passed this round does `gate.sh` move the item from the unimplemented list to "covered by which stage".
+the acceptance criterion.** The acceptance criterion is bound to the thing under test: which
+environment to bring up, which workload to run, which faults to inject — the project decides,
+tests and verifies all of it itself, and the apparatus and its gate stages live in the project;
+the shared gate carries none. The unimplemented list always carries `最终判据` (final criterion). Before
+writing that key, write the acceptance criterion into the project's own kb: which environment, which workload,
+which faults. Only a stage that does all of it declares `# gate-covers: 最终判据` in its header; a stage that
+does part of it does not, because the gate cannot tell whether it is complete and the summary would claim too much.
+A stage covering any other item on the list declares `# gate-covers: <that item>` the same way (keys are copied
+literally from `gate.sh`). Only when that stage ran and passed this round does
+`gate.sh` move the item from the unimplemented list to "covered by which stage".
 
 ## The gate must not pretend to pass
 
@@ -152,10 +152,26 @@ failing, and the tail still reports green with nobody able to tell.
 ⇒ A check that scans a set of objects must report **how many items it checked** in its
 success line; `gate-lint.sh` enforces this.
 
+**Reporting "how many were checked" is not enough: "which were not checked" must be listed one by one too, and that list must be computed on the spot.**
+A stage can honestly report how many items it checked while missing a whole other half of its objects: both statements are true,
+and the reader cannot see that the second one exists. Measured (2026-09-16, singlefs's rerun stage): it reported "ran 119 this time",
+`gate-lint` was all green, and none of the 9 timing rows in that table had run; 6 of them neither ran nor appeared on any line.
+What it hid were two real problems: one experiment's retained artifact had long stopped matching its source, and another panicked outright in a release build.
+The root cause was a hand-copied skip list — hard-coded as 4 numbers, while what really did not run was every timing row in the table plus those 4.
+**So the skip list must come from the same data as the scanned set, computed on the spot**; the success line reports both "ran N; did not run M: named one by one".
+This is not a check yet: `gate-lint` does not look at whether a script that reports a count also lists what it skipped, so it rests on whoever writes the stage.
+
+**The number in the success line needs something pinning it too.** It is a success line, so it never goes red; it reports a count,
+so it satisfies "a check that scans a batch reports how many it checked"; it is not a rejection, so none of the other three `gate-lint` rules reaches it.
+Put together, a miscounted statistic can stay green in the gate indefinitely, and it is exactly the conclusion people read.
+Measured (2026-09-16, singlefs's kb-rot stage): it reported "326 checks owed, 0 paid off"; the true numbers were 297 and 29 —
+the boundary was hard-coded to one heading, the table had been moved above that heading, and so everything paid off was counted as owed.
+**So a statistic in a success line is either pinned with `want=` in a discrimination fixture, or it stays out of the success line.**
+
 **Project-local stages follow the same rules as shared ones.** They reject submitters
 just like shared stages, so they are subject to `gate-lint` and `shell-lint` too —
-`gate.sh` hands `.claude/gate.d/` to both lints. (Until now it was in neither lint's
-scan; the first run over it produced 7 rejections with no way out.)
+`gate.sh` hands `.claude/gate.d/` to both lints (the first scan over singlefs's local
+stages found 7 rejections with no way out).
 
 # What the gate can and cannot prove
 
@@ -170,7 +186,7 @@ silent error this project most wants to avoid.
 | Case | Why the gate cannot see it |
 |---|---|
 | the test tests the implementation, not the contract | it counts whether a test exists, it does not judge whether the test is right |
-| the litmus declaration is itself wrong | declared Sometimes, measured Sometimes → "matches". **Without a control case** that proves nothing |
+| the declaration is itself wrong | declaration and measurement agree → "matches", though the declaration is wrong. **Without a control case** that proves nothing |
 | the invariant itself is wrong | the checker will faithfully check a wrong rule, all green |
 | the covered path is not the one that breaks | coverage is not correctness |
 | the number in the prose disagrees with its own artifact | the replay's **range** assertion pins only which band the conclusion lands in, not the number in the prose: the wider the range, the further the prose can drift (measured: the prose said 1.475×, the kept artifact says 1.625×, the range is [1.15, 2.10] — all green) |

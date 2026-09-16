@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:fe25a05f9bc995efa3c23d66199761f3691965fdfb7eb281fc5556b395fa5d3e -->
+<!-- generated-from: rules/machine-first.md sha256:0aa7ae3483c2b45e258cf9d1adae32ecb642b93571424c102c36200d6a86ea4b -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -13,11 +13,9 @@ through the criterion again; the ones that fail are dropped.
 ## Stance: inherit sceptically, not by default
 
 The default attitude toward established "best practice" is **doubt**, not compliance.
-
-The reason is direct: **a substantial share of these principles exist to hold up a
-quality floor under the constraint of limited human cognitive capacity.** They are
-calibrated to the human limit. Machine capacity passed that line some time ago, and
-**a floor set to the old limit is a floor set too low.**
+The reason is in `engineering-philosophy.md`, "Why the old commandments need re-deriving", and is
+not repeated here: most of these principles are floors set to the limit of the human brain, and
+that limit is no longer the constraint.
 
 This does not mean they are all wrong — it means **their reasons must be re-checked**,
 and "everyone does it this way" is not one of them.
@@ -56,22 +54,17 @@ re-checkable answer.** That job now splits in two:
 
 | Who | Does what | Precision |
 |---|---|---|
-| herd7 / LKMM | **Exhausts** every interleaving the memory model permits, returns a Never / Sometimes verdict | Complete for the litmus you actually wrote |
-| The model | Translates the synchronisation pattern in the code into a litmus; enumerates which scenarios to ask about | **Incomplete — the gap is here** |
+| The tool | **Exhausts** every interleaving a given formal model permits, and returns a verdict | Complete for the formal model you actually wrote |
+| The model | Translates the synchronisation pattern in the code into that formal model; enumerates which scenarios to ask about | **Incomplete — the gap is here** |
 
 **Calibration**: the tool is precise, the model is not. The tool answers only the
-litmus you wrote; nothing guarantees you did not omit a scenario that should have
-been asked. That is why `scripts/lkmm.sh` requires **every Never to have its own control**
-(same filename prefix, declared Sometimes, and its content is that litmus with the barriers removed):
-with a Never and no control paired to it, you cannot tell whether the barrier held or whether
-the pattern never had a chance to hit. However many Sometimes exist elsewhere does not count, and
-neither does a "control" with a different reader or `exists` — they answer a different question.
+question you wrote down; nothing guarantees you did not omit a scenario that should have
+been asked, or that what you wrote down is what the code does today.
 
-**Between the litmus and the code sits one more translation step, and the model does that one too.**
-If the code changes its order and the litmus does not follow, herd7 still says Never.
-So every Never states which code it models (`singlefs-models`), and `crates/` must hold a test that
-reads it and compares it against the order the code actually issues today. `lkmm.sh` checks that
-both exist; whether the test checks the right thing is for a person to judge.
+Which tool to use, how to show its verdicts have discriminating power, and how to bind the formal
+model you wrote to the code are all bound up with the thing under test, so **the project decides,
+tests and verifies them itself**, in its project-local rules. The shared gate carries none of this layer.
+Basis: singlefs judges its memory-ordering declarations with herd7 / LKMM, and records the tool version in its `.claude/kb/verification-build.md`.
 
 - **What it holds up**: "exhaustiveness is machine-checkable", and what follows
   from it — "prefer exhaustive explicit branches" and "only a bounded control-flow
@@ -87,7 +80,7 @@ relaxation is withdrawn on the spot:
 |---|---|
 | The model drops a mid-context fact at this project's actual scale — misses a constraint already in the window | The "keep PRs small" relaxation; go back to slicing at a size that fits |
 | Generated duplicate code no longer matches its generator | The "DRY" relaxation; back to no duplication |
-| A litmus verdict contradicts a real-hardware stress result | "Exhaustiveness is machine-checkable"; `lkmm.sh` demotes to reference and stops being a gate |
+| The verdict of the tool the project uses to exhaust interleavings contradicts what real hardware shows | "Exhaustiveness is machine-checkable"; that tool demotes to reference and stops being a gate |
 
 **This table is this file's own disproof step** (`evidence-discipline.md`): a
 premise for which you cannot state "what would overturn it" is not a premise, it

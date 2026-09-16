@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:ccefa39750d9a4fb30ad5202f4905b79649cb56c6d95ff0959df399e2e5b7879 -->
+<!-- generated-from: CLAUDE.md sha256:2ed859d0a1c739a0d101b2425a2e482021a2b226e2107fef64da7f833a541324 -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -31,7 +31,11 @@ see that a hash does not match — not whether the editions say the same thing.
 **Pushing goes through a hook that checks and pushes every edition together.** Run
 `git config core.hooksPath scripts/githooks` once in each language repo; after that, `git push` in any of
 them first checks every language repo (on master, clean working tree, same VERSION, gate green) and
-only then pushes them all. See `scripts/push-all.sh`.
+only then pushes them all. See `scripts/push-all.sh`. Pushing any other ref (a feature branch, a tag) does
+not trigger it: only the ref you named gets pushed.
+
+⚠️ **Do not probe this path with `git push --dry-run`**: the hook cannot tell a dry run from a real one, so
+the run that pushes master pushes the other two language repos **for real**.
 
 **What gets translated and what gets copied verbatim** turns on one question: is there
 prose written for people in it? The two lists live in `scripts/manifest.sh`

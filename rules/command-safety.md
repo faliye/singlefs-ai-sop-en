@@ -1,11 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:923b9d8b27581e5c02e4aa48b63b068a9ba2d12acb744619a1490c2e965c988f -->
+<!-- generated-from: rules/command-safety.md sha256:81fded7520c9cc967fab9500f3c69a9398904906282cfd06930f1bd9aa616ec6 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
-Four of these are failing checks now, not reminders — `scripts/shell-lint.sh` judges
-them: **killing processes by pattern match**, **carrying a value out of a subshell
-through a variable**, **git's undo commands inside a script**, and **`rm -rf` on an
-unguarded variable path**. The rest are still prose, because the criterion for
+Five of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
+by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
+subshell through a variable**, **git's undo commands inside a script**, and **`rm -rf` on
+an unguarded variable path**. The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
 can and cannot prove" — what is not done has to be said, not glossed over).
 
@@ -52,14 +52,11 @@ from outside it just looks like "still waiting".
 Measured (2026-09-13): a loop waiting for a background experiment to finish matched the binary name with
 `pgrep -f`, waited a whole round without exiting, and stopped only when it was killed by its literal pid.
 ⇒ To wait for a process to end, use its **literal pid**: `until ! kill -0 "$pid" 2>/dev/null; do sleep 5; done`;
-for a background job you started yourself, use `wait`; for things like VMs, write the pid to a file and wait on that.
-The S3 check in `scripts/shell-lint.sh` turns `pgrep -f` in a script red (after `if` / `while` / `until` / `!`
-also counts as command position); it cannot reach command lines typed by hand, which is why this is written here too.
-
-## QEMU virtual machines must write their pid to a file
-
-Tear them down by the literal pid from that file; never by name matching.
-A runaway VM will eat all memory, and name matching will take other tests down with it.
+for a background job you started yourself, use `wait`; for one you did not start (a daemon another script launched, say), have whoever starts it write its pid to a file and wait on that.
+The S3 check in `scripts/shell-lint.sh` turns every `pgrep -f` in command position in a script red (after `if` /
+`while` / `until` / `!` also counts as command position), without looking at whether the same line also has a `kill`:
+assign it to a variable and kill on the next line, or just count the matches, and the pattern still hits its own
+command line. It cannot reach command lines typed by hand, which is why this is written here too.
 
 ## Do not use echo to fake success
 
@@ -72,10 +69,10 @@ Any command that changes state must be verified by **reading the state back**: a
 ## Result collection needs a completeness gate
 
 The program under test prints results and a script outside collects them — **losing a
-line on that path is silent**. Consoles get polluted by BIOS escape sequences, kernel
-logs and serial noise, and anchoring at start-of-line (`grep '^ANCHOR'`) quietly drops
-the line whose start got overwritten. What you see outside is "one item fewer",
-not "something failed".
+line on that path is silent**. Other things get mixed into the output (text written in by
+another process, escape sequences, a previous line left without its newline), and anchoring at
+start-of-line (`grep '^ANCHOR'`) quietly drops the line whose start got overwritten.
+What you see outside is "one item fewer", not "something failed".
 
 **Do this**: have the program under test report, on its final line, how many results it
 emitted; the collector compares the count and discards the round on a mismatch.
@@ -107,10 +104,9 @@ results forever while the exit code stays 0 — green light, wrong answer.
 
 Under `set -u` it is worse: the reference is not an empty value, it is an immediate
 "unbound variable" that **takes the script down before it prints its diagnosis**.
-Measured in this repository's own QEMU harness — five failure branches never printed
-a single `howto`, and those branches are exactly where you need one when the harness
-is lying. A comment cannot stop this, so it is now a failing item in
-`scripts/shell-lint.sh`.
+Measured: five failure branches of a test apparatus never printed a single `howto`, and
+those branches are exactly where you need one when the apparatus is lying. A comment
+cannot stop this, so it is a failing item in `scripts/shell-lint.sh`.
 
 ## After a script edits a file, read it back — a compiler warning is a free signal
 
@@ -130,6 +126,21 @@ wave it off.** Observed: a replacement failed to take because of an indentation
 mismatch, leaving a method as dead code. Every build reported it `never used`, and
 that warning was ignored for a whole round — while the conclusion drawn from that
 code **pointed in the wrong direction.**
+
+## Three silent failures at a process boundary
+
+`set -e`, `pipefail` and environment variables all go wrong where one process calls
+another, and the form is always the same: **the exit code is right, the criterion never
+ran.**
+
+| Form | Measured | How to write it |
+|---|---|---|
+| `inner; rc=$?` under `set -e` | The moment the inner one goes red the outer shell exits on that very line, so nothing after it runs — and red is exactly when the result matters most | Take the exit code inside an `if`: `if inner; then rc=0; else rc=$?; fi` |
+| `export X="$(cmd)"` / `local x="$(cmd)"` | `export` and `local` are commands, and their own exit code masks the command substitution's; a failing `cmd` counts as a success | Assign first, `export` second — write it as two lines |
+| An environment variable used for a handshake leaking into a child process | The variable the outer level set for the inner one is still in the environment, and a third level started by the inner one takes it as its own input — measured: two false reds when the gate self-test ran nested | `unset` it as soon as it is read; clear it with `env -u` when starting a child process |
+
+**So the criterion is "how many process levels does this value cross"**: cross one and you
+have to ask whether it is still there at the next level, and whether it should be.
 
 ## The exit code of a pipeline is not the one you want
 

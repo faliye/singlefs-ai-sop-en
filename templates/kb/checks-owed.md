@@ -1,4 +1,4 @@
-<!-- generated-from: templates/kb/checks-owed.md sha256:264069c9878b2fb21c88d0ec6af91be0a46e60ab8642ecf81ff3e61e725da9e7 -->
+<!-- generated-from: templates/kb/checks-owed.md sha256:4a03be119c2d1d9d54c79672ce2f7d63321de8230121c760a1de35ac9ca16fb8 -->
 # Checks owed
 
 **`checks-owed.md` holds checks we already know we want but cannot yet enforce.**
@@ -9,7 +9,7 @@ image**, and the checker is its executable form; `checks-owed.md` holds requirem
 
 **The bar for writing one down**: you can state what it stops, how it goes red, and what
 prerequisite is missing. Missing any of the three means it is not thought through yet;
-do not write it (`singlefs-ai-sop/rules/sop-first.md`).
+do not write it (`../singlefs-ai-sop/rules/sop-first.md`).
 
 <!-- doc-lint:registry name-col=2 -->
 

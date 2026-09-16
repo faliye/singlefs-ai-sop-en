@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:0845b9ce38e46e9a6feb374ddb7b945832b1926a5d7054d2af038957e3e3480d -->
+<!-- generated-from: rules/kb-discipline.md sha256:ae592faac47d7e663d421d07fc2a31359540a597c9acb4b6a5d374c76e30ef2c -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -30,6 +30,9 @@ by people, not by the gate.
 **Self-references are equally forbidden** — "this entry", "this decision", "this
 experiment", "that decision", "this invariant", "this section", "this table", "this
 file", "this document".
+Of these, "this file" is outside the gate: doc-lint's self-reference word list has no "file"
+ending, and a genuine self-reference almost always says "this document". Writers still must
+not use it to point at the document; that half is checked by people.
 
 A self-reference is sneakier than a dangling reference: a dangling reference at least
 points in a direction, while a self-reference points at **"here"** — and the item
@@ -157,7 +160,7 @@ characters): **every citation has to carry it, and a name too heavy to carry is 
 all**. Domain terms (`RAID5`, `SHA256`) are shaped exactly like numbers and a machine cannot
 tell them apart; exempt them explicitly: `<!-- doc-lint:not-numbers RAID5 SHA256 -->`.
 
-**Which half the gate covers**: `scripts/doc-lint.sh` enforces the mechanically decidable
+**Which half the gate handles**: `scripts/doc-lint.sh` enforces the mechanically decidable
 half —
 
 | What it checks | The criterion |

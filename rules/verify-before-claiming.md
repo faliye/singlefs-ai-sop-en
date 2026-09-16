@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:672e8e2d3bba54b250ad1873876df7b852003bff03939b91512e9e5f7bc30eb8 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:bf91b423123ba76a6324ea0c0c922a81b2776d17ec8dd8c8bbaf4858179a958b -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -22,7 +22,7 @@ without my knowing:
 **What does not need checking now**: files read earlier in this same conversation,
 pure code-logic derivation, arithmetic.
 
-## "Is it settled" and "what does it actually say" are two different questions
+## Whether it is settled and what it actually says are two different questions
 
 Checking the status column and confirming a decision is "settled" **does not mean you
 know what it settled on**. Before using a decision to build a model, write a check, or
@@ -81,6 +81,18 @@ source directory together and was cut at 12 lines; only one source file surfaced
 ahead as if it were the only one — the same-named constant in three more source files sat past the cut.
 ⇒ **Before saying "only these places" or "these are all the matches", do not truncate the output**; if it is long,
 count first (`grep -c`, `| wc -l`), and read the contents once the count matches.
+
+## Which half the gate handles
+
+**Not one item in this rule is a check.** "Check now, before you say it" is a behaviour,
+not a textual form: the same sentence looks identical in the file whether it was checked on
+the spot or written from memory, and no machine can tell the two apart.
+`scripts/doc-lint.sh` reaches only the written side (a kb entry's source and status, whether
+a number carries its short name); it cannot check whether a sentence was just verified.
+
+So this rule runs entirely on people. It is written here not as an excuse but so that "the
+gate is all green" is not read as "this rule was kept" (`show-me-test.md`: the gate proves
+that evidence requirements are met, not semantic correctness).
 
 ## Putting it into practice
 

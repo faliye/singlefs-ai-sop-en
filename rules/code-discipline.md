@@ -1,4 +1,4 @@
-<!-- generated-from: rules/code-discipline.md sha256:f2aebb3050a6fa8595182ca917ccfecc0eca2516614b34eecd81687214b66834 -->
+<!-- generated-from: rules/code-discipline.md sha256:25eadcaaea2f539c4914ad802a50d72b45021fde323ad3ce8d3fa9df8ea6b498 -->
 <!-- doc-lint:rule-definition -->
 # Code discipline: how machine-first lands in code
 
@@ -342,8 +342,8 @@ dropped, relaxed, rewritten, kept (reason rewritten), left to tooling, demoted t
 | Call the loop counter `i` and the temporary `tmp` | Linux kernel coding style | fewer characters, convention | **dropped** | Name it for what it is: `stripe_index`, `unflushed_block` |
 | Generic parameters `T`, `U`; lifetimes `'a` | Rust convention | fewer characters | **dropped** | Name them for their role: `Key`, `Value`, `'journal` |
 | Abbreviations everyone knows are fine | common saying | fewer characters | **dropped** | Spell them out; a domain abbreviation may be used once registered |
-| Names must be pronounceable | *Clean Code* | people discuss code out loud | **this reason dropped** | What matters is no ambiguity and searchability; with no abbreviations, a name is pronounceable anyway |
-| Names must be searchable | *Clean Code* | people search in an editor | **kept, and stronger** | grep is how a model finds things: one name per semantic concept, and one search across the repository finds them all |
+| Names must be pronounceable | *Clean Code* | people discuss code out loud | **kept, reason rewritten** | What matters is no ambiguity and searchability; with no abbreviations, a name is pronounceable anyway |
+| Names must be searchable | *Clean Code* | people search in an editor | **kept, reason rewritten**, and stronger | grep is how a model finds things: one name per semantic concept, and one search across the repository finds them all |
 | Hungarian notation, `m_` prefixes, `I` on interface names | old C / C++ / C# conventions | the editor did not show types | **dropped**; what it wanted goes to types | A different meaning is a different newtype; a unit the type cannot express goes into the name |
 | No noise words like `Manager`, `Helper`, `Data`, `Info` | *Clean Code* and others | they carry no information | **kept** | If deleting the word takes nothing away from the name, it was saying nothing |
 | Don't repeat the module name in the type name (`block::Address`) | clippy's `module_name_repetitions`, Go package naming conventions | the full path reads as repetitive | **dropped** | A name stands on its own: write `BlockAddress`. This deliberately makes the name carry namespace information, and accepts longer type names as the cost |
@@ -376,7 +376,7 @@ dropped, relaxed, rewritten, kept (reason rewritten), left to tooling, demoted t
 
 | Popular practice | Source | What it originally solved | Disposition | How we write it |
 |---|---|---|---|---|
-| Value objects instead of primitive types | *Refactoring* (Primitive Obsession) | domain meaning | **kept, and stronger** | A different meaning is a different type |
+| Value objects instead of primitive types | *Refactoring* (Primitive Obsession) | domain meaning | **kept, reason rewritten**, and stronger | A different meaning is a different type |
 | Make illegal states unrepresentable | Yaron Minsky | fewer checks to write | **kept** | See "Types" |
 | Parse, don't validate | Alexis King | the conclusion of validation gets lost | **kept** | Verify once at the boundary, turn it into a type that carries the proof, and trust the type from there on |
 | Private fields with getters / setters | Java-family encapsulation convention | freedom to change the implementation later | **rewritten** | Encapsulation exists to protect an invariant: fields with one are private, fields without one are simply public |
@@ -414,7 +414,7 @@ dropped, relaxed, rewritten, kept (reason rewritten), left to tooling, demoted t
 | A catch-all error type such as `anyhow`, `Box<dyn Error>` | Rust ecosystem convention | fewer error types to write | **dropped at a library's public boundary** | The caller cannot branch: variants are split by the decision the caller must make, with the underlying cause carried as the source |
 | `unwrap()` when you are sure it cannot fail | Rust convention | one line shorter | **dropped** | Use `expect`, with a message naming the invariant it relies on |
 | Defensive programming: check arguments everywhere | common saying | keep bad input out | **rewritten** | Check once at the boundary, turn it into a type that carries the proof, and do not re-check inside |
-| Error codes or exceptions | a debate across languages | each has its cost | **left to types** | Failure is written into the return type, and the compiler forces it to be handled |
+| Error codes or exceptions | a debate across languages | each has its cost | **rewritten** | Failure is written into the return type, and the compiler forces it to be handled |
 
 ### Comments and documentation
 
@@ -443,7 +443,7 @@ dropped, relaxed, rewritten, kept (reason rewritten), left to tooling, demoted t
 | One assertion per test | *Clean Code* | see at a glance which one went red | **dropped** | One scenario per test; several assertions are fine, each with a message saying what it expects |
 | Coverage must reach some percentage | common practice | quantify whether testing is enough | **rewritten** | Coverage is not correctness; argue with path counts and mutation lists (`test-discipline.md`) |
 | Mock every dependency | common practice | fast, isolated | **rewritten** | A mock encodes the test author's assumptions, which amounts to handing yourself the answer; prefer the differential-testing model and real implementations |
-| The test pyramid: mostly unit tests | Mike Cohn | speed | **rewritten** | Unit tests are fast feedback; acceptance rests on model-based differential testing, crash-point replay and QEMU stress (`show-me-test.md`) |
+| The test pyramid: mostly unit tests | Mike Cohn | speed | **rewritten** | Unit tests are fast feedback; acceptance rests on the final criterion the project sets (`show-me-test.md`) |
 | Test code must be DRY too | common practice | less to write | **relaxed** | Each test reads as its own scenario; setup may move into helpers, assertions may not |
 | A flaky test passes after a few reruns | common practice | don't block the pipeline | **dropped** | Unstable is reported as unstable, never rerun until green (`test-discipline.md`) |
 | Write the test first | Kent Beck (TDD) | derive the design from usage | **kept, reason rewritten** | Watching it go red first is what proves it can go red (`show-me-test.md`) |
@@ -479,7 +479,7 @@ afterwards has to support it forever. That side needs its own criterion; you can
 | Shadowing with an unrelated meaning | clippy `shadow_unrelated` |
 | Warnings are errors | clippy `-D warnings` |
 | Whether a name says enough, whether one concept has one name, whether a function does one thing, whether a comment says why, whether error variants follow the caller's decisions, whether loop state is written out, `..Default::default()` | review. A machine cannot judge these, or no ready-made check exists yet |
-| Names in shell scripts | **not yet a check**; `gate.sh` lists it among the unimplemented stages |
+| Names in shell scripts | **not yet a check**; `gate.sh` lists it among the unimplemented stages. ⚠️ This discipline applies to shell just the same, but **the existing scripts have never been swept**: `scripts/` still holds a hundred-odd single letters and abbreviations. Do not take them as models |
 
 The clippy ones run inside `scripts/check.sh`, i.e. the gate's "Build and unit tests" stage; that stage does not run when the project root has no `Cargo.toml`.
 

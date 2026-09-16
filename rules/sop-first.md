@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:dd68bd2779e0e24df982a1ae9b00f9c5fa4f00c7c87f63102187ffa27ec8dff2 -->
+<!-- generated-from: rules/sop-first.md sha256:c22648ee6b8e02a80c6b7a5a4d601846000313e8a608a59b1e07726ac2c6310c -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -49,7 +49,8 @@ right" to guesswork — and people who can only guess will route around the gate
 simply not submit. **Both outcomes are worse than letting the patch through.**
 
 So: **when rejecting, state what to do next.**
-Enforced by `scripts/gate-lint.sh`, which covers both shapes of rejection:
+Enforced by `scripts/gate-lint.sh`, which covers every shape of rejection in the table
+below:
 
 | Shape | Where the remedy goes | Criterion |
 |---|---|---|
@@ -58,15 +59,13 @@ Enforced by `scripts/gate-lint.sh`, which covers both shapes of rejection:
 | a printed `✗` (an `echo`, or a `print` in embedded python) | the `→` line before the next rejection | no `→` in between fails |
 
 The `die` row is not an afterthought: `die` is `bad` + `exit`, so it is a rejection
-too. For as long as the gate only recognised `bad`, a rejection as remedy-free as
-`die "unit tests failed"` sat right on the gate path, and 17 `die` sites were exempt
-as a group.
+too — and a rejection as remedy-free as `die "unit tests failed"` is one that checking
+only `bad` cannot find.
 
 The third row covers **a project's own local stages**. Most of them do not source
 `lib.sh`; they `echo "  ✗ …"` directly, or put the criterion inside embedded python:
 `print('  ✗ …')` — neither of the first two rows reaches them. Measured on singlefs's
-local stages: 46 such rejections, all exempt until now, 14 of them with no next step
-at all.
+local stages: of 46 such rejections, 14 had no next step at all.
 
 The window is not 5 lines here: python often prints one `✗`, then loops through the
 offending items, and only then gives the remedy — 5 lines would misjudge the whole
@@ -86,8 +85,7 @@ state the next step, the criterion behind the check is not clear to you either.
    the rule rather than paper over this one instance — otherwise the same problem
    comes back.
 3. **Make the right thing easy.** Templates, skeletons, ready examples to copy are
-   all part of the gate. The pair of litmus files in `litmus/` exists precisely so
-   people can copy them.
+   all part of the gate.
 
 ## The compounding effect
 

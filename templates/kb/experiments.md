@@ -1,8 +1,8 @@
-<!-- generated-from: templates/kb/experiments.md sha256:6e50711dc72aae68335f519cb53285dc772218ae92f14c07bd53ab57c8f3116a -->
+<!-- generated-from: templates/kb/experiments.md sha256:33886d6ba2deb6401aeeb57b652c07872678225b0f8a4dfc31014259941064ab -->
 # Experiment record
 
-Each experiment answers one question. **Criteria, thresholds and voiding clauses are
-fixed before the run** (`rules/test-discipline.md`, "the answer must not already exist
+Each experiment answers one question. **Criteria, thresholds and discard clauses are
+fixed before the run** (`../singlefs-ai-sop/rules/test-discipline.md`, "the answer must not already exist
 before the experiment runs"); only after they are written do you go and look at existing
 conclusions. Changing a criterion after the run makes it a new experiment — rerun.
 

@@ -4,6 +4,197 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.50 — 2026-09-16
+
+**One full audit: three real bugs on the `--staged` path, doc-lint exempting the rules proper wholesale, and a
+batch of leftovers from after 0.0.48, fixed together.**
+
+Gate (`scripts/`, one copy across the three repositories):
+- The `--staged` handshake variable `GATE_STAGED_FROM` leaked into the child processes the inner run started: the
+  `gate.sh` that selftest runs nested took it as its own project root when looking for sibling directories, and the
+  "upstream older than copy" / "copy behind upstream" cases went red by mistake — on 0.0.49, `--staged` in singlefs
+  could not pass. A user-set `GATE_BASE` leaked into selftest the same way, and two show-me-test cases exited 3.
+  `gate.sh` now unsets `GATE_STAGED_FROM` as soon as it has read it, and selftest starts every child with both
+  stripped (`env -u`).
+- `--staged` could not run on the SOP repository itself: the inner run used the source repository's scripts while
+  `ROOT` was the temporary tree, so it was treated as a consuming project and went red with "version stamp missing",
+  and the three stages that run only in the SOP repository silently did not run. When the source repository is this
+  package, the `gate.sh` inside the temporary tree runs, and i18n-sync finds the sibling language repositories from
+  the source repository's parent directory.
+- `--staged` used a diff base one notch narrower than a direct run: the temporary tree is a detached HEAD,
+  `@{upstream}` does not resolve, and it fell back to `HEAD~1` — so the "split it into two commits and it slips
+  through" hole was open on that side (measured: direct run `origin/master`, `--staged` `HEAD~1`). The base is now
+  computed in the source repository and passed in.
+- shell-lint's S3 went red on `pgrep -f` only when the same line also contained one of the substrings
+  `xargs|kill|until|while|if`: `pids=$(pgrep -f X)` with `kill $pids` on the next line, or `while` and `pgrep -f`
+  written on separate lines, were all green, while `pgrep -f notify` was judged a wait loop because it contains `if`.
+  Now any `pgrep -f` in command position goes red, with the fixture `pgrepsplit`.
+- "Version stamp missing" recorded a FAIL but printed it through `warn` with no remedy; gate-lint only recognises
+  `bad` / `die` / `✗`, so it could not see it. Now `bad` + `howto`.
+- doc-lint's `rule-definition` marker exempted the whole file: put padding phrases or "originally X" into `rules/`
+  and doc-lint stayed green, while the same sentence in the README went red at once. The body is now checked; only
+  the examples quoted in backticks and 「」 are cut out before the word list is applied. The 14 rule files and
+  `CLAUDE.md` move from "skipped" to "checked" (checked 14 → 29). Fixtures `rulesprose` / `ruleshiststate` (red),
+  `rulesexample` (green).
+- doc-lint excluded the installed copy with the wildcard `*/singlefs-ai-sop/*` plus a "don't exclude when ROOT is inside the package"
+  exception, so the scan set depended on where the package lives: the same fixture `projok` reported "checked 1" in the zh repo and
+  "checked 2" inside the singlefs copy, and once synced there, selftest went red on one case at once. Now `$ROOT/.claude/<family>/*`,
+  relative to ROOT; a new case copies the scripts under a path containing `/singlefs-ai-sop/` and runs the same fixture.
+- **`--staged` was silently swallowed when invoked through the project wrapper**: the wrapper puts the project root in `$1`
+  and appends the user's arguments, while gate.sh hard-coded `$1 == --staged`. The command the rules and the skill recommend
+  never entered that branch; the gate ran against the working tree and said nothing. Arguments are now order-free, and an
+  unrecognised argument is refused.
+- **Heredoc detection treated three non-heredocs as an opening** (`<<<` here-strings, `# … <<PY` in a comment,
+  `$((1<<SHIFT))`), and from that line on the whole file went unchecked — the bigger the script, the likelier the hit.
+  The delimiter rule now lives once in `lib.sh` as `HEREDOC_RE` (the `CMD_POS` precedent), and comment lines are skipped first.
+- **`… | grep -q` at the end of a pipe**: grep exits on the first match, the upstream takes SIGPIPE, and under `pipefail`
+  the pipeline returns 141, so the condition reads false. Past the pipe buffer (64 KiB) the check silently stops running
+  (measured: the same uncounted-summary script is red at 4 lines and green at 338 KB; a 108 KB new file carrying tests was
+  judged to carry none). gate-lint's G3, both places in show-me-test, and doc-lint's invariant-id lookup now use `grep -c`.
+- **gate-ok recorded the HEAD at the end of the run**: a commit another session lands mid-run gets stamped as verified and
+  then sits outside every later diff window. It now records the HEAD from the start of the run, and records nothing when
+  `GATE_BASE` was set explicitly (which includes the inner layer of `--staged`).
+- **The diff base took the upstream tip instead of the merge base**: after a fetch without a merge, the upstream tip carries
+  commits the local branch does not have, so a clean working tree was judged "crates code changed with no test changes".
+  A false red pushes people into working around the gate.
+- **`GATE_BASE` was not validated**: one wrong letter (`orgin/master`) made `changed_files` fall back to the empty-repo path,
+  show-me-test report "nothing to judge", the gate go green, and gate-ok advance. It is now refused with a remedy.
+- **"Is the thing under the gate the SOP repo itself" compared `pwd`**: run through a symlink it was judged a consuming
+  project — red for a missing version stamp, with the three SOP-only stages silently skipped. Now `pwd -P`.
+- **Running gate-lint / shell-lint standalone inside a project reported the copy's fixtures** as the project's own
+  violations. Both lints now exclude `$ROOT/.claude/<family>/`, matching what doc-lint already does.
+- **One trailing space after a kb `## Revision history` heading voided the whole rule**: body scanning no longer stopped
+  there, and the file was still reported as missing the section. Trailing whitespace is now trimmed before comparing.
+- **`x="$(sed -n … I18N)"` exits 2 when I18N is absent**, and `set -e` takes the script down with no output (six sites: gate.sh, gate-lint, shell-lint, two in doc-lint, push-all; round four found two more).
+- **pre-push ignored which ref was being pushed**: a feature branch, a tag, even `git push --dry-run` pushed the other two
+  language repos **for real**. Only a master push triggers it now; `CLAUDE.md` states the hook's reach and the `--dry-run` trap it cannot stop.
+- **Files seeded by install.sh were 0600** (`mktemp` permissions preserved by `mv`); now 644.
+- `env.sh` now checks the tools the gate itself depends on and never checked: gawk, sha256sum, timeout, plus
+  git ≥ 2.28, bash ≥ 4.3 and `sort -V`. `manifest.sh` pins its sort to `LC_ALL=C`; selftest isolates
+  the user's global and system git config.
+
+Round three (the items the first two audits left open, folded in as well):
+- **shell-lint S5 knew one spelling**: `rm -rf "$d"/x`, `rm -rf -- "$d/x"`, and an unguarded second argument on the same line were all green. Now two steps: pick out `rm -r`, then check each argument for an unguarded variable path.
+- **`--staged` failed when run from a git hook**: the hook's GIT_DIR is relative, points elsewhere once gate.sh changes directory, and the remedy said "run git worktree prune". The GIT_* variables are cleared up front; a failed worktree add prints git's own words and points at `worktree remove --force`.
+- **`--staged` cleanup lives in the EXIT trap only**, so every exit path removes the temporary worktree.
+- **The version-mismatch rejection hit an unbound variable**: the family name was defined dozens of lines later. Moved above its first use; its remedy no longer tells people to run git log inside a copy that has no .git.
+- **Local stages each chose their own diff base**: gate.sh computes it once and exports `GATE_DIFF_BASE` to every stage.
+- **"Nothing to judge" is kept apart from "judged"**: naming-lint exits 3 when there is no .rs and the gate records "not run"; doc-lint gains `--not-impl`, and a language without a word list lists those checks under not implemented instead of PASS.
+- **gate-lint scans .py too**, applying only "a directly printed ✗ needs a remedy" (13 such lines in singlefs's lib-*.py had never been checked).
+- **doc-lint's two "deprecated" patterns shared one message**, so deleting either stayed green; split, each with its own fixture.
+- **install.sh could write the version stamp downward** when the copy was older than the stamp, and the downgrade travelled with the commit. Now refused. The wrappers say what to do when the copy is missing instead of bash's bare "No such file".
+- **i18n-sync accepted only a `.git` directory** in three places, refusing worktrees. This release was built on worktrees, which exercised all three.
+- **Dates may not be invented**: three fixtures and one skill example said 2026-01-01, more than half a year before this repository's first commit, and the gate stayed green. All replaced with real dates: fixtures use their own creation dates, the skill example uses `date +%F`. doc-lint checks history entries and measured-on dates, changelog-lint checks section dates, selftest checks fixture dates. The lower bound is the checked project's own first commit minus 7 days of grace (git is asked only when the directory is itself a repository top level and not a shallow clone, never an enclosing one), falling back to this package's start, 2026-08-26; the upper bound is today in the latest time zone (UTC+14). Why both ends are set this way: see round four.
+- Cases added for gate.sh's judgment branches (local stages handed to both lints, show-me-test exit 3, not running the installed copy, .rs without Cargo.toml, `--staged` copying the ignored copy), all of which could be flipped to PASS with no case going red; bump.sh and the i18n-sync `--stamp` rejections had no coverage and now do.
+- lib.sh drops the unused `added_lines`.
+
+Round four (three models audited this release, one each on forward derivation, backward derivation and cross-check, over two rounds; the problems they found are fixed here too):
+- **The date check judged real dates impossible.** The upper bound was the date on the machine's clock, and that clock is UTC: a same-day date written in Tokyo between 00:00 and 09:00 was judged "later than today",
+  and 8 of singlefs's 194 commits wrote history entries in that window dated later than the commit's UTC date. The lower bound was pinned to the first commit, while work done before git init enters the first commit carrying the dates it was done on:
+  singlefs's initial commit already holds 5 history entries from the day before, and against 0.0.50 as it stood before the handover its gate was red at those 5 places (measured during the audit).
+  The upper bound now follows the latest time zone and the lower bound allows 7 days of grace (measured: only one day early); something like 2026-01-01 is still stopped. Four cases pin both ends, with the clock fixed by a fake `date`.
+- **The machinery that names retired wrappers was deleted along with QEMU**, while the same release produced a new retired wrapper: singlefs's `.claude/scripts/lkmm.sh` forwards to a deleted script,
+  install.sh refreshed the stamp as usual, and running the wrapper gave the remedy "the copy is not installed". The machinery is back, made generic; see the handover section below.
+- **The unimplemented list stopped mentioning the acceptance criterion**: once the two QEMU keys were deleted, a project with no final-criterion stage wired in got not a word about it in the summary. Replaced by `最终判据` (final criterion), which names no apparatus; see below.
+- **Two zero-output sites remained for a missing I18N**: doc-lint reading `this=`, and manifest reading `this=` and `reference=`. Both get `|| true`, with one case each.
+- **selftest threw the stamping output into `/dev/null` while building translation fixtures**: once the stamp and its read-back disagreed in form, lib.sh's `set -e` took the whole self-test down at case 245,
+  the remaining 58 cases never ran, and all that was left was exit code 1. On failure it now prints the original message before stopping.
+- **Content unrelated to VMs had been deleted by mistake; it is back**: the "Test images always go in a temporary directory" and "Look before running anything destructive" sections of `command-safety.md`, and `mkfs`, `dd` and `lsblk` in its table.
+  Crash-point replay needs images and mkfs just as much, and singlefs's code and scripts cite "Test images always go in a temporary directory" by its heading. The dmsetup check in `env.sh`, which is for the block-layer write recording used by crash-point replay, is back too.
+- Wording: the "skip list" paragraph brought into `show-me-test.md` said gate-lint already checks `noskip`; no such check exists, so it now says this is not done yet;
+  doc-lint's file-header comment still said `rule-definition` skips the whole file; the pre-push comment put the `--dry-run` trap in the README, when it is in `CLAUDE.md`;
+  of the two "irrefutable" in `test-discipline.md`, the previous round had fixed only one; the date item said "five fixtures" where there are three, and the one place in the `fence` fixture that said 2026-01-01 becomes its creation date;
+  the "sort does not understand -V" example in env.sh is rewritten so it can be checked (0.0.9 → 0.0.10 would be judged a downgrade, measured during the audit).
+- The second audit round then found:
+  - **When the machine's date does not understand `-d`, the date lower bound silently disappears**, and 2026-01-01 passes: the date check is called inside an `if` condition, which `set -e` does not cover.
+    doc-lint and changelog-lint now try `date -d` once at the start and stop if it fails; env.sh checks this too.
+  - **In a shallow clone the "first commit" is where history was cut off**; used as the lower bound, it misjudges more the older the project is. In a shallow clone git is not asked, and the bound falls back to this package's start.
+  - **Not one `Measured (<date>` or `実測（<date>` in the en / ja repositories was checked**: only the Chinese `实测（` was recognised, and the unchecked half was not on the unimplemented list either. All three forms are recognised now.
+  - **Retired wrappers were recognised only in the current form**: the three-line wrappers laid by 0.0.49 and earlier went unrecognised, and the stamp was refreshed as usual. Both forms are recognised now; a wrapper a project added from the template around a shared script that still exists does not count as retired.
+  - **30 days of grace let through too many invented dates**: measured: only one day early; narrowed to 7 days.
+  - **No selftest case covered "the working-tree fingerprint does not touch the real index"**: with the fingerprint changed to run `git add -A` directly on the real index, the computed tree was byte-for-byte identical and not one existing case went red,
+    while every gate run would quietly stage the user's unstaged changes. One case added, comparing `git status` before and after the call directly.
+  - Wording: the merged-in "Write conjunctions as conjunctions" section forbids `⇒`, yet the rule lines newly written in this release had 7 `⇒`; they become conjunctions, and the section now states that the gate does not check this and older text has not been swept;
+    the "skip list" sentence in `show-me-test.md` no longer describes an exemption syntax that is not implemented; the `最终判据` passage now says to write the acceptance criterion into the project's kb first, and a stage that does only part of it does not write that key;
+    three sentences that said model-based differential testing also needs a recorded write stream are corrected; the measured record in `session-wrapup.md` states that what it hit was the kind that commits without paths;
+    the gate skill's stage table gains "Working tree unchanged during the run"; two section headings stacked together in gate.sh are separated; several comments in doc-lint and changelog-lint follow the grace change.
+- Evidence that they go red: the 8 fixes the first audit round found — date upper bound, grace period, not looking up to an enclosing repository, retired wrappers, a template wrapper around a shared script that still exists not counting as retired, the two I18N sites, final criterion —
+  plus 6 from the second round — `date -d`, shallow clones, the en / ja measured-date forms, old-form wrappers, 7 days of grace, the fingerprint not touching the real index — were each reverted to the old form, and each time the case aimed at it went red.
+  Printing the original message when stamping fails has no dedicated case: it was verified by breaking the stamp read-back and watching the self-test stop at the first fixture build and print the original message.
+
+Changes from another session over the same period, folded into this release as well:
+- **The gate goes red when the working tree changes while it runs**: gate.sh fingerprints the working tree at the start and at the end (tracked files plus untracked files that are not ignored, computed with a copied temporary index, never touching the real one),
+  and goes red when they differ; the remedy is to wait until the edits stop, or use `--staged`. Two selftest cases: editing a file mid-run goes red, staging alone mid-run does not count as a change;
+  the "gate-ok records the HEAD from the start of the run" case now writes its content before the run and only moves HEAD during it.
+- `show-me-test.md`, two paragraphs: reporting how many were checked is not enough — what was not checked must be listed one by one, with the list computed on the spot; the number in a success line needs a fixture pinning it too.
+- `evidence-discipline.md`, two paragraphs: every number that enters a conclusion — first ask whether it was measured or guessed; the list a withdrawal sweep turns up must not be replaced wholesale — first tell whether each hit states the present or what happened on one occasion.
+- `writing-discipline.md`, one section: "Write conjunctions as conjunctions; unpack noun strings into sentences".
+- `session-wrapup.md`, two items: running without `--staged` goes red if the working tree changes; "commit only these paths" is not `git commit -- <path>`.
+
+selftest 268 → 320 cases: the three rounds of fixes added 58, round four added 12, another session's changes brought in 2, and handing QEMU and herd7 over removed 20 (see below). Evidence that they go red: across three rounds, each fix was reverted to its old form, and each time the case aimed at it went red.
+Four of those cases were fake on the first try and stayed silent under mutation: filler lines written as comments in the large-file fixture, an absolute GIT_DIR, a manual cleanup before die, and a local stage failing on its own and masking the lint verdict. Two mutations had broken the case statement's syntax and were redone as whole-line replacements. All were fixed until they went red.
+
+Rules and documents (every language together):
+- `command-safety.md`: five failing checks, not four — `pgrep -f` added; the S3 description now matches the script
+  (any command position goes red); one padding phrase.
+- `sop-first.md`: rejection shapes "two" → three; the two historical sentences ("17 `die` sites were exempt",
+  "all exempt until now") deleted or turned into measured records.
+- `show-me-test.md`: the local-stages sentence "until now it was in neither lint's scan" becomes a measured record.
+- `test-discipline.md`: two "irrefutable" aligned with the section heading's "unfalsifiable"; "this section's main
+  point" now names the rule.
+- `verify-before-claiming.md`: the heading "whether it is settled and what it actually says are two different
+  questions" loses its inner quotes, matching its two citations.
+- `kb-discipline.md`: states that "this file" is outside the gate and rests on people. `design-doc-discipline.md`:
+  doc-lint scans only `.md`; the code-comment clause rests on review.
+- `engineering-philosophy.md`: the howto requirement is in `sop-first.md`, not `show-me-test.md`; the criterion
+  sentence now quotes `machine-first.md` verbatim. `machine-first.md`: the paragraph duplicated word for word from
+  `engineering-philosophy.md` shrinks to one sentence plus a reference.
+- `code-discipline.md`: three disposition labels ("this reason dropped", "kept, and stronger", "left to types")
+  folded into the six declared ones.
+- `writing-discipline.md`: "Which half the gate handles" adds that the rules proper are checked too, with only the quoted
+  examples exempt.
+- skills: gate adds the `--staged` usage, lists every failure cause for gate self-check and shell discipline, says
+  the rule manifest does not apply under the en / ja copy, and carries the new `rule-definition` semantics;
+  crash-test's `gate-covers` keys gain `命名纪律（shell）`; decide: "本工程" → "本项目".
+- templates: the three kb templates' relative paths to the rules become `../singlefs-ai-sop/rules/…`, which
+  resolves from `.claude/kb/`; the project template's shell-lint comment lists everything.
+- README: "clone" → "copy"; the three-gate passage said both "enforced by gate-lint" and "judged by people" — now
+  the gate covers only the form of gate 3.
+- en / ja: wording inconsistencies in the 0.0.48 / 0.0.49 translations fixed along the way (English "remedy" had
+  been used for both 出路 and 改法; Japanese had two spellings each for "literal pid" and "VM").
+- Round three: `test-discipline.md` and `verify-before-claiming.md` gain a "Which half the gate handles" section stating what is a check and what rests on people; `command-safety.md` gains "Three silent failures at a process boundary"; `code-discipline.md` states that shell naming discipline has not been back-applied to existing scripts; `sop-first.md` drops a countable claim; in the English and Japanese repositories the "Which half the gate handles" section title had two renderings each, now unified into one.
+
+QEMU and herd7 are handed over to singlefs entirely. Only singlefs uses them, so how to test them, how to verify them and whether to gate on them are its own decisions; this package no longer tests or verifies either:
+- `scripts/lkmm.sh`, `scripts/fetch-deps.sh`, `scripts/fixtures/lkmm/` and `templates/litmus/` are deleted. The gate has no LKMM stage.
+- The unimplemented list drops the two keys `QEMU 真实负载` (QEMU real workload) and `QEMU 崩溃注入` (QEMU crash injection), replaced by `最终判据` (final criterion), which names no apparatus: the acceptance criterion is set by the project,
+  and the item becomes "covered by whom" only when a project stage meets it, declares `# gate-covers: 最终判据`, and ran and passed this round.
+- `install.sh` no longer lays `.claude/scripts/lkmm.sh` or seeds `litmus/` at the project root. Naming retired wrappers is now generic: any file in `.claude/scripts/` that matches the wrapper template (its current form or the form from 0.0.49 and earlier) character for character
+  and whose shared script is absent from this release is named, and the version stamp is held back, instead of recognising only a hard-coded `qemu.sh`. The full wrapper text is written only in `wrapper_text`, so laying a new wrapper and recognising a retired one compare against the same text.
+- `env.sh` no longer checks qemu-system-x86_64, fio or `/dev/kvm`.
+- `i18n-sync.sh` drops the `.litmus` form of the provenance marker, and `install.sh` no longer recognises it when stripping markers; `manifest.sh` no longer counts `.litmus` in the translated list or the coverage check;
+  the remedy in `show-me-test.sh` loses its two lines on concurrency and memory ordering.
+- Rules: in `show-me-test.md`, "The final criterion is QEMU/KVM stress testing" becomes "The final criterion is set by the project". `machine-first.md` premise two no longer names herd7 / LKMM,
+  and states that the tool, its discriminating power and its binding to code are the project's own decisions, with the basis pointing at singlefs's kb; the two kinds of "model" in its table are written apart, and the one that gets exhausted is called the "formal model".
+  `command-safety.md` drops the "QEMU virtual machines must write their pid to a file" section; in the sentence on waiting for a process to end, "things like VMs" becomes a process you did not start yourself;
+  the result-collection sentence's "BIOS escape sequences, kernel logs, serial-port noise" is rewritten without naming a source; the measured record on subshell assignments no longer names a QEMU harness.
+  `test-discipline.md`, `code-discipline.md` and `sop-first.md` follow.
+- Skills: crash-test drops its LKMM and QEMU sections, and its `gate-covers` keys are `模型对拍` (model-based differential testing), `崩溃点重放` (crash-point replay), `最终判据` (final criterion) and `命名纪律（shell）` (naming discipline for shell); gate drops its LKMM row.
+  The project template and README follow; GLOSSARY's "control case", previously defined in terms of litmus, becomes the umbrella term consistent with `test-discipline.md`: a positive control or a real baseline.
+- selftest drops the lkmm fixtures and the litmus provenance markers, two groups, 20 cases in all; the 3 retired-wrapper cases are now built from lkmm.sh. Names like `stop_vm`, `HAS_KVM` and `KERNEL_PATH` in the shell-lint fixtures become neutral ones.
+- The removed text as it stood is kept in singlefs under `.claude/handover/qemu-herd7/`.
+- **This release does not bump the version, so the gate gives no sign that the rules changed**: singlefs's version stamp is already 0.0.50, the `规范版本` (spec version) and `副本与上游同版本` (copy and upstream at the same version) stages stay green, and syncing rests entirely on people.
+  When syncing, install.sh stops at two places: the two litmus lines in `.claude/install-owned` (this package no longer lays those paths) and the `.claude/scripts/lkmm.sh` wrapper (its target is deleted);
+  it stops at the first one first, and the second shows up only when you rerun after fixing it. The gate stops at one: the `# gate-covers: QEMU 真实负载` header of `gate.d/55`, a key no longer on the list.
+  By what stage 55's header says, it runs a real workload plus two controls that must go red, with no crash injection, so the line should be deleted; once the acceptance criterion is written into the kb and the stage does all of it, write `最终判据`.
+  Nothing shared judges `litmus/` any more; to keep judging it, wire the handed-over `lkmm.sh` in as the project's own stage. Other places that will not go red but no longer tell the truth after syncing are listed in the README of the handover directory.
+
+Not touched: in `evidence-discipline.md`, "five such claims were found…" — the parenthesis counts only four; the
+original record is in singlefs and cannot be verified here. Seven GLOSSARY terms unused anywhere in the repository,
+pending verification; a batch of dates in the changelog-lint and doc-lint fixtures are earlier than the day the fixture was added (for example, a fixture added on 2026-09-10 says 2026-09-01), all within the bounds.
+They are invented version sections and history entries inside fixtures, not placeholder dates like 2026-01-01; this release leaves them, and whether to change them is undecided.
+
+Two more were deliberately left. The "Which half the gate handles" section for `evidence-discipline.md` was not added: this release takes in another session's two paragraphs in that file, and adding the section would need another round of audit. Trimming the case paragraphs and merging duplicated criteria in the rules was not done: what would be removed is evidence, and when in doubt it stays.
+
 ## 0.0.49 — 2026-09-14
 
 **Four gate gaps found while wrapping up 0.0.48, fixed together.**

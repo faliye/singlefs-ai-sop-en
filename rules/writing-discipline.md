@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:ddd3ebe829c3aef9c1a6af13a7d16ddb64c1da223f28dcae649a505cfe55b5f2 -->
+<!-- generated-from: rules/writing-discipline.md sha256:cff66be6bda7e5ded054e9c094445ebaf875ec5ef15403a96f69e88559622e66 -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -120,6 +120,19 @@ take them and verify for themselves. They are evidence, not "please take my word
 | **Concessions that concede nothing** | "While X, however Y" where X and Y do not actually conflict | Keep only the half you mean |
 | **Over-explaining** | "as is well known", "needless to say", "it goes without saying"; stating a conclusion and then restating its negation | Say it once |
 
+### Write conjunctions as conjunctions; unpack noun strings into sentences
+
+Symbols and strings of nouns are not sentences. Replacing conjunctions with `⇒`, `×`, `+` and compressing an action into a noun string like "verbatim verification of the four mandatory sites" saves characters, but the reader has to rebuild the sentence in their head first; and a noun string needs no subject and no causation, so the writer can dodge "who did what, and why does it hold" — stiff phrasing covers for gaps in the logic.
+
+- Where "so / because / then / but" belongs, write the word, not `⇒`; inside a table cell, where space is tight, symbols may stay.
+- Unpack noun strings: "main agent additionally verbatim-verifies four mandatory sites" becomes "I also checked the four mandatory sites word for word."
+- Keep bold for verdicts and numbers; do not bold whole sentences or paragraphs — a page of bold has no emphasis left.
+- Label-style colons ("mechanism:", "basis:", "measurement:") carry structure in a kb and may stay, but a complete sentence must follow the colon.
+
+This does not conflict with "as short as possible": what gets cut is padding, not the skeleton of the sentence. Natural is not verbose.
+
+The gate does not check this. The `⇒` already in `rules/` have not been swept yet; do not take them as examples.
+
 ### The test
 
 **Read it out loud.** Would you say this sentence to a colleague? If not, rewrite it.
@@ -144,7 +157,10 @@ conclusion first**.
 ### Which half the gate handles
 
 `scripts/doc-lint.sh` checks **the fixed phrasings in a word list** — the common
-padding and archaic constructions. A hit turns red and suggests the replacement.
+padding and archaic constructions. A hit turns red and suggests the replacement. The rules
+proper (`rules/*.md`, `CLAUDE.md`, skill bodies) are checked the same way: the
+`<!-- doc-lint:rule-definition -->` at the head of a file exempts only the examples quoted in
+backticks and 「」; the body is checked as usual.
 
 **What it cannot check**: whether a sentence flows, whether a concession is redundant,
 whether an explanation is bloated. Those need a person to read it aloud. So a green

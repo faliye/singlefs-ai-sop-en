@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:b1497af9b106ff877318dc5bf1af8c50d20476695d7c671ebde5467eee498556 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:539b9e71408246e286745625b2e83554305a3517105b992419cb6fd24d14362f -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -77,6 +77,13 @@ root, one entry per line, **each with its reason written out**. An entry pointin
 directory that does not exist, or one that excludes no file at all, goes red: an
 exclusion that does nothing leaves people believing those files are already steered
 around.
+
+## Every number that enters a conclusion: was it measured, or guessed?
+
+An upper bound nobody measured gets treated as fact by the reasoning downstream, and the factor by which it is wrong multiplies straight into the conclusion.
+Measured (2026-08-30, singlefs): "10⁶ fsync/s" was written into a decision as an upper bound, and from it "a 48-bit counter lasts only 8.9 years — not enough". Measured on the machine: 2785/s, overestimated 359×; at the measured rate it is 3202 years — the conclusion pointed the wrong way, and the real bottleneck was a different field.
+
+So for every rate, capacity or ratio that enters a conclusion, first ask "was this measured or guessed?" — if guessed, go measure it. What cannot be measured here (say, the fsync rate of an enterprise drive) is written as a conditional: "at 10⁵/s it is 89 years; that tier cannot be measured on this machine, so it stays an assumption" — never as an upper bound.
 
 ## How another project does it is a lead, not evidence
 
@@ -226,7 +233,7 @@ can be wrong, and that usually shows only at the moment it fires. Four forms:
 | **The hit does not tell the arms apart** | One cell knocks every arm out at once; the cause lies in a premise all arms share | Do not use it to judge the arms: open a separate item for that shared premise and fix it first; judge the arms only on the cells that tell them apart. When writing a clause like "all out ⇒ fall back to one arm", also write how to record a cell that knocks every arm out |
 | **The discriminator cannot be observed** | The criterion asks the system under judgement to tell two situations apart, but what that system can see at the moment it decides is identical, item for item, in both | Two criteria that demand different outcomes for those two situations contradict each other; any design can satisfy only one. Change the criterion — and a changed criterion is a new round |
 | **The hit is filed under the wrong criterion** | A leg reports "criterion X fires", while what happened belongs, by the wording, to another criterion with a different threshold | Check word by word which clause of which criterion the hit satisfies; filing it wrong knocks an arm out under the wrong threshold |
-| **The remedy does not reach the cells that were hit** | A reverse-acceptance clause written before the run says "hit ⇒ choose between remedy A and remedy B", and one of the remedies is still hit on exactly the cells that were hit | When writing the clause, state for each remedy which cell it fixes; after a hit, check each remedy against the hit cells first, and when handing over one that is still hit, write "does not work on these cells" — leave that out and choosing it keeps the misjudgement in place |
+| **The fix does not reach the cells that were hit** | A reverse-acceptance clause written before the run says "hit ⇒ choose between fix A and fix B", and one of the fixes is still hit on exactly the cells that were hit | When writing the clause, state for each fix which cell it repairs; after a hit, check each fix against the hit cells first, and when handing over one that is still hit, write "does not work on these cells" — leave that out and choosing it keeps the misjudgement in place |
 
 Measured (2026-09-13, two rounds of three-way argumentation on one design question, one of each):
 ① a flaw in administrator rollback knocked all three candidate arms out on the correctness criterion (zero faults),
@@ -242,11 +249,11 @@ Measured (2026-09-14, the third round on another design question, the fourth for
 said "a misjudgement written on the new arm ⇒ let the user choose between 'tighten the new arm once more' and
 'hard-code that the publication writing the row does not take the new instance's own transactions'". Of the three
 cells hit, one misjudged a unit of an abandoned instance, and the other two had no carried-over transaction at all —
-the second remedy did nothing for any of the three, so handing it over as written would have offered an empty choice.
+the second fix did nothing for any of the three, so handing it over as written would have offered an empty choice.
 
 ⇒ **When a criterion fires, ask four questions first**: does it tell the arms apart? Can the system under judgement
 actually see, at that moment, what it is asked to tell apart? Which clause of the criterion's wording does it satisfy?
-Is each remedy the pre-run clause offers still hit on the cells that were hit? Only when all four pass, judge by the
+Is each fix the pre-run clause offers still hit on the cells that were hit? Only when all four pass, judge by the
 clauses written before the run.
 
 ## Quote an artifact by copying the line whole
@@ -346,6 +353,16 @@ The one who withdrew it swept two places, missed one, and did not know it.
 ⇒ This and "background material fed to a multi-party argument must itself be checked
 first" are two ends of one hole: at one end the citer did not re-check, at the other the
 withdrawer did not sweep clean. **Both ends have to be plugged.**
+
+⚠️ **Do not replace the list a sweep turns up wholesale: for each hit, first tell whether it states the present or reports what happened on one occasion.**
+The same old value in a repository is often half "it is N now" and half "on that occasion it became N", "written as X from run seven on" —
+the latter stays true, and replacing it turns a true sentence false.
+Measured (2026-09-16, singlefs widening its tree-table entry from 148 to 200 bytes): of twenty mentions of "the seventh run", only the few
+pointing at the artifact registered today should have moved to the eighth; the rest were event statements such as "the seventh run closed
+three gaps" or "written as 4096 from the seventh run on"; "the tree-table entry went from 145 to 148" is a dated note, and the only current
+value in it is the one in its closing parenthesis.
+
+**Test: swap the new value into the sentence — is it still true?** If yes, it states the present, so change it. If no, it reports that occasion, so leave it.
 
 ### A withdrawal's rationale collapsing does not bring the withdrawn conclusion back
 

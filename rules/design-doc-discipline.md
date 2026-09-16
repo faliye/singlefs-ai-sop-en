@@ -1,4 +1,4 @@
-<!-- generated-from: rules/design-doc-discipline.md sha256:4711d347e35efac603f0bef8ed2a2ad58de58fca5bd2f33f39a528424c0923c1 -->
+<!-- generated-from: rules/design-doc-discipline.md sha256:c03cce7099e37680088ed730cb3d27c98abfd78261338099870e2cc291ab8fa4 -->
 <!-- doc-lint:rule-definition -->
 # Design document discipline
 
@@ -42,7 +42,8 @@ compounds.
 history goes to `CHANGELOG.md` — they are read in full at the start of every session,
 and history dilutes them.
 
-Enforced by `scripts/doc-lint.sh`.
+History statements in body text, and where the history section sits, are enforced by
+`scripts/doc-lint.sh`, which scans only `.md`; the clause on code comments rests on review.
 
 ## 2. Length must match the weight of the change
 
