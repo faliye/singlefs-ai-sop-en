@@ -1,11 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:65a91747a2ec61be727eb3bf24a9135e2d0f7f420942917f041f2eea6d917ef9 -->
+<!-- generated-from: rules/command-safety.md sha256:06023b88db228684cbe526849e0851b9333c8a57a495114467f52d8fc44a7019 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
-Five of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
+Six of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
 by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
-subshell through a variable**, **git's undo commands inside a script**, and **`rm -rf` on
-an unguarded variable path**. The rest are still prose, because the criterion for
+subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
+an unguarded variable path**, and **a `wait` with no arguments**. The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
 can and cannot prove" — what is not done has to be said, not glossed over).
 
@@ -42,7 +42,9 @@ The pattern string appears in the wrapper's own command line, so it **kills your
 shell.**
 
 To stop a process: `ps` first, look at it, then kill by **literal pid** in a separate
-second command. For counting, use structured criteria from `/proc` and exclude your
+second command; or hand it to `scripts/proc.py stop <pid>`: it sends TERM, sends KILL if the process is still there
+after `--grace` seconds (default 10), and refuses when the target is the process issuing the command or one of its ancestors.
+For counting, use structured criteria from `/proc` and exclude your
 own process tree.
 
 **The same pattern string inside a wait loop is another form: it kills nothing, it spins forever.**
@@ -53,10 +55,20 @@ Measured (2026-09-13): a loop waiting for a background experiment to finish matc
 `pgrep -f`, waited a whole round without exiting, and stopped only when it was killed by its literal pid.
 ⇒ To wait for a process to end, use its **literal pid**: `until ! kill -0 "$pid" 2>/dev/null; do sleep 5; done`;
 for a background job you started yourself, use `wait`; for one you did not start (a daemon another script launched, say), have whoever starts it write its pid to a file and wait on that.
+If the pid was not recorded, find it with `scripts/proc.py find <executable-name> [--argument <argument>]`: it compares the executable name exactly instead of matching a pattern against the whole command line, and it does not list the process tree that issues the command;
+with the pid in hand, `scripts/proc.py wait <pid> --timeout <seconds>` waits for it to exit, and if it has not exited when time is up, lists the ones still alive and exits with code 3.
 The S3 check in `scripts/shell-lint.sh` turns every `pgrep -f` in command position in a script red (after `if` /
 `while` / `until` / `!` also counts as command position), without looking at whether the same line also has a `kill`:
 assign it to a variable and kill on the next line, or just count the matches, and the pattern still hits its own
-command line. It cannot reach command lines typed by hand, which is why this is written here too.
+command line.
+Commands typed by hand are refused before they run by `scripts/claude-hooks/pattern-process-guard.sh`, which uses the same criteria as shell-lint's S2 and S3 (`PATTERN_KILL_RE` and `PATTERN_PGREP_RE` in `scripts/lib.sh`),
+and when it refuses it gives the pid-based ways to do the same thing. It is a Claude Code PreToolUse hook; a project registers it once under `hooks.PreToolUse` in `.claude/settings.json`:
+
+```json
+{"matcher": "Bash", "hooks": [{"type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/singlefs-ai-sop/scripts/claude-hooks/pattern-process-guard.sh"}]}
+```
+
+In a session where it is not registered, commands typed by hand still rely on this text alone.
 
 ## Once you start a background task or a subagent, re-check it on a schedule, and do not force it to end
 
@@ -78,6 +90,80 @@ So:
 - In sessions such as Claude Code, when two model calls are too far apart the prompt cache expires and the whole context has to be written again.
   Measured (same day): a subagent waited in the foreground for builds and replays and came back after more than five minutes; in one stretch of work that rewrote the context 6 times, 360k to 590k tokens each.
   Run long work in the background and come back to re-check periodically; that is cheaper than one idle wait of tens of minutes.
+
+## Within one script, run the checks in parallel when they can be
+
+**Criterion: this batch of checks do not depend on each other, and every one of them has to start a
+subprocess to do its work (a build, a test run, a VM, a python process). Then run them in parallel,
+instead of waiting for them one at a time.**
+
+The cost of one at a time is that wall-clock time adds up item by item, and once a gate is slow nobody
+runs it locally any more: whoever submits switches to pushing and letting the remote tell them whether
+it went red, and what `sop-first.md` asks for — "runs locally, and judges the same as the remote" —
+fails on the spot.
+
+Measured (2026-09-19, this repo, `time bash scripts/gate.sh`, 32-core machine): the whole gate took
+26.7 s of wall clock, of which `selftest.sh` alone took 24.8 s, while its CPU only reached 66% — not even
+one core saturated, the time going into waiting for subprocesses to exit one at a time.
+After its six batches of fixture cases were made parallel, all 350 verdicts stayed case-for-case identical
+and that stage came down to 21.4 s at 105% CPU. The same day, downstream in singlefs,
+`.claude/gate.d/59-crates-mutation-replay.sh` runs `cargo test` one row at a time, 173 rows in the table.
+
+**Once it is fast, look again at where the remaining time goes.** In that same measurement, 10 s of those
+21.4 s was **one** case idling (what it verifies is precisely that `wait` does not return once the timeout
+logic is broken). That wait is deliberate, not a matter of parallelism, and no amount of extra machine
+saves it — **parallelism cures "waiting for subprocesses one at a time"; it does not cure "whether the
+waiting is justified".**
+
+**These three do not go parallel**:
+
+| Case | Why |
+|---|---|
+| A later item reads an earlier item's product | There is an ordering dependency; in parallel it reads something not finished being written |
+| They share one writable state | The same temp directory, the same target directory, the same device. To go parallel, give each item its own |
+| Each item is fast by itself | Starting a process costs a few milliseconds; when an item only runs for a few milliseconds, parallelism is a net loss |
+
+Take the degree of parallelism from `nproc`, do not hard-code it; heavy work such as VMs and builds gets
+its own ceiling from memory and devices.
+
+## Parallelism must not swallow the failures
+
+**A `wait` with no arguments always exits 0.** However many of that background batch went red, it says nothing.
+
+Measured (2026-09-19, three background jobs, the second one `exit 7`):
+
+| How it is written | What the parent process sees |
+|---|---|
+| `for …; do check & done; wait` | **0** |
+| `\|\| bad=1` inside the background body, parent reads `$bad` | **0**. The background body is a subshell and the assignment does not come back — that is "an assignment in a subshell does not reach the parent process" |
+| Record `pids+=($!)` when starting, then `wait "$pid"` one at a time | **7** |
+| Each item writes its exit code to its own file, read them one at a time | It is there to read |
+
+So there are only two ways to collect: take the exit code with `wait "$pid"` one at a time, or have each
+item drop its exit code into its own file and read them in a fixed order when collecting.
+singlefs's `.claude/gate.d/55-qemu-first-transaction.sh` is the latter: three VMs run at once, each writes
+its exit code to `$work/<mode>/vm-exit`, and collection judges them in the order of the mode table.
+
+S6 in `scripts/shell-lint.sh` judges this one: a `wait` with no arguments in command position turns red.
+Where the exit code really is collected elsewhere, write `# shell-lint:exit-collected <how it is collected>`
+on that line, and the reason may not be left out — the same rule as `.claude/abbreviations` and
+`.claude/naming-lint-exclude`: to be let through, write down where the exit code went.
+
+**Output must not go straight to stdout.** When two background jobs print at once, the lines past the pipe
+buffer cut into each other, and a `✗` gets separated from the way out that follows it — which is exactly what
+`sop-first.md` asks every refusal to carry. The order also comes out different on every run, so the same
+input gives different output twice over and nobody can say which version is the real one.
+So each item writes its own file, and collection reads them back in the order the work was handed out.
+
+**However many items were handed out, that many have to come back.** After going parallel, one item not
+running is not an error: its file is not there, the loop turns one time fewer, and the end still reports green.
+Count them when collecting, and turn the whole thing red when the count does not match what was handed out
+(the item "result collection needs a completeness gate" covers the same thing).
+
+**After making something parallel, prove again that it can go red.** Making it parallel is itself able to turn
+a check that used to go red into a green one — the first two rows of the table above are exactly that.
+Do what `show-me-test.md` says: feed it an input that must go red, and see whether the parallel version still
+goes red. A parallelization that has not been proved again amounts to switching that check off.
 
 ## Do not use echo to fake success
 
