@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:bf91b423123ba76a6324ea0c0c922a81b2776d17ec8dd8c8bbaf4858179a958b -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:dfe7ee5ece7eca72ede1ab803b38c2cda897fa38b5f2555d085516ae5fb21e6e -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -97,8 +97,8 @@ that evidence requirements are met, not semantic correctness).
 ## Putting it into practice
 
 - **Before rewriting any status line in the kb or a TODO, run that line's command.**
-  Do not rewrite it unchecked — the old line at least carries a date; rewriting it
-  gives a wrong statement a fresh timestamp.
+  Do not rewrite it unchecked: rewriting it vouches afresh for a statement nobody has checked,
+  and readers will take it as just checked.
 - If you cannot say "this is the command I learnt it from", the sentence must be
   written as **conjecture**, not as fact.
 - Factual corrections from someone else **also get checked** — neither accepted

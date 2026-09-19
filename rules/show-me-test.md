@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:8dde3dc33b250f059d95dca7f161e883333d76a2bf1fd9054de7a1a94b0b7f52 -->
+<!-- generated-from: rules/show-me-test.md sha256:81c42f4b11ad0b53e15af9c4126b1336b34ce1a8faa2b0400fe920fb4a6737be -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -173,6 +173,12 @@ just like shared stages, so they are subject to `gate-lint` and `shell-lint` too
 `gate.sh` hands `.claude/gate.d/` to both lints (the first scan over singlefs's local
 stages found 7 rejections with no way out).
 
+⚠️ **The reach stops at `.claude/gate.d/`.** Scripts elsewhere in the project (research scripts, hooks) reject people just the same, yet sit outside the reach of these two lints.
+Measured (2026-09-18, singlefs): running gate-lint on its own over the whole repository found 84 rejections in these two kinds of directory with no way out, and nobody had reported them before.
+⇒ If a project has such directories, hook up a local stage in `.claude/gate.d/` that hands them to both lints, setting `GATE_LINT_DIR` and `SHELL_LINT_DIR` respectively to the target directory when calling them —
+without them the shared scripts still scan the SOP's own package by default, and judging a fixture directory red or green then mixes in the real repository's scripts.
+Hooking up gate-lint alone does only half the job: measured (2026-09-19, singlefs), shell-lint run on its own over the same research scripts still reports 18 findings, and the local stage that hooks up only gate-lint sees none of them.
+
 # What the gate can and cannot prove
 
 > **Gate proves evidence requirements, not semantic correctness.**
@@ -212,6 +218,12 @@ silent error this project most wants to avoid.
    that list every time precisely so "it passed" is not mistaken for "it was
    verified". When a project stage declares coverage of an item (`# gate-covers:`),
    the item leaves the list only if that stage ran and passed this round.
+
+5. **A handed-back list that a machine confirms is complete is not thereby judged right.**
+   For work a subagent judges item by item (sweeps, re-reviews), what can be made into a check is "every item has a verdict, every verdict is one of the recognised kinds, and the reason quotes that item's own words" —
+   that stops "the sample was enough" and "wave the whole group through", but not wrong verdicts. So after the completeness check, still spot-check and re-judge across **every kind of verdict**; redo the stretch where a spot check hits a wrong verdict, then sample again.
+   Measured (2026-09-18, singlefs): candidates were handed to sweep agents by group, dozens to a hundred-odd rows per group; a sweep agent wrote one boilerplate sentence and waved a whole group through, and every group containing known rot was waved through;
+   after switching to row-by-row verdicts with a machine completeness check, an attacker could still mechanically generate a boilerplate report that passed the checker, and a report judging everything "needs a change" still fell outside the re-judging pool, which sampled only "unrelated".
 
 ## Why this rule
 

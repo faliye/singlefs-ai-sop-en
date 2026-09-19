@@ -4,6 +4,33 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.51 — 2026-09-19
+
+**The kb reference check gains the bare positional forms; several lessons measured on singlefs on 2026-09-17 and 09-18 go into the rules; current-state sentences carry no date, without exception.**
+
+Gate (`scripts/`, one copy across the three repositories):
+- doc-lint's dangling-reference check gains the bare forms without "see" (上述, 下文, 下表, 以下是, 逐条如下：, 上面三条 and the like).
+  The criteria were measured over 357 kb files in singlefs: 103 new hits outside the old criteria, and read one by one, every one was a genuine reference;
+  上面 / 下面 ("above" / "below") match only the forms that point at a position in the document, and 前面 / 后面 and 上方 / 下方 are not checked. Fixtures dirref (red) and dirrefok (green).
+- The dangling-reference and self-reference patterns are first compiled once by grep on their own, and a pattern that does not compile turns red on the spot:
+  that grep is wrapped in `|| true`, so a compile failure (exit 2) looks exactly like "no match", and writing a range of circled numbers turned the whole check silently green for every kb file.
+  New selftest case "a pattern that does not compile turns red on the spot"; cases 320 → 323.
+- Downstream: scanning singlefs with this version's doc-lint turns two genuine references red (`.claude/kb/experiments/154-…` line 8, "下文 H5…",
+  and `.claude/kb/milestone/02-second-txn.md` line 266, "下面的数" and "下面引的六家"); singlefs fixes them.
+
+Rules:
+- kb-discipline: item 1 gains the bare forms and the gate's reach for "above" / "below"; under item 8, new "A dated snapshot of the current state is history too, and stays stuck on that day":
+  a current-state sentence carries no date, and an existing one has its date deleted and its fact kept. Item 2 now says "dates go only with events",
+  and the sentence "the old line at least carries a date" in verify-before-claiming's "Putting it into practice" is rewritten to match — the three used to contradict one another, and are reconciled as the user decided: current-state sentences carry no date.
+- evidence-discipline: "An independent count that matches only the total does not confirm a breakdown"; "Sweep by the old wording, not only by the new names".
+- test-discipline: new sections "Time phases inside the process under test, not in the loop that relays its output" and "An experiment must state which decision it measures for, and when enough is enough";
+  "a positive control's answer must not sit anywhere the side under test can read it"; the list of what runs on people under "Which half the gate handles" gains these three.
+- show-me-test: "The reach stops at `.claude/gate.d/`": research scripts and hooks elsewhere in the project need their own local stage handing them to both gate-lint and shell-lint
+  (singlefs's research scripts: 84 gate-lint findings, 18 shell-lint findings); corollary 5, "A handed-back list that a machine confirms is complete is not thereby judged right".
+- command-safety: new section "Once you start a background task or a subagent, re-check it on a schedule, and do not force it to end". Record-and-report-only applies to tools that detect stuck or spinning work;
+  a hook that refuses one specific dangerous form is not covered (read broadly, the original sentence clashed with session-wrapup item 4).
+- session-wrapup: "Do not write it into a session's private memory".
+
 ## 0.0.50 — 2026-09-16
 
 **One full audit: three real bugs on the `--staged` path, doc-lint exempting the rules proper wholesale, and a

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:539b9e71408246e286745625b2e83554305a3517105b992419cb6fd24d14362f -->
+<!-- generated-from: rules/evidence-discipline.md sha256:dba4abd9147405169a969d028f36f0ad9726f1005d497d5f4710bffbd5fbe9b2 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -34,6 +34,12 @@ program keeps for itself, and the two agree cell for cell. That agreement only b
 evidence once you have also observed that **dropping direct I/O sends the block-layer
 count to zero while the program's own count does not move at all** — otherwise the
 agreement could just be the second path echoing the first.
+
+⚠️ **An independent count that matches only the total does not confirm a breakdown.** The block-layer count agreeing with the total implied by the program's read pattern shows that both sides counted the same pile of requests,
+not that "N of them are of this kind and M of that kind": the counter cannot tell which request belongs to which kind.
+Measured (2026-09-17, singlefs): a write-up said the read requests were "exactly the slot-by-slot reads of the whole ring plus 81, with the block-layer count as an independent second path",
+while in the same artifact the bytes read did not equal requests × slot width, and the 81 extra requests carried only 319 488 bytes, less than one slot width on average. The request arithmetic matched, the byte count did not, and the breakdown came from the code alone.
+⇒ Before using a count to confirm a breakdown, ask whether the counter can distinguish the kinds being split. If it cannot, write only "consistent with", say where the breakdown comes from, and check the other raw count as well.
 
 **This is the same discipline as "every verification must be able to fail", applied to
 the cross-check path**: the main check must be shown to go red, and so must the
@@ -363,6 +369,15 @@ three gaps" or "written as 4096 from the seventh run on"; "the tree-table entry 
 value in it is the one in its closing parenthesis.
 
 **Test: swap the new value into the sentence — is it still true?** If yes, it states the present, so change it. If no, it reports that occasion, so leave it.
+
+⚠️ **Sweep by the old wording, not only by the new names.** A stale sentence is written in the old wording ("only the first transaction", "no second instance yet");
+searching by the names of what this phase newly built mostly turns up sentences that have already been fixed.
+The ready-made list of old wordings is this phase's own diff: current-state sentences it deleted or rewrote in one place often live on unchanged elsewhere.
+Measured (2026-09-18, singlefs, after three days of changes in one phase): four sweep agents searched by the new names (function names, "two streams"); two reported zero and one only sampled;
+a targeted search for the old wordings this phase had changed elsewhere found more than twenty rows in the checks-owed table whose prerequisite column still said "layer 0 has only the first transaction of a single mount".
+
+⇒ Before sweeping, write down "how the repository would describe this thing before it was done" (no X, X not yet, only Y, N items) and search the whole repository for those phrasings;
+also take each current-state sentence this phase's diff deleted and search, one by one, for whether it still lives elsewhere.
 
 ### A withdrawal's rationale collapsing does not bring the withdrawn conclusion back
 

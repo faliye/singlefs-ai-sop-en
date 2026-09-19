@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:81fded7520c9cc967fab9500f3c69a9398904906282cfd06930f1bd9aa616ec6 -->
+<!-- generated-from: rules/command-safety.md sha256:65a91747a2ec61be727eb3bf24a9135e2d0f7f420942917f041f2eea6d917ef9 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -57,6 +57,27 @@ The S3 check in `scripts/shell-lint.sh` turns every `pgrep -f` in command positi
 `while` / `until` / `!` also counts as command position), without looking at whether the same line also has a `kill`:
 assign it to a variable and kill on the next line, or just count the matches, and the pattern still hits its own
 command line. It cannot reach command lines typed by hand, which is why this is written here too.
+
+## Once you start a background task or a subagent, re-check it on a schedule, and do not force it to end
+
+Long work may run long: a build, a full replay, or a job handed to a subagent can take hours and that is normal. What needs guarding against is **a wait nobody is watching**:
+the condition it waits for will never hold, and from outside all you see is "still running".
+
+Measured (2026-09-17, singlefs): a subagent wrote `cmd > log 2>&1; echo "exit=$?"`. That `echo` sits outside the redirection and went to standard output,
+and it then waited in the log with `until grep -q "^exit=" log; do sleep 10; done` for a line that would never appear. It kept spinning until the main agent checked on it.
+The same day a test in another session ran for more than three hours with no output at all, and nobody could tell slow from stuck.
+
+So:
+
+- **Anything started gets re-checked.** For a task started in the background or a subagent sent off, whoever dispatched it checks on a schedule: how long since its last action,
+  whether it is sitting in a wait loop, whether the same command keeps running with byte-identical output, whether the files it writes are still growing.
+- **Keep detection separate from handling.** Tools that detect stuck or spinning work (hooks, watchdog scripts) only record and report; they do not block commands, kill processes, or stop subagents.
+  Whether it ends and how it is handled is decided by whoever dispatched it, after looking. A tool that decides "timed out, kill it" also kills work that was still making progress.
+  A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4: refuse, before writing, to overwrite an untracked file).
+- **Before waiting for a line in a log, make sure that line is really written to that file.**
+- In sessions such as Claude Code, when two model calls are too far apart the prompt cache expires and the whole context has to be written again.
+  Measured (same day): a subagent waited in the foreground for builds and replays and came back after more than five minutes; in one stretch of work that rewrote the context 6 times, 360k to 590k tokens each.
+  Run long work in the background and come back to re-check periodically; that is cheaper than one idle wait of tens of minutes.
 
 ## Do not use echo to fake success
 

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:c1cbbd31e15430b9a3bb02508f8a161d6f7ee79d5479408f12c3d5edd23147f3 -->
+<!-- generated-from: rules/session-wrapup.md sha256:dcb3a51a09042ac52fc246c0ac38af5db39504caae67244e606ae1b450ef1628 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -41,6 +41,12 @@ Where to change it — look at what the item governs:
 **When in doubt, keep it in the project.** singlefs is this SOP's only user, so
 "would another project need it" is not a criterion — there is no other project to
 look at, and anyone can answer "yes".
+
+**Do not write it into a session's private memory.** A session's own memory (for example Claude Code's memory) lives only on this machine and is seen only by sessions on it:
+other contributors cannot see it, and subagents that do not inherit the project instructions cannot read it either. So pitfalls and conventions that someone else could run into
+go into the project or into this SOP; private memory holds only the user's personal preferences (when to commit, which language to reply in, and the like).
+Measured (2026-09-17, singlefs): one inventory of the private memory found 10 of 18 entries were project conventions or progress, and two of them contradicted the rule text in the project,
+so other sessions kept reading the old wording in the rules.
 
 ## 3. Did any decision change?
 

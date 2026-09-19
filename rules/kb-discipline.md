@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:ae592faac47d7e663d421d07fc2a31359540a597c9acb4b6a5d374c76e30ef2c -->
+<!-- generated-from: rules/kb-discipline.md sha256:79dd4ec798d39e9a28048ff947cd436f11feded141ee120ca59cc93a2bfde11c -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -18,7 +18,10 @@ A fact must still hold when retrieved alone, without the paragraph above it.
 **No dangling references** — "as stated above", "same as above", "see above",
 "mentioned earlier", "the aforementioned", "as described below", and positional
 references such as "see below", "see the section below", "see the table above", "that
-table above". They are harmless when read through and break on the spot when retrieved;
+table above", as well as the bare forms without "see": "the above-mentioned", "the text below", "the table below",
+"the three items above", "below is the original text before it was voided", "the following is", "item by item, as follows:",
+and phrasings that point at the adjacent paragraph or line, such as "see the next paragraph" and "same as the line above".
+They are harmless when read through and break on the spot when retrieved;
 and **a model will not say "I do not follow" — it will fill in something.**
 
 "the previous entry" / "the next entry" are **outside the gate**: measured on a real
@@ -26,6 +29,18 @@ corpus, false reds outweigh true ones — one registered short name is literally
 of the previous timeline", and ordinary verb phrases like "note down one more item" hit
 too. Writers still must not use them to point at another entry, but that half is checked
 by people, not by the gate.
+
+"Above" and "below" (上面 / 下面): **the gate checks only the forms that point at a position in the document**:
+those preceded by the start of a sentence, punctuation, or a function word such as 以, 把, 按, 取, 在 or 是,
+and followed by 的, 是, 保留, a numeral, 第 (an ordinal) or an item number, plus those that follow 列在, 照录在, 附在 or 放在
+("listed / copied / attached / placed above or below"). "the four points above it", "the units below a multi-level tree"
+and "the line below each heading" describe physical positions and are not judged. The exact patterns are the ones in `scripts/doc-lint.sh`.
+"The above" and "the following" (以上 / 以下) are checked only in forms like "the following is" and "the several items above";
+"earlier" / "later" (前面 / 后面) and "over" / "under" (上方 / 下方) are **outside the gate**.
+The basis was measured on 2026-09-17 over 357 kb files in singlefs: 前面 / 后面 and 以上 / 以下 were overwhelmingly
+"before / after this code" and numeric thresholds ("4 KiB and above"), and 上方 / 下方 mostly pointed at named positions ("below the field table").
+The same measurement found 103 bare forms outside the old criteria, and read one by one, every one was a genuine reference.
+Writers still must not use these words to point elsewhere in the document; that half is checked by people.
 
 **Self-references are equally forbidden** — "this entry", "this decision", "this
 experiment", "that decision", "this invariant", "this section", "this table", "this
@@ -71,7 +86,8 @@ numbering) are language-independent and do run.
 
 ## 2. Every entry carries its source and status
 
-Source, date, measured or inferred, on what measurement basis.
+Source, measured or inferred, on what measurement basis. Dates go only with events: a measurement or a conclusion read elsewhere says which day it was done;
+a sentence that states the current state carries no date (see "A dated snapshot of the current state is history too, and stays stuck on that day" under section 8).
 
 This is not pedantry: **it is the only cue a model has for telling "this is
 established" from "this was a guess at the time".** Without the cue, the two look
@@ -201,3 +217,17 @@ Every kb document must close with a "## Revision history" section — keep the s
 even with no history yet, for later. `INDEX.md` is the exception: it is a signpost
 table, it carries no facts of its own, so it has no old conclusions to keep.
 Enforced by `scripts/doc-lint.sh`.
+
+### A dated snapshot of the current state is history too, and stays stuck on that day
+
+Sentences like "Status on 2026-09-14: … still not in layer 0's workload" or "(all four already present as of 2026-09-14 …; layer 0 has only the first transaction)" written in the body text
+state the present on the day they are written, and from the next day on they are a snapshot of that day: later changes do not touch them, so they stay stuck on that day.
+When retrieval serves one up, the model reads the leading date as "that is in the past", while the sentence actually says "the current state as of that day".
+Measured (2026-09-18, singlefs): the local model, sampled twice, judged such sentences both times as "about the past, no change needed", and those lines really were stale.
+
+⇒ A current-state sentence carries no date: when the state changes, change the current value, and write what it looked like on that day into "## Revision history".
+For an existing dated current-state sentence, delete the date and keep the fact; check the fact itself once first (`verify-before-claiming.md`), and if it is stale, change it to the current value.
+To tell whether a dated sentence is a current-state sentence, delete the date and read it again — if it reads as saying how things are today (whether something exists, how many, what is still owed), it is a current-state sentence;
+only if it reads as saying what was done that day (changed to, settled, ran once) is it an event sentence. A date in the past does not mean the sentence talks about the past.
+
+The gate does not check this for now: the existing kb uses this pattern a lot ("Status (date):" and the like), and a check would turn whole areas red at once; sweep first, then add the check.
