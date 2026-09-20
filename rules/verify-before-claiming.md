@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:dfe7ee5ece7eca72ede1ab803b38c2cda897fa38b5f2555d085516ae5fb21e6e -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:26d01dd4ba95a7aaad3e1d8af23618cec11c599456feca1164a561e94f580562 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -46,13 +46,6 @@ This one is the hardest to catch yourself, because **the "check now" step really
 happen**: you ran the command, you read the file, you are holding a proposition you
 genuinely verified. **The error is that the sentence you then said is wider than it.**
 
-**Observed twice (2026-09-10, same day, same person)**:
-
-| What was checked (narrow, true) | What was stated (broad, false) | Cost |
-|---|---|---|
-| "`sudo` is blocked by the sandbox" | "root is unavailable, so this observation cannot be made" | Another path in the same repo **does not need that privilege**, and the docs say word for word that it was measured working ⇒ **a whole round with zero observations, and the recorded reason was false** |
-| "this object is not listed in that class rule's enumeration" | "nothing in the repo covers this cell" | **The class membership is stated in two other files**, so the class rule covered it all along ⇒ an entire experiment's framing was void, and the same owed-check entry **got written wrong twice** |
-
 Both have the same shape: **what was verified is one path / one file; what was asserted
 is all paths / the whole repo.**
 
@@ -76,9 +69,6 @@ judging, **grep its name across the whole repo** and see whether it has been pla
 some existing class — **the class rule answers for it.**
 
 ⚠️ **Truncated output is a narrow claim too**: `grep … | head -12` shows the first 12 lines, not every match.
-Measured (2026-09-13): to find which sources define a format constant, a search ran over the docs directory and the
-source directory together and was cut at 12 lines; only one source file surfaced in those 12 lines, so the edit went
-ahead as if it were the only one — the same-named constant in three more source files sat past the cut.
 ⇒ **Before saying "only these places" or "these are all the matches", do not truncate the output**; if it is long,
 count first (`grep -c`, `| wc -l`), and read the contents once the count matches.
 

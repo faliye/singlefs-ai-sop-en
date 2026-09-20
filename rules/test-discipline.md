@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:6ef4313e3a82b7baec3f8056d46a592c51605dfc0fc5afd3b3fa44627425cacd -->
+<!-- generated-from: rules/test-discipline.md sha256:3a676959e636320c4f4aad4b507dad2396e72c7cb5d7f822faaaf3588b8a31bd -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -32,8 +32,6 @@ When a wrapper starts a child process, reads its output lines and relays each on
 Relaying can block (a serial console in a VM, a slow terminal, a pipe drained slowly) while the child's writes into the pipe do not,
 so every later timestamp carries the printing backlog of the lines before it. The backlog varies from round to round and looks like scheduling jitter, so nobody suspects it.
 
-Measured (2026-09-17, singlefs): lines the child printed back to back, with only microseconds of computation between them, carried timestamps 21.7–25.8 ms apart;
-in 9 of 10 rounds the phase computed outside was shorter than the child's own timing of the same work, which is physically impossible. The 186%–259% spread of that cell had been reported twice as VM scheduling noise.
 
 **What to do**: time inside the process under test and write the number into its result line. If arrival times must be used, read the child's output to the end first and relay afterwards.
 When both an outer and an inner number exist, report a containment self-check: the outer phase must contain the inner one, and rounds where it does not are left out of the statistics.
@@ -81,8 +79,6 @@ never go back and edit the criterion. **Edit it and it is a new experiment: re-r
 ⚠️ **The reverse holds too: a positive control's answer must not sit anywhere the side under test can read it.**
 When what is under test is an agent that reads the repository, an answer written into the script it is going to run, or into records in the same repository, simply gets copied;
 storing only a hash is not enough either: an unsalted short hash over a small candidate space is as good as plaintext.
-Measured (2026-09-18, singlefs, acceptance-testing the sweep agents): one sweep agent read the known-rot list in the tool's source and copied it as "needs a change", and applied a default verdict by carrier type to the other 1,700-odd rows;
-after switching to storing only a hash of 16 hex characters, the attacker reversed it out of more than 40,000 candidates in 0.01 seconds.
 
 ⇒ An answer used for a blind test stays out of any repository the side under test can read, or is replaced with a stretch of history it has never seen; a control left in the repository serves only as a regression check (guarding against the tool being narrowed), not as a blind test.
 
@@ -112,11 +108,6 @@ Written backwards it does not look like *wrong*, it looks like **not triggered**
 round's report "this clause did not fire" is **indistinguishable** from "this clause was checked
 and the conclusion is fine".
 
-Measured (2026-09-09): a clause pinned before the run said "if an arm's benefit appears **only
-under the non-interleaved load**, record it as condition-unknown", while that round's finding was
-that the benefit appears **only under the interleaved load** ⇒ the antecedent is permanently false, the
-clause never fired, **and it should have**. The person who wrote it self-checked twice without noticing;
-another leg caught it by reading the antecedent word for word.
 
 ⇒ **Every time you pin a failure clause, write the next sentence: "what observation would make
 this fire".** If you cannot write that sentence, the clause is either backwards or vacuous, and
@@ -126,7 +117,7 @@ conclusion unfalsifiable", this one governs "the clause itself can never be trig
 
 ### Do not write a criterion as a conjunction; a threshold must not be a tautology of the arm's definition
 
-The same discipline has two quieter failures; one experiment on 2026-09-13 hit each of them once:
+The same discipline has two quieter failures:
 
 | Form | Measured | Consequence |
 |---|---|---|
@@ -185,12 +176,6 @@ If some clause uses a quantity as the input of a stop / start / admission predic
 **end-of-run value** is not enough: an end value of 0 and "never positive" are two different sentences, and they call for
 two different fixes.
 
-Measured (2026-09-13): a placement experiment reported the end value of "the number of fully empty segments" — 0 in all
-40 cells — and the debt line concluded from that "this quantity is never positive; the predicate can only be fed by
-compaction". The second run reported the trajectory instead — a peak of 2, positive in 5% of 2000 rounds — and the truth
-was "it does read positive; the foreground just consumes it on the spot", so the fix changed from "find the predicate
-another input" to "stop the foreground from eating it". Reading the endpoint as the trajectory erred in exactly the more
-hopeless direction.
 
 ⇒ A quantity consumed by a predicate is reported with at least three numbers: **the peak after the initial supply is
 used up, the number of rounds it was positive, and the end value**. A report that gives only the end value may not use
@@ -205,10 +190,6 @@ Without this link, "enough" has no exit anywhere in the chain: every check looks
 so stopping once the decision can be made always looks like debt. Splitting the work makes it worse: whoever writes the registration does not pay for implementing it,
 whoever runs the experiment may not cut scope (to prevent after-the-fact modelling), and whoever dispatches the work asks only "what is still missing" at each hand-back.
 
-Measured (2026-09-17, singlefs): two counting experiments were meant to put cost numbers on eight choices that a round of argument had handed over,
-yet the question given to the side writing the registration did not mention those eight choices at all.
-The registrations could only follow every discipline in full, and came to 1341 and 1097 lines; the side running them handed back whenever one pass could not finish and was dispatched again, eleven times across the two experiments.
-The numbers that separated the candidates were all in about four hours after the start; the following two hours of numbers changed no choice.
 
 So:
 

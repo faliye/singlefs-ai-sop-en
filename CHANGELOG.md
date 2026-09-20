@@ -4,6 +4,20 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.53 — 2026-09-20
+
+**Rule files carry the how only: a fourth document discipline, a check that fails, and history cleared out of the rules in all three languages.**
+
+Rules (`rules/`):
+- New `rules-discipline.md`, covering `rules/*.md` and a project's `.claude/rules/*.md`. The body carries four things only (how, what to do and not do, what to do by default, which rule lives where); the criterion stays, the argument moves out; measurements, arguments and decision records lifted out of the body are deleted outright, with no new home — a shared rule's history goes where it always did, `CHANGELOG.md`, one section per version; a link to history must carry the deterrent "do not read it unless you are tracing where this came from", with not one word dropped; rule files keep no history section.
+- The third row of the three-document table in `writing-discipline.md` now points at it; the authoritative statement of "`CLAUDE.md` and `rules/*.md` keep no history section" moves from `design-doc-discipline.md` into the new rule.
+- All 14 rules, `CLAUDE.md`, `agents/INDEX.md`, `skills/crash-test` and `skills/decide` swept against the new rule: measurements, argument sections, decision dates and gate-discrimination write-ups deleted from the body; the body keeps the how. Section structure aligned file by file across the three languages.
+
+Gate (`scripts/`, one copy across the three repos):
+- New `rules-lint.sh`, judging seven things: record sections, argument sections, dated lines, explanatory paragraphs and half-sentences, lexical explanations, and history links with no deterrent. Four exemptions: dates inside 「」, threshold dates inside backticks, table rows (exempt from the last three), and files registered in the exclusion list. Its patterns are Chinese, so a repository of another language reports not implemented (exit 77) rather than passing silently.
+- Two `gate.sh` stages: "rule discipline" scans this package's `rules/`, "rule discipline (project-local)" scans the project's `.claude/rules/`. Both also scan `CLAUDE.md`, `agents/*.md` and `skills/*/SKILL.md` — they are executed the same way rules are. A project needs no stage of its own in `.claude/gate.d/`.
+- `selftest.sh`: 15 new rules-lint fixtures (each red fixture breaks exactly one thing; the green ones sit on the edge of all four exemptions); `gate.sh`'s stubs and wants updated for the new stages.
+
 ## 0.0.52 — 2026-09-19
 
 **The ban on finding processes by pattern now also covers commands typed in a session; a new `scripts/proc.py` does the same work by process ID; checks within one script go parallel where they can, while "a bare `wait` swallowing the failures" becomes a failing check; shell-lint's S1 loses two false reds.**

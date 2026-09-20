@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:79dd4ec798d39e9a28048ff947cd436f11feded141ee120ca59cc93a2bfde11c -->
+<!-- generated-from: rules/kb-discipline.md sha256:1436a415f693f1d482661b796a5ccf56670e3d23a7df0ef6203e8c76c459a1b2 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -37,7 +37,7 @@ and followed by 的, 是, 保留, a numeral, 第 (an ordinal) or an item number,
 and "the line below each heading" describe physical positions and are not judged. The exact patterns are the ones in `scripts/doc-lint.sh`.
 "The above" and "the following" (以上 / 以下) are checked only in forms like "the following is" and "the several items above";
 "earlier" / "later" (前面 / 后面) and "over" / "under" (上方 / 下方) are **outside the gate**.
-The basis was measured on 2026-09-17 over 357 kb files in singlefs: 前面 / 后面 and 以上 / 以下 were overwhelmingly
+
 "before / after this code" and numeric thresholds ("4 KiB and above"), and 上方 / 下方 mostly pointed at named positions ("below the field table").
 The same measurement found 103 bare forms outside the old criteria, and read one by one, every one was a genuine reference.
 Writers still must not use these words to point elsewhere in the document; that half is checked by people.
@@ -223,7 +223,6 @@ Enforced by `scripts/doc-lint.sh`.
 Sentences like "Status on 2026-09-14: … still not in layer 0's workload" or "(all four already present as of 2026-09-14 …; layer 0 has only the first transaction)" written in the body text
 state the present on the day they are written, and from the next day on they are a snapshot of that day: later changes do not touch them, so they stay stuck on that day.
 When retrieval serves one up, the model reads the leading date as "that is in the past", while the sentence actually says "the current state as of that day".
-Measured (2026-09-18, singlefs): the local model, sampled twice, judged such sentences both times as "about the past, no change needed", and those lines really were stale.
 
 ⇒ A current-state sentence carries no date: when the state changes, change the current value, and write what it looked like on that day into "## Revision history".
 For an existing dated current-state sentence, delete the date and keep the fact; check the fact itself once first (`verify-before-claiming.md`), and if it is stale, change it to the current value.

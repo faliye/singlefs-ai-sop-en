@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:06023b88db228684cbe526849e0851b9333c8a57a495114467f52d8fc44a7019 -->
+<!-- generated-from: rules/command-safety.md sha256:19f0678ac7f2ff0c62596e4321ebd8649581548d1f63b35fd77d56f460938a1d -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -20,10 +20,6 @@ Two kinds cannot, and they are handled differently:
 | **Throws away uncommitted work** | `git checkout <file>`, `git restore`, `git reset --hard`, `git clean` | `git stash` or `cp` a copy out first; use them only when you mean to discard *all* uncommitted changes to that file |
 | **Deletes data outright** | `rm -rf`, `> file`, `sed -i`, `rsync --delete`, `mkfs`, `dd` | Look at the target first (`ls` / `git status` / `lsblk`); guard variable paths with `${VAR:?}` |
 
-**Measured the hard way**: an attempt to undo one throwaway `sed` used
-`git checkout <file>` and took every uncommitted change to that file with it.
-That round was recovered from a just-amended commit still in the reflog — had that
-commit not existed, the work was gone.
 
 **So: run throwaway experiments on a copy**, not in the working tree.
 
@@ -51,8 +47,6 @@ own process tree.
 With a wait like `until ! pgrep -f "X"; do sleep 5; done`, the pattern matches the shell command line the
 loop itself runs in, so `pgrep` always finds a match and the loop never exits — and nothing reports an error;
 from outside it just looks like "still waiting".
-Measured (2026-09-13): a loop waiting for a background experiment to finish matched the binary name with
-`pgrep -f`, waited a whole round without exiting, and stopped only when it was killed by its literal pid.
 ⇒ To wait for a process to end, use its **literal pid**: `until ! kill -0 "$pid" 2>/dev/null; do sleep 5; done`;
 for a background job you started yourself, use `wait`; for one you did not start (a daemon another script launched, say), have whoever starts it write its pid to a file and wait on that.
 If the pid was not recorded, find it with `scripts/proc.py find <executable-name> [--argument <argument>]`: it compares the executable name exactly instead of matching a pattern against the whole command line, and it does not list the process tree that issues the command;
@@ -75,9 +69,6 @@ In a session where it is not registered, commands typed by hand still rely on th
 Long work may run long: a build, a full replay, or a job handed to a subagent can take hours and that is normal. What needs guarding against is **a wait nobody is watching**:
 the condition it waits for will never hold, and from outside all you see is "still running".
 
-Measured (2026-09-17, singlefs): a subagent wrote `cmd > log 2>&1; echo "exit=$?"`. That `echo` sits outside the redirection and went to standard output,
-and it then waited in the log with `until grep -q "^exit=" log; do sleep 10; done` for a line that would never appear. It kept spinning until the main agent checked on it.
-The same day a test in another session ran for more than three hours with no output at all, and nobody could tell slow from stuck.
 
 So:
 
@@ -88,8 +79,6 @@ So:
   A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4: refuse, before writing, to overwrite an untracked file).
 - **Before waiting for a line in a log, make sure that line is really written to that file.**
 - In sessions such as Claude Code, when two model calls are too far apart the prompt cache expires and the whole context has to be written again.
-  Measured (same day): a subagent waited in the foreground for builds and replays and came back after more than five minutes; in one stretch of work that rewrote the context 6 times, 360k to 590k tokens each.
-  Run long work in the background and come back to re-check periodically; that is cheaper than one idle wait of tens of minutes.
 
 ## Within one script, run the checks in parallel when they can be
 
@@ -102,12 +91,6 @@ runs it locally any more: whoever submits switches to pushing and letting the re
 it went red, and what `sop-first.md` asks for — "runs locally, and judges the same as the remote" —
 fails on the spot.
 
-Measured (2026-09-19, this repo, `time bash scripts/gate.sh`, 32-core machine): the whole gate took
-26.7 s of wall clock, of which `selftest.sh` alone took 24.8 s, while its CPU only reached 66% — not even
-one core saturated, the time going into waiting for subprocesses to exit one at a time.
-After its six batches of fixture cases were made parallel, all 350 verdicts stayed case-for-case identical
-and that stage came down to 21.4 s at 105% CPU. The same day, downstream in singlefs,
-`.claude/gate.d/59-crates-mutation-replay.sh` runs `cargo test` one row at a time, 173 rows in the table.
 
 **Once it is fast, look again at where the remaining time goes.** In that same measurement, 10 s of those
 21.4 s was **one** case idling (what it verifies is precisely that `wait` does not return once the timeout
@@ -130,7 +113,6 @@ its own ceiling from memory and devices.
 
 **A `wait` with no arguments always exits 0.** However many of that background batch went red, it says nothing.
 
-Measured (2026-09-19, three background jobs, the second one `exit 7`):
 
 | How it is written | What the parent process sees |
 |---|---|
@@ -194,9 +176,6 @@ holds an output that was judged void — the file name was chosen by the caller 
 The exit code reported the error, but the file stays, and the next person browsing the directory will not go back to
 check what the exit code was.
 
-Measured (2026-09-12): a script that fetches a model's answer `print`ed the body first and then ran a garbled-text gate;
-on red it exited 5 and saved a separate void copy, yet the caller's `> …-output-s1.md` file still held that same body,
-differing from the void copy by a single newline.
 
 **What to do**: write the result to a temporary file first and output it only once the gate passes; on red, stdout stays
 empty. This gate must be shown to go red as well: change the script back to "output first, judge later", and the
@@ -211,9 +190,6 @@ results forever while the exit code stays 0 — green light, wrong answer.
 
 Under `set -u` it is worse: the reference is not an empty value, it is an immediate
 "unbound variable" that **takes the script down before it prints its diagnosis**.
-Measured: five failure branches of a test apparatus never printed a single `howto`, and
-those branches are exactly where you need one when the apparatus is lying. A comment
-cannot stop this, so it is a failing item in `scripts/shell-lint.sh`.
 
 ## After a script edits a file, read it back — a compiler warning is a free signal
 

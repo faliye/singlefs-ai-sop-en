@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:cff66be6bda7e5ded054e9c094445ebaf875ec5ef15403a96f69e88559622e66 -->
+<!-- generated-from: rules/writing-discipline.md sha256:805c4dce4880e2b75b4fe5cf27182dfdc4f792c88740d442f852375d0c695904 -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -14,7 +14,7 @@ it is for, make the length match the weight of the change, and write plainly.
 |---|---|---|---|
 | **Design docs** | humans read them through | make people **agree** and **get started** | `design-doc-discipline.md` |
 | **Engineering kb** | model retrieval | keep the model from **making things up** | `kb-discipline.md` |
-| **Rules** | execution | must be turnable into a check that fails | `rules/`, see `sop-first.md` |
+| **Rules** | execution | must be turnable into a check that fails | `rules-discipline.md` |
 
 Before writing, ask: will this be read start to finish by a person, or pulled out
 one item at a time by a model? Different answers, different writing.

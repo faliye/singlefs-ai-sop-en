@@ -1,4 +1,4 @@
-<!-- generated-from: rules/engineering-philosophy.md sha256:2418a48eb7d03a4083d95e9595ea9aa9da6dae10fde6b37f0c3091e6dcb02e7e -->
+<!-- generated-from: rules/engineering-philosophy.md sha256:c17c178d233e0f798a5050b7e2661dac359708786edd7f55906a6924da1514c1 -->
 <!-- doc-lint:rule-definition -->
 # Engineering Philosophy
 
@@ -10,34 +10,6 @@ should have been separate.**
 They used to be conflated — because the people writing the code and the people
 reading it were the same people, so "easy to write" and "easy to read" had to be
 the same thing. **They no longer are.**
-
-## Why the old commandments need re-deriving
-
-Nearly all of today's software engineering best practices grew on one implicit
-premise: **the ceiling of engineering quality is set by human cognitive capacity.**
-
-Keep functions short, keep nesting shallow, minimise concepts, unify the design,
-eliminate duplication — on the surface these say different things. Underneath
-they solve one problem: **make it fit in a limited human head.**
-They are not wrong. They are **calibrated for that constraint.**
-
-And that constraint is loosening. Tracing logic, maintaining consistency,
-covering cases exhaustively — these happen to be machine strengths, and machine
-capacity passed the human ceiling some time ago.
-
-**A floor calibrated to the old ceiling is now a floor set too low.**
-
-**"Machine capacity passed the human ceiling" rests on two falsifiable premises**
-— the order of magnitude of the context window, and that concurrent interleavings
-can be decided exhaustively. The premises themselves, their calibration, and what
-you would have to observe to overturn them are in `machine-first.md`, under "What
-this stance assumes, and how to overturn it". They are not repeated here: write
-one premise in two places and the two places will eventually disagree.
-
-So this project's stance toward established best practice is to **follow it
-critically, not by default.** Each rule gets re-asked: what problem did it
-originally solve, and does that problem still exist? The procedure is in
-`machine-first.md`; what it concluded is in `code-discipline.md`.
 
 ## What each axis optimises for
 

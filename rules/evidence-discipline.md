@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:dba4abd9147405169a969d028f36f0ad9726f1005d497d5f4710bffbd5fbe9b2 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:3b3b173be1780e9229ec67589351df3da7bf16688b868e71dd94e0a38b83d813 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -37,8 +37,6 @@ agreement could just be the second path echoing the first.
 
 ⚠️ **An independent count that matches only the total does not confirm a breakdown.** The block-layer count agreeing with the total implied by the program's read pattern shows that both sides counted the same pile of requests,
 not that "N of them are of this kind and M of that kind": the counter cannot tell which request belongs to which kind.
-Measured (2026-09-17, singlefs): a write-up said the read requests were "exactly the slot-by-slot reads of the whole ring plus 81, with the block-layer count as an independent second path",
-while in the same artifact the bytes read did not equal requests × slot width, and the 81 extra requests carried only 319 488 bytes, less than one slot width on average. The request arithmetic matched, the byte count did not, and the breakdown came from the code alone.
 ⇒ Before using a count to confirm a breakdown, ask whether the counter can distinguish the kinds being split. If it cannot, write only "consistent with", say where the breakdown comes from, and check the other raw count as well.
 
 **This is the same discipline as "every verification must be able to fail", applied to
@@ -87,7 +85,6 @@ around.
 ## Every number that enters a conclusion: was it measured, or guessed?
 
 An upper bound nobody measured gets treated as fact by the reasoning downstream, and the factor by which it is wrong multiplies straight into the conclusion.
-Measured (2026-08-30, singlefs): "10⁶ fsync/s" was written into a decision as an upper bound, and from it "a 48-bit counter lasts only 8.9 years — not enough". Measured on the machine: 2785/s, overestimated 359×; at the measured rate it is 3202 years — the conclusion pointed the wrong way, and the real bottleneck was a different field.
 
 So for every rate, capacity or ratio that enters a conclusion, first ask "was this measured or guessed?" — if guessed, go measure it. What cannot be measured here (say, the fsync rate of an enterprise drive) is written as a conditional: "at 10⁵/s it is 89 years; that tier cannot be measured on this machine, so it stays an assumption" — never as an upper bound.
 
@@ -158,7 +155,7 @@ done)**:
 | Would I **accept** the opposite result | You can say "if the numbers came out the other way, here is how I would change the conclusion" — written down **before** the run |
 | Did I take readings at **only one point** | A multiple derived from one size, one parameter, one workload is not "worst case" |
 | Does the **same artifact** hold a counterexample to the range I quoted | You can show the range covers every sampled point in the artifact — picking three points to report "1.25–1.5" while a 1.000 sits in that very same output |
-| Is this number a function of **some parameter that was never swept** | You can say which knobs in the apparatus this arm's cost / benefit depends on, and that each of them was swept — before an arm's cost goes into the body text, ask "which parameter is it a function of". Measured (2026-09-13): an arm's "commit-intrinsic blocks drop 99%" was written up as "a number, not a way of sampling"; the backward leg swept a parameter that had never been swept (the number of overflow segments), and on half the cells that number was 0 |
+| Is this number a function of **some parameter that was never swept** | You can say which knobs in the apparatus this arm's cost / benefit depends on, and that each of them was swept — before an arm's cost goes into the body text, ask "which parameter is it a function of" |
 
 ⚠️ **The moment of greatest danger is "overturning an old conclusion"**: by then you
 already have a new direction, and the thrill of overturning tilts every choice in the new
@@ -193,12 +190,6 @@ winner changes no criterion on paper, and is post-hoc modelling in substance.
 | **Tighten only** | The new form must be judged **at least as harshly by the original criteria**. Not one word looser |
 | **State where it tightened** | Say what the new form **demands more of** than the old one. If you cannot say, it is a loosening |
 
-Measured (2026-09-09): a backward-reasoning leg ruled an arm out under the failure clause
-written before the run, on the grounds that it did not cover field order. On checking, the
-arm as registered had never said it projected scalars only — **what was hit was its weakest
-reading**. The verdict followed the three steps: record that the weakest reading did lose,
-tighten the arm to "must carry row order", and state that the new form demands one more
-thing and nothing less.
 ⚠️ **The first step is the one people skip**, and once it is skipped an honest tightening
 and a "loosen it, then declare victory" **read identically on the page**.
 
@@ -207,11 +198,6 @@ the second.** Read separately, both sentences make sense; together they can cont
 by one of the two sentences and reaches the opposite verdict, and the author of the definition cannot see that they have
 in fact written two arms.
 
-Measured (2026-09-12): a candidate arm read "always make the new value durable on every disk (at most 7 publishes), so
-the residue is always 5 + 5c". Durability takes only 6 or 7 publishes, and with 6 the residue is 5 + 4c — the first
-sentence does not imply the second. The forward leg implemented "make it durable" and judged it to fail seed for seed
-like an arm already knocked out; the backward leg read "always do all 7" and judged that it passes when nothing fails.
-Both verdicts were right; they were verdicts on two different arms.
 
 ⇒ When writing an arm, treat "what that achieves" as a proposition to be proven: if it cannot be derived, delete it, or
 change the method to one it can be derived from.
@@ -223,11 +209,6 @@ number in any cell yet. The legitimate way: state in the pre-run registration **
 rests on, and that the moment was before the artifact**; keep the original criterion as written and judge the two arms
 each on its own. Without that passage in the registration, nobody can tell afterwards whether it was added after seeing
 the numbers.
-Measured (2026-09-13): a "follow the member" hint arm already showed in unit tests to be almost as scattered as the
-subtrahend arm; before the artifact ran, the "home fixed" arm and the segment-granularity criterion were added and
-written into the registration. The backward leg checked it against the three steps above (record the loss, tighten only,
-state where it tightened) and ruled it compliant — had that passage been missing from the registration, it would have
-been struck down as after-the-fact modelling.
 
 ### A criterion can be written wrong too: when it fires, first decide which kind it is
 
@@ -241,21 +222,7 @@ can be wrong, and that usually shows only at the moment it fires. Four forms:
 | **The hit is filed under the wrong criterion** | A leg reports "criterion X fires", while what happened belongs, by the wording, to another criterion with a different threshold | Check word by word which clause of which criterion the hit satisfies; filing it wrong knocks an arm out under the wrong threshold |
 | **The fix does not reach the cells that were hit** | A reverse-acceptance clause written before the run says "hit ⇒ choose between fix A and fix B", and one of the fixes is still hit on exactly the cells that were hit | When writing the clause, state for each fix which cell it repairs; after a hit, check each fix against the hit cells first, and when handing over one that is still hit, write "does not work on these cells" — leave that out and choosing it keeps the misjudgement in place |
 
-Measured (2026-09-13, two rounds of three-way argumentation on one design question, one of each):
-① a flaw in administrator rollback knocked all three candidate arms out on the correctness criterion (zero faults),
-while the clause written before the run said "the other two both out ⇒ back to the third" — the third was hit too, so
-following the letter meant falling back to an arm that was just as out;
-② a first-round criterion asked recovery to tell "the rollback's first root was never written" from "it was written and
-later went bad", and those two situations are identical on disk, item for item;
-③ a leg reported "a confirmed rollback gets undone" (the durability criterion, whose threshold counts faults) as a hit on
-the correctness criterion (which does not count faults); only when the judging side checked the criteria word by word did
-it find that one more step (the abandoned units being scrubbed first) is needed to really land in the correctness cell.
 
-Measured (2026-09-14, the third round on another design question, the fourth form): a clause written before the run
-said "a misjudgement written on the new arm ⇒ let the user choose between 'tighten the new arm once more' and
-'hard-code that the publication writing the row does not take the new instance's own transactions'". Of the three
-cells hit, one misjudged a unit of an abandoned instance, and the other two had no carried-over transaction at all —
-the second fix did nothing for any of the three, so handing it over as written would have offered an empty choice.
 
 ⇒ **When a criterion fires, ask four questions first**: does it tell the arms apart? Can the system under judgement
 actually see, at that moment, what it is asked to tell apart? Which clause of the criterion's wording does it satisfy?
@@ -280,11 +247,6 @@ one. **A green replay does not constitute "the numbers in the prose are right"**
 pins which range the conclusion lands in, and the wider that range, the further the prose can
 drift inside it — and it drifts toward the number the writer happened to remember.
 
-Measured (2026-09-06): an experiment's prose said "durable semantics is 1.475× slower",
-"durable ÷ nosync = 22.33×", "the injected 5 ms came back as 5 123 506 ns", while its own
-kept artifact says, verbatim, 1.625× / 30.36× / 5 199 857 ns. All three sit inside the
-replay's range assertions ([1.15, 2.10], [10, 500], [4.5 ms, 5.5 ms]) — **the gate was all
-green**.
 
 ⇒ The same governs **claims a single command could count**: "N unit tests", "M mutations",
 "K lines of artifact". They look decorative; they are in fact the measurement basis of how
@@ -300,13 +262,6 @@ two numbers to lay side by side; a missing qualifier **leaves nothing to compare
 every number at the citing site is true, and what is wrong is that the conclusion claims a wider
 range than the artifact supports.
 
-Measured (2026-09-09): an experiment's prose said "the one thing only A really buys is the
-reclaim cell … B and C cannot free a single one", while its own kept artifact gives, for B at one
-parameter setting, **exactly the same numbers as A**; the table in the prose **has no column for
-that parameter**. **The harness's assertion was scoped correctly all along** — the unit test
-pinned that parameter, and the assertion message carried the qualifier — the prose is what shed
-the scope. Replay was byte-identical and **the gate was all green**. Three downstream sites had
-already inherited that sentence, one of them the very decision item that was settled on it.
 
 ⇒ **Criterion**: when a conclusion says "only A buys it / unique to A / only A can", go to the
 artifact and read **the non-A arms at every parameter setting**; if the table in the prose
@@ -318,11 +273,6 @@ When you sweep a parameter and report a "minimum viable value" or a "maximum saf
 endpoint of the swept range, it only says "viable up to the endpoint"; the real boundary lies outside the range and was
 not measured. Writing "the minimum viable value is X" turns the starting point of the sweep into a measurement.
 
-Measured (2026-09-12): an experiment swept the reserve pool from "pre-run formula − 6" to "pre-run formula + 8" and
-reported, for two arms, "the smallest reserve pool that does not deadlock", with the prose saying "both are smaller than
-the pre-run formula". For one arm both numbers were exactly the lower edge of the sweep (formula − 6), and that arm's
-reserve formula was not pinned by any criterion — how much it actually needs, this round said nothing about. The backward
-leg caught it while checking where the sweep started.
 
 ⇒ Before reporting an extreme found by a sweep, check whether it is an endpoint. If it is, write "≤ endpoint (lower edge
 of the sweep; boundary not measured)"; otherwise widen the range and re-run until the extreme falls inside it.
@@ -348,13 +298,6 @@ does not surface for days.
 number**". You are done only when you can produce that list. The scope is the whole
 repository, not "the places I remember" — memory hands you exactly the easy ones.
 
-Measured (2026-09-06): when the width of a location entry was rewritten, the decision text
-itself said "this item settles a number that never went through the decision process and
-had already been consumed", and it named and swept **two** downstream derived numbers.
-Three days later a third citation in another document still carried the old value, was
-copied into the background material of a three-way argument, and **all three legs
-inherited it** — every argument resting on that number was voided for the whole round.
-The one who withdrew it swept two places, missed one, and did not know it.
 
 ⇒ This and "background material fed to a multi-party argument must itself be checked
 first" are two ends of one hole: at one end the citer did not re-check, at the other the
@@ -363,18 +306,12 @@ withdrawer did not sweep clean. **Both ends have to be plugged.**
 ⚠️ **Do not replace the list a sweep turns up wholesale: for each hit, first tell whether it states the present or reports what happened on one occasion.**
 The same old value in a repository is often half "it is N now" and half "on that occasion it became N", "written as X from run seven on" —
 the latter stays true, and replacing it turns a true sentence false.
-Measured (2026-09-16, singlefs widening its tree-table entry from 148 to 200 bytes): of twenty mentions of "the seventh run", only the few
-pointing at the artifact registered today should have moved to the eighth; the rest were event statements such as "the seventh run closed
-three gaps" or "written as 4096 from the seventh run on"; "the tree-table entry went from 145 to 148" is a dated note, and the only current
-value in it is the one in its closing parenthesis.
 
 **Test: swap the new value into the sentence — is it still true?** If yes, it states the present, so change it. If no, it reports that occasion, so leave it.
 
 ⚠️ **Sweep by the old wording, not only by the new names.** A stale sentence is written in the old wording ("only the first transaction", "no second instance yet");
 searching by the names of what this phase newly built mostly turns up sentences that have already been fixed.
 The ready-made list of old wordings is this phase's own diff: current-state sentences it deleted or rewrote in one place often live on unchanged elsewhere.
-Measured (2026-09-18, singlefs, after three days of changes in one phase): four sweep agents searched by the new names (function names, "two streams"); two reported zero and one only sampled;
-a targeted search for the old wordings this phase had changed elsewhere found more than twenty rows in the checks-owed table whose prerequisite column still said "layer 0 has only the first transaction of a single mount".
 
 ⇒ Before sweeping, write down "how the repository would describe this thing before it was done" (no X, X not yet, only Y, N items) and search the whole repository for those phrasings;
 also take each current-state sentence this phase's diff deleted and search, one by one, for whether it still lives elsewhere.
@@ -404,15 +341,6 @@ replacement entirely — and the replacement is what is actually load-bearing to
 | Does that rationale itself stand up | Check each of its supports; do not just read its conclusion sentence |
 | Has the re-argument for reviving the withdrawn one actually been done | Not done is not done — "the rationale collapsed" is not a substitute |
 
-Measured (2026-09-09): a rationale was withdrawn on 2026-09-06 for being "mutually
-exclusive with X", and X was cancelled the next day. The asker wrote down "this withdrawal
-needs re-judging," pointing toward revival. The backward-reasoning leg of a three-way
-argument hit three things: ① another document had already swept it that same day and left
-a replacement rationale that **does not depend on that exclusivity**, whose text says
-verbatim "switching back to the original one requires arguing it again; that was not
-done"; ② each of the replacement's two supports is broken, one of them a dangling citation
-— the sentence it cites was deleted along with a different decision; ③ and the slot is not
-even asking the question the withdrawn rationale answered.
 ⇒ None of the three has anything to do with whether the exclusivity still holds.
 **Following "the premise is gone, so the withdrawal is void" touches none of them.**
 

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:81c42f4b11ad0b53e15af9c4126b1336b34ce1a8faa2b0400fe920fb4a6737be -->
+<!-- generated-from: rules/show-me-test.md sha256:8b3315fd5b13ea584be8f4ce547880c46c8a9d53797449ca2b8223741bae6d80 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -81,14 +81,6 @@ this go in".
 mutation testing only take effect inside the apparatus they live in; stand up a second
 apparatus, model the same thing again from scratch, and that check will not say a word.
 
-Measured (2026-09-06): a counting model took the "capacity × fill rate" budget for the
-number of objects of one kind, then added a second kind on top of it — 126% of a disk's
-worth of objects. It was fixed the same day, with an assertion left behind to go red.
-**Hours later another model made the same mistake** (135% this time), and that assertion,
-living in a different apparatus, said nothing: the new apparatus had its own unit tests
-green, every mutation caught, the gate green. Two models reported numbers 1.5× apart for
-**the same physical quantity** and nothing anywhere compared them. The wrong number went
-into a settled clause.
 
 ⇒ **The criterion is not "was this trap turned into a check that goes red", it is "which
 layer is this trap on"**:
@@ -105,12 +97,7 @@ cross-apparatus check helps.
 check that goes red, **the evidence is complete and the gate is green**, so they never ask
 again how far that check reaches.
 
-⚠️ **A cross-apparatus check may pin only the value, not the quantity.** Measured (2026-09-13): a format constant had
-the same name and the same value, 78, in four apparatuses, and the check comparing the kb's registered value with each
-apparatus's source stayed green. Two of the apparatuses used it as the whole record header; the other two used it as the
-header's ten fields and added three later-settled increments themselves to get 95 — two quantities, one name, one value.
-The registered value happened to be the smaller quantity, so the two apparatuses that treated it as the whole header
-undercounted by 17 bytes all along, and nothing raised an alarm.
+⚠️ **A cross-apparatus check may pin only the value, not the quantity.**
 ⇒ **A cross-apparatus check must pin "which quantity this name refers to"**: two quantities get two registered names,
 each pinned to its own value; a check that only asks "is the value right" stays silent when one name is used for two
 quantities (the other side of "one semantic concept, one name across the repo" in `code-discipline.md`).
@@ -154,7 +141,7 @@ success line; `gate-lint.sh` enforces this.
 
 **Reporting "how many were checked" is not enough: "which were not checked" must be listed one by one too, and that list must be computed on the spot.**
 A stage can honestly report how many items it checked while missing a whole other half of its objects: both statements are true,
-and the reader cannot see that the second one exists. Measured (2026-09-16, singlefs's rerun stage): it reported "ran 119 this time",
+and the reader cannot see that the second one exists.
 `gate-lint` was all green, and none of the 9 timing rows in that table had run; 6 of them neither ran nor appeared on any line.
 What it hid were two real problems: one experiment's retained artifact had long stopped matching its source, and another panicked outright in a release build.
 The root cause was a hand-copied skip list — hard-coded as 4 numbers, while what really did not run was every timing row in the table plus those 4.
@@ -164,9 +151,6 @@ This is not a check yet: `gate-lint` does not look at whether a script that repo
 **The number in the success line needs something pinning it too.** It is a success line, so it never goes red; it reports a count,
 so it satisfies "a check that scans a batch reports how many it checked"; it is not a rejection, so none of the other three `gate-lint` rules reaches it.
 Put together, a miscounted statistic can stay green in the gate indefinitely, and it is exactly the conclusion people read.
-Measured (2026-09-16, singlefs's kb-rot stage): it reported "326 checks owed, 0 paid off"; the true numbers were 297 and 29 —
-the boundary was hard-coded to one heading, the table had been moved above that heading, and so everything paid off was counted as owed.
-**So a statistic in a success line is either pinned with `want=` in a discrimination fixture, or it stays out of the success line.**
 
 **Project-local stages follow the same rules as shared ones.** They reject submitters
 just like shared stages, so they are subject to `gate-lint` and `shell-lint` too —
@@ -174,10 +158,9 @@ just like shared stages, so they are subject to `gate-lint` and `shell-lint` too
 stages found 7 rejections with no way out).
 
 ⚠️ **The reach stops at `.claude/gate.d/`.** Scripts elsewhere in the project (research scripts, hooks) reject people just the same, yet sit outside the reach of these two lints.
-Measured (2026-09-18, singlefs): running gate-lint on its own over the whole repository found 84 rejections in these two kinds of directory with no way out, and nobody had reported them before.
 ⇒ If a project has such directories, hook up a local stage in `.claude/gate.d/` that hands them to both lints, setting `GATE_LINT_DIR` and `SHELL_LINT_DIR` respectively to the target directory when calling them —
 without them the shared scripts still scan the SOP's own package by default, and judging a fixture directory red or green then mixes in the real repository's scripts.
-Hooking up gate-lint alone does only half the job: measured (2026-09-19, singlefs), shell-lint run on its own over the same research scripts still reports 18 findings, and the local stage that hooks up only gate-lint sees none of them.
+Hooking up gate-lint alone does only half the job
 
 # What the gate can and cannot prove
 
@@ -222,18 +205,6 @@ silent error this project most wants to avoid.
 5. **A handed-back list that a machine confirms is complete is not thereby judged right.**
    For work a subagent judges item by item (sweeps, re-reviews), what can be made into a check is "every item has a verdict, every verdict is one of the recognised kinds, and the reason quotes that item's own words" —
    that stops "the sample was enough" and "wave the whole group through", but not wrong verdicts. So after the completeness check, still spot-check and re-judge across **every kind of verdict**; redo the stretch where a spot check hits a wrong verdict, then sample again.
-   Measured (2026-09-18, singlefs): candidates were handed to sweep agents by group, dozens to a hundred-odd rows per group; a sweep agent wrote one boilerplate sentence and waved a whole group through, and every group containing known rot was waved through;
-   after switching to row-by-row verdicts with a machine completeness check, an attacker could still mechanically generate a boilerplate report that passed the checker, and a report judging everything "needs a change" still fell outside the re-judging pool, which sampled only "unrelated".
-
-## Why this rule
-
-**Contribution throughput is becoming unbounded, while human review bandwidth has
-not changed.**
-
-Wherever submissions come from — more people, better tools, more automation — the
-supply side only grows. "Humans reading code line by line" does not keep up. The
-only thing that scales with it is **automated verification**: it does not care where
-a patch came from or how elegant it is, only whether it passes.
 
 ## Putting the criterion on evidence is exactly how we avoid treating sources differently
 

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/design-doc-discipline.md sha256:c03cce7099e37680088ed730cb3d27c98abfd78261338099870e2cc291ab8fa4 -->
+<!-- generated-from: rules/design-doc-discipline.md sha256:f277f9947819d76e8d8d2fcef88674583ace9ab71a18942cfe8e65e033afdee6 -->
 <!-- doc-lint:rule-definition -->
 # Design document discipline
 
@@ -38,9 +38,7 @@ compounds.
   pointing at **why this code looks the way it does now** → keep;
   pointing at **a version that no longer exists** → delete.
 
-`CLAUDE.md` and `rules/*.md` **keep no revision history section at all**; their
-history goes to `CHANGELOG.md` — they are read in full at the start of every session,
-and history dilutes them.
+`CLAUDE.md` and `rules/*.md` follow a different discipline; see `rules-discipline.md`.
 
 History statements in body text, and where the history section sits, are enforced by
 `scripts/doc-lint.sh`, which scans only `.md`; the clause on code comments rests on review.

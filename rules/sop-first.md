@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:c22648ee6b8e02a80c6b7a5a4d601846000313e8a608a59b1e07726ac2c6310c -->
+<!-- generated-from: rules/sop-first.md sha256:9a597f82725a7c8f253445168dfb6a2df8f2c7d5c3baff57ed99b0b7831bc8f1 -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -6,18 +6,6 @@
 
 In any round of work, if "add one gate check" conflicts with "write one feature",
 add the gate check first.
-
-## Why
-
-Because this project will be worked on by many people (and many models), and
-**everyone's ceiling differs, but the floor can be constrained.** The thing that
-constrains the floor is the SOP: rules that state what "done" means, and scripts
-that turn "not done" red on the spot.
-
-Wrong code can be torn up and rewritten next round; that cost is bounded.
-**A missing piece of SOP leaves everyone without footing on that piece** — errors
-accumulate unnoticed, and by the time they surface they have soaked into dozens of
-commits. That cost is not linear.
 
 ## Corollaries
 

@@ -1,8 +1,8 @@
-<!-- generated-from: agents/INDEX.md sha256:4ae652fd692ec2d89f4d71c38b7b2b79b924f43047f178013253bd484fc3ab5c -->
+<!-- generated-from: agents/INDEX.md sha256:469140a3d88e0740cdc316de689d0ddb321b208edc4b50342d6e7cff1013a3dd -->
 # Shared subagent definitions
 
 **This layer is governed; it is currently empty.** Empty is a state, not an oversight —
-writing it down explicitly, because "there is none" and "we forgot" look identical in a
+writing it down explicitly: "there is none" and "we forgot" look identical in a
 directory listing (`rules/kb-discipline.md`: a blank is more dangerous than an error).
 
 ## What belongs here

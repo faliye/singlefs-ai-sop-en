@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:0aa7ae3483c2b45e258cf9d1adae32ecb642b93571424c102c36200d6a86ea4b -->
+<!-- generated-from: rules/machine-first.md sha256:7283c2ee708b6a8e328f22cd655cb72f44c0c14a94e540031fc8d4a6c6a33cbb -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 

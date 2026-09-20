@@ -2,7 +2,7 @@
 name: decide
 description: Record or change a singlefs design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checker.
 ---
-<!-- generated-from: skills/decide/SKILL.md sha256:577d396c7ffda1c69cd492ece1a5d481a1254edb28913175fda29ab4140d780d -->
+<!-- generated-from: skills/decide/SKILL.md sha256:b70ce9157f6410306911babf4550559116a206acc5d1fb540484c1475293623c -->
 
 # Recording a design decision
 
@@ -56,12 +56,6 @@ are marked as not verified in this project.>
    rationale**, or the argument lands entirely on the rationale while the slot is
    somewhere else.
 
-   Measured: one slot sat stuck for three days across two rounds of argument. The real
-   cause was that the question "does it need integrity equal to X" had two readings (the
-   thing's **own bytes**, or the **target it points at**); the rationale withdrawn earlier
-   answered the first, while the wording asked the second, so no verdict on "does that
-   rationale hold" could ever land on that slot. Once the question was pinned down, the
-   slot closed on the spot — **what needed settling was the question, not the rationale**.
 
 ## When to settle and when to wait
 

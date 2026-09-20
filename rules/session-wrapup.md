@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:dcb3a51a09042ac52fc246c0ac38af5db39504caae67244e606ae1b450ef1628 -->
+<!-- generated-from: rules/session-wrapup.md sha256:57775e095c1f47e4d74b9fd7cd7b438c41adfe7f678525f67aabd54108e376aa -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -45,8 +45,6 @@ look at, and anyone can answer "yes".
 **Do not write it into a session's private memory.** A session's own memory (for example Claude Code's memory) lives only on this machine and is seen only by sessions on it:
 other contributors cannot see it, and subagents that do not inherit the project instructions cannot read it either. So pitfalls and conventions that someone else could run into
 go into the project or into this SOP; private memory holds only the user's personal preferences (when to commit, which language to reply in, and the like).
-Measured (2026-09-17, singlefs): one inventory of the private memory found 10 of 18 entries were project conventions or progress, and two of them contradicted the rule text in the project,
-so other sessions kept reading the old wording in the rules.
 
 ## 3. Did any decision change?
 
@@ -91,11 +89,8 @@ through them before wrapping up:
   silently — something that never went into git is gone once overwritten. Create new files exclusively
   (`set -o noclobber`, `open(path, 'x')`), and look up the number in the same command that writes the first file;
   where the tool layer can stop it (a pre-write hook that refuses to overwrite untracked files), stop it there.
-  Measured (2026-09-12): one whole-file write overwrote another session's freshly written pre-run registration, which
-  was restored word for word only by replaying that session's conversation transcript.
 - **"Commit only these paths" is not `git commit -- <path>`.** A commit given paths commits what those paths hold in the **working tree**, not in the index — when the same file also carries another session's uncommitted edits, they ride along.
   And the index itself is shared: another session can put its files into it at any moment. So before staging, confirm `git diff --cached --name-only` is empty; after staging and before committing, check the list and each file's cached diff once more, then `git commit` with no paths.
-  Measured (2026-09-12), the second kind: only explicit paths were `git add`ed and the commit was made without paths, yet a version-stamp file another session had staged in the meantime went into the commit.
 
 If you collide on a number and it can be made into a check that goes red, make it one
 (`rules/show-me-test.md`, "turn traps you have hit into checks that fail"); on the
