@@ -1,4 +1,4 @@
-<!-- generated-from: rules/rules-discipline.md sha256:abfcf662b1980cc51f74a6408c15f8c8afda61380b42573723be4e29514eb741 -->
+<!-- generated-from: rules/rules-discipline.md sha256:c08b7d842ef43b418d3db7f093c61794cd840bd12c507b442afe4865aa98cff3 -->
 <!-- doc-lint:rule-definition -->
 # Rule-file discipline
 
@@ -62,6 +62,22 @@ Shared rules record their history in `CHANGELOG.md`, one section per version.
 
 The criterion and the how-to are in the "Boundary" section of `sop-first.md`; not repeated here.
 
+## 7. No positional references in the body, and no self-reference
+
+Never write anything that points at a position in the document: "the previous section",
+"the table below", "mentioned earlier", "the above", "as follows:", "ditto", "see the section below",
+nor self-references such as "this clause", "this section", "this table", "this document".
+
+Write the position as a name: a section becomes its heading, a table becomes the thing it judges,
+a fact elsewhere becomes a link to the file it lives in.
+
+The scope is `rules/*.md`, `CLAUDE.md`, `agents/*.md` and `skills/*/SKILL.md`; the criterion is the same
+one `kb/*.md` is held to, and the per-word scope is whatever `kb-discipline.md` clause 1 states.
+When a rule file carries the `<!-- doc-lint:rule-definition -->` marker, examples inside backticks
+and 「」 are exempt; the body itself is still judged.
+
+Enforced by `scripts/doc-lint.sh`.
+
 ## What the gate covers
 
 `scripts/rules-lint.sh` judges the part of clauses 1, 3, 4 and 5 that can be reduced to literal patterns —
@@ -70,6 +86,8 @@ links with no deterrent. It scans this package's `rules/`; a project hands its o
 `RULES_LINT_DIR`, and the shared `gate.sh` runs that stage automatically. Files not yet swept are registered
 one per line in the project root's `.claude/rules-lint-exclude`; delete a line once that file is done —
 the exclusion list only shrinks.
+
+Clause 7 is judged by `scripts/doc-lint.sh`, not by `rules-lint`.
 
 **What it cannot cover**: the line in clause 2 (which sentence is criterion and which is argument), and
 whether the link under the deterrent points at the right place. Those are

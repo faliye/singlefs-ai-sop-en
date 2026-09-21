@@ -4,6 +4,53 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.54 — 2026-09-21
+
+**Freezing evidence binds this round only; a change that did not reach the whole repository must register every file it skipped; and the body of a normative text may not point at a position.**
+
+Rules (`rules/`):
+- Three paragraphs added under "Evidence kept verbatim may not be edited afterwards" in
+  `evidence-discipline.md`: the freeze holds within one round — once this round is committed, the next
+  commit deletes the batch the previous one left behind, this round's stays, and this round's verification
+  still works; to find what was deleted, go to the version history. Old evidence is a reference, not a basis:
+  when an earlier conclusion is in doubt, verify it again rather than digging through old evidence; to
+  overturn it, run another round under the project's own inference discipline. The check that body text
+  matches its artefacts is judged against **this change**, not against the whole repository.
+- New section in `show-me-test.md`, "When a change does not reach the whole repository, every file left out
+  must be registered": when a norm, an operation or a change covers only some files, each file not covered
+  goes into an exclusion table, one per line, with the reason after `#`. **No exclusion table means the whole
+  repository must be changed.** The criterion is "does this sentence become false, or does some gate stop
+  working, if it is changed". An exclusion pointing at a path that does not exist goes red, and the table
+  must be readable by a single command.
+- New clause 7 in `rules-discipline.md`, "No positional references in the body, and no self-reference":
+  the scope is `rules/*.md`, `CLAUDE.md`, `agents/*.md` and `skills/*/SKILL.md`; the criterion is the same
+  one `kb/*.md` is held to, with the per-word scope in `kb-discipline.md` clause 1. Write the position as a
+  name — a section becomes its heading, a table becomes the thing it judges, a fact elsewhere becomes a link
+  to the file it lives in. In a rule file carrying the `<!-- doc-lint:rule-definition -->` marker, only the
+  examples inside backticks and 「」 are exempt; the body itself is still judged.
+- The closing line of `show-me-test.md` changed from "the quality of the gate is this project's ceiling" to
+  "the quality of the gate is how high this project's floor sits": inference 3 in the same file says the gate
+  is **a floor, not a ceiling**, and the closing line used the same word for a different quantity.
+- All three languages swept against clause 7: `CLAUDE.md`, `command-safety.md`, `engineering-philosophy.md`,
+  `evidence-discipline.md`, `kb-discipline.md`, `machine-first.md`, `show-me-test.md`, `sop-first.md`,
+  `writing-discipline.md` and `skills/gate/SKILL.md` now name what they used to point at. Forms the gate's
+  patterns cannot reach ("the second line", "the paragraph above", "this table", "this file") were fixed by hand.
+
+Scripts (`scripts/`):
+- `sb superblock` dropped from the abbreviation list in `naming-lint.sh`: an abbreviation exists for one
+  concept; when the concept goes, the line goes — it is not repointed at a different expansion.
+- The reference checks in `doc-lint.sh` (contextual references, self-reference) now cover normative texts as
+  well as `kb/*.md`: `rules/*.md`, `CLAUDE.md`, `agents/*.md`, `skills/*/SKILL.md`. They scan the body with
+  examples carved out, so the tables that enumerate these very words do not judge themselves, and the failure
+  message now distinguishes "kb body" from "normative body". New fixtures: `fixtures/doc-lint/rulesref`
+  (red — all 6 positional references across `rules/` and `CLAUDE.md` must be reported) and `rulesrefok`
+  (green — in a marked rule file, examples inside backticks and 「」 are not judged).
+
+Cross-language (`I18N`):
+- The Japanese `show-me-test.md` regained the paragraph it was missing (evidence is the same measure for
+  everyone, and the submitter can apply it in advance).
+- The English and Japanese `CLAUDE.md` wiring tables gained the agents row, which only the Chinese one had.
+
 ## 0.0.53 — 2026-09-20
 
 **Rule files carry the how only: a fourth document discipline, a check that fails, and history cleared out of the rules in all three languages.**

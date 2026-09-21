@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:8b3315fd5b13ea584be8f4ce547880c46c8a9d53797449ca2b8223741bae6d80 -->
+<!-- generated-from: rules/show-me-test.md sha256:e785f5234c9b9068e5f88280608eb7d579ebbfc57503608f7aa0349cba74c530 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -11,7 +11,8 @@ the most important rule here.**
 
 ## The gate raises the floor; it does not screen people out
 
-The first line is the purpose, the second is the reason. That order matters.
+"Make every submitted patch review-worthy" is the purpose; "Contribution throughput
+may be unbounded; acceptance throughput is evidence-bound" is the reason. That order matters.
 
 **The gate does not exist to keep anyone out. It exists to raise every submission
 to the line where it is worth spending human time on.** The mechanical parts —
@@ -19,7 +20,7 @@ whether tests exist, whether declarations match what was measured, whether docs
 and implementation are in sync — are done by scripts, which frees human attention
 for the part only humans can judge: **is this test testing the right thing?**
 
-The second line says why this is necessary: wherever submissions come from, that
+Why this is necessary: wherever submissions come from, that
 side only grows, while human review bandwidth has not changed. **The only thing
 that scales with it is evidence.**
 
@@ -148,6 +149,25 @@ The root cause was a hand-copied skip list — hard-coded as 4 numbers, while wh
 **So the skip list must come from the same data as the scanned set, computed on the spot**; the success line reports both "ran N; did not run M: named one by one".
 This is not a check yet: `gate-lint` does not look at whether a script that reports a count also lists what it skipped, so it rests on whoever writes the stage.
 
+# When a change is not rolled out across the whole repo at once, every excluded file gets registered
+
+The rule that a skip list must come from the same data as the scanned set is about the
+skip list of **one check**. The same thing holds for **one
+change**, and there it is even easier to slip past: when a spec, an operation or a change
+covers only part of the files, **whatever it did not cover gets registered in an exclusion
+table**, one entry per line with the reason after `#`. **No exclusion table means the whole
+repo has to change.**
+
+The test is not "it is a hassle to change", it is "changing it would make the sentence false,
+or would make some gate stop working": another project's terminology and verbatim citations,
+a check's own input, a tool's own pattern table, the sentence that states this very change —
+those change into errors, so register them; everything else changes.
+
+Treat the exclusion table the way a check is treated: **an entry pointing at a path that does
+not exist is a failure** — an exclusion that does nothing leaves people believing that batch
+of files was already steered around. The table has to be readable by one command; do not let
+"what was excluded" live only in the memory of whoever did the work.
+
 **The number in the success line needs something pinning it too.** It is a success line, so it never goes red; it reports a count,
 so it satisfies "a check that scans a batch reports how many it checked"; it is not a rejection, so none of the other three `gate-lint` rules reaches it.
 Put together, a miscounted statistic can stay green in the gate indefinitely, and it is exactly the conclusion people read.
@@ -223,5 +243,5 @@ So this project **defines no categories by source** and writes no special rules 
 any of them. There is one division only: **submissions that carry evidence, and
 those that do not.**
 
-**So the quality of the gate is this project's ceiling.** `scripts/` matters more
-than any crate.
+**So the quality of the gate is how high this project's floor sits.** `scripts/`
+matters more than any crate.

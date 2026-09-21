@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:19f0678ac7f2ff0c62596e4321ebd8649581548d1f63b35fd77d56f460938a1d -->
+<!-- generated-from: rules/command-safety.md sha256:9b027b70a29465e89c54624a2bb4991c6d830b74fa67341c1ebc3e0ce53c2d08 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -143,7 +143,7 @@ Count them when collecting, and turn the whole thing red when the count does not
 (the item "result collection needs a completeness gate" covers the same thing).
 
 **After making something parallel, prove again that it can go red.** Making it parallel is itself able to turn
-a check that used to go red into a green one — the first two rows of the table above are exactly that.
+a check that used to go red into a green one — a bare `wait` and `|| bad=1` inside a background body are exactly that.
 Do what `show-me-test.md` says: feed it an input that must go red, and see whether the parallel version still
 goes red. A parallelization that has not been proved again amounts to switching that check off.
 

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:9a597f82725a7c8f253445168dfb6a2df8f2c7d5c3baff57ed99b0b7831bc8f1 -->
+<!-- generated-from: rules/sop-first.md sha256:05059d36c9bc6db892ee1f51250147daf49692422e72818e266ce619c4f27ac1 -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -37,8 +37,7 @@ right" to guesswork — and people who can only guess will route around the gate
 simply not submit. **Both outcomes are worse than letting the patch through.**
 
 So: **when rejecting, state what to do next.**
-Enforced by `scripts/gate-lint.sh`, which covers every shape of rejection in the table
-below:
+Enforced by `scripts/gate-lint.sh`, which covers every shape of rejection:
 
 | Shape | Where the remedy goes | Criterion |
 |---|---|---|

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:3b3b173be1780e9229ec67589351df3da7bf16688b868e71dd94e0a38b83d813 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:aaf59b21df8a35619e911e0f023174744c7370b678e14ef4f089e53bfea78089 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -72,6 +72,25 @@ this input" has quietly stopped being true.
 
 So a prompt can only be edited together with a re-run. To add an explanation, open a
 separate file; leave the original alone.
+
+**The freeze holds for this round only; once the round is over, the archive is the version
+control history.** Within a round, not one character of its evidence — prompts, the legs'
+reports, raw output, stored artifacts — may change. Once that round is committed, the next
+commit deletes **the batch the previous one left behind**; this round's own evidence stays,
+so this round's verification still runs. To look up what was deleted, go read it in the
+version control history.
+
+⇒ **Old evidence is a reference, not a basis.** When an earlier conclusion is in doubt,
+re-verify it rather than digging up the old evidence: old numbers are bound to the build
+they were taken on, and whether they still hold today is answered only by running it today
+(see "all old data is only a reference" in this same file). Overturning an earlier
+conclusion means running the project's own inference discipline again, not confronting it
+with an old file.
+
+⇒ **A check on artifact lines quoted in prose judges "this change", not the whole repo.**
+Numbers written into prose today must match today's artifacts verbatim; lines copied down
+earlier are historical reference, their artifacts have been archived, and judging them now
+means judging against a comparison that no longer exists.
 
 ⇒ **The gate has to steer around these directories too.** A check that demands someone
 go back and edit the original forces one of two outcomes: the evidence chain breaks, or
@@ -290,7 +309,8 @@ registered?** No answer means you are not done writing it.
 ### Withdrawing a number or a conclusion also means sweeping for who cites it
 
 Same discipline, with the object swapped for a value or a clause that has been withdrawn
-or rewritten. It hides better than the case above: whoever withdrew it usually did sweep
+or rewritten. It hides better than "A new criterion must be swept back over the entries already
+on the books": whoever withdrew it usually did sweep
 a few places, so they have every reason to believe they finished, and the one they missed
 does not surface for days.
 
@@ -318,7 +338,8 @@ also take each current-state sentence this phase's diff deleted and search, one 
 
 ### A withdrawal's rationale collapsing does not bring the withdrawn conclusion back
 
-This is the mirror image of the section above, and it is easier to fall for, because it
+This is the mirror image of "Withdrawing a number or a conclusion also means sweeping for who
+cites it", and it is easier to fall for, because it
 looks like you are correcting an error.
 
 When a conclusion is withdrawn, the rationale written down at the time is often just the

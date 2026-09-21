@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:7283c2ee708b6a8e328f22cd655cb72f44c0c14a94e540031fc8d4a6c6a33cbb -->
+<!-- generated-from: rules/machine-first.md sha256:02c565213f83bedd2c2b8915217ff01f49d2bf7b167cfb357d49dc11471db03f -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -82,7 +82,8 @@ relaxation is withdrawn on the spot:
 | Generated duplicate code no longer matches its generator | The "DRY" relaxation; back to no duplication |
 | The verdict of the tool the project uses to exhaust interleavings contradicts what real hardware shows | "Exhaustiveness is machine-checkable"; that tool demotes to reference and stops being a gate |
 
-**This table is this file's own disproof step** (`evidence-discipline.md`): a
+**The "When a premise fails, take these back" table is `machine-first.md`'s own disproof step**
+(`evidence-discipline.md`): a
 premise for which you cannot state "what would overturn it" is not a premise, it
 is a belief.
 
@@ -94,7 +95,8 @@ is a belief.
    remember", "people cannot read that much", or "review bandwidth is short", it
    most likely does not.
 3. **Ask whether it has a second reason.** Many rules happen to also solve a
-   problem that has nothing to do with humans (see the "kept" table). If so →
+   problem that has nothing to do with humans (see "Kept (independent of who reads
+   the code)"). If so →
    keep it, **and rewrite its stated reason to that one.**
 4. **The rewritten reason must be able to land in the gate.** If it cannot, demote
    it to advice; do not write it as a rule.
@@ -114,7 +116,8 @@ is a belief.
 **How code is written** (names, branches, types, functions and nesting, comments,
 duplication): the per-principle conclusions, together with how to write each one, are in
 `code-discipline.md`, and that is the only place they live.
-**Design- and process-level** principles are in the two tables below.
+**Design- and process-level** principles are in "Relaxed (artefacts of human bandwidth)"
+and "Kept (independent of who reads the code)".
 
 ## Relaxed (artefacts of human bandwidth)
 

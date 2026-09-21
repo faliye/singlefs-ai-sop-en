@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:1436a415f693f1d482661b796a5ccf56670e3d23a7df0ef6203e8c76c459a1b2 -->
+<!-- generated-from: rules/kb-discipline.md sha256:5a0d1bf45a5424294f4d3bcfc6bb232be8aecf52a3062b9b9adb6ed7c8540232 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -13,7 +13,7 @@ is incidental, not the objective.
 
 ## 1. Every fact stands on its own
 
-A fact must still hold when retrieved alone, without the paragraph above it.
+A fact must still hold when retrieved alone, without the other paragraphs in its section.
 
 **No dangling references** — "as stated above", "same as above", "see above",
 "mentioned earlier", "the aforementioned", "as described below", and positional
@@ -52,7 +52,7 @@ not use it to point at the document; that half is checked by people.
 A self-reference is sneakier than a dangling reference: a dangling reference at least
 points in a direction, while a self-reference points at **"here"** — and the item
 retrieval hands back **has no "here"**. It has already been lifted out of the file; the
-`## D22 How unit atomicity composes` heading above it does not travel with it. So when
+`## D22 How unit atomicity composes` heading that item sits under does not travel with it. So when
 "this decision also rules that K may not be a format constant" comes back alone, not one
 word remains about whose decision that was.
 

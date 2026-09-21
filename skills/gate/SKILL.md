@@ -2,7 +2,7 @@
 name: gate
 description: Run singlefs's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:db2a0d011964d5a27a9b18b0f04d8545abd745e0a1ab3a450013c934d011028f -->
+<!-- generated-from: skills/gate/SKILL.md sha256:e71deec8f716d300a5c2209711931977bb2540d363c7d9f439d035307ba07e0e -->
 
 # The acceptance gate
 

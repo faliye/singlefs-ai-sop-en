@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:d8e17abafec00f8034b0f5964d8a7690485966d2e05b2f4b1b9c05c4f9d3a017 -->
+<!-- generated-from: CLAUDE.md sha256:21238fa8d9aef84611bebd3b24949323545c207fb3307ccf56dbe30990b76c78 -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -93,6 +93,7 @@ own hook-up (**no symlinks**):
 | rules | The project's `CLAUDE.md` references `@.claude/singlefs-ai-sop/rules/x.md`; no copy is kept in the project |
 | Project-local rules | Put them in `.claude/rules/x.md` and reference them as `@.claude/rules/x.md`. They do not go upstream |
 | skills | The project's `.claude/skills/<name>/SKILL.md` is a **stub**: frontmatter plus a pointer to the shared body |
+| agents | The project's `.claude/agents/<name>.md` is a **stub**: frontmatter plus a pointer to the shared body. Conventions in `agents/INDEX.md` |
 | scripts | The project's `.claude/scripts/x.sh` is a **wrapper**: set up the environment, then `exec` the shared script |
 
 Never put substance or logic inside a stub or a wrapper — the substance should exist
