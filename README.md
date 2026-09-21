@@ -10,7 +10,7 @@ system is being built.
 **It does not govern how the filesystem should be designed.** Disciplines like
 "start from the transaction" belong to the project, in its own `.claude/rules/`.
 
-**This SOP was made for singlefs. singlefs is its only user, and nothing here
+**This SOP was made for the one user named in `I18N` under `consumers=`, and nothing here
 presumes it generalises to other projects.** So the criterion is not "would another
 project need it too" — there is no other project to look at, so anyone can answer
 "yes". The criterion is whether the item governs collaboration, or governs how the
@@ -59,7 +59,7 @@ Every such judgement is made by people — the SOP is a standard, not something 
 test. The real signal is **how often it changes**: frequent change means the design is
 wrong, not that it is improving.
 
-**Work does not happen here.** Day-to-day work lives in singlefs.
+**Work does not happen here.** Day-to-day work lives in the consumer project.
 `0.x` means not yet settled; after `1.0.0`, changes to `rules/` should be rare.
 
 ## Staying in sync

@@ -4,6 +4,38 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.56 — 2026-09-21
+
+**The consumer's name is now gone from script comments too; twelve of its local checks are taken upstream; and a use-before-definition in 0.0.55 that cut downstream gates in half is fixed.**
+
+Regression fix (`scripts/gate.sh`):
+- The "agent definition discipline" stage added in 0.0.55 called `run_rules_lint` dozens of lines before it
+  was defined. The SOP repository has no `.claude/agents/`, so that `if` was never entered — all three gates
+  were green while any project with agent definitions died on that line: 121 items run, no summary, and not
+  one of the later stages executed. That stage was redundant anyway, so it is gone; the project-local rules
+  stage now also runs when only `.claude/agents/` exists.
+- **New exit guard**: the summary line must be printed; exiting early now says so on stderr and returns the
+  original exit code. "Did not run" and "ran and passed" used to look identical.
+
+De-branding (clause 8 of `rules/rules-discipline.md`, carried through):
+- 28 measurement provenance comments in scripts, 4 in gate fixtures, plus `README.md`, `install.sh` and
+  `templates/` — all rewritten to name no one. The one occurrence in *code*: the git ref
+  `refs/singlefs/gate-ok` is now `refs/sop/gate-ok`.
+
+Twelve consumer-local stages taken upstream:
+- `doc-lint.sh`: twelve history-tone patterns, each with its own reason and its own fixture line.
+- `shell-lint.sh` gains **S7**: a pipefail pipeline ending in an early-exiting `grep -q` reads a hit as a miss.
+  Upstream's own `lib.sh` had two of these; both fixed.
+- New `script-modes.sh`: **upstream's own changelog-lint, show-me-test and version-discipline had lost their
+  executable bit in the index**; fixed here.
+- New `stage-selftest.sh`, `link-targets.py`, `history-ordinal.sh`, `hooks-registered.sh`,
+  `relay-timing-lint.py`, `number-name-sync.sh`.
+- `rules-lint.sh` gains one lexical pattern; `gate.sh` gains `run_stage_may_skip` (exit 77 = not run this round).
+- The corresponding 10 local stages and 2 library scripts are deleted downstream; no criterion was lost —
+  each was measured against the consumer project first.
+
+Selftest grows from 373 to 395 cases.
+
 ## 0.0.55 — 2026-09-21
 
 **0.0.54 widened the reference checks to normative texts and caught the work objects along with them; singlefs's temporal-reference check is taken upstream.**

@@ -1,8 +1,8 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:e76f71b9d747bd7b1eed2f643de50fd189ba213831122b1bdfc2881af534b4f4 -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:a13665de77df53b52b0bb603f16ab069a1c9395f79f023b394c33d81dc63b6a3 -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
-the singlefs main line. No longer.>
+the main line. No longer.>
 
 ## Rules (always in force)
 
