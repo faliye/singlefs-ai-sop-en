@@ -1,8 +1,8 @@
 ---
 name: decide
-description: Record or change a singlefs design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checker.
+description: Record or change this project's design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checker.
 ---
-<!-- generated-from: skills/decide/SKILL.md sha256:b70ce9157f6410306911babf4550559116a206acc5d1fb540484c1475293623c -->
+<!-- generated-from: skills/decide/SKILL.md sha256:3e0052a40d68bea7ba65f465894a0f7322f601ba2ff1d410c36a538ff4c39e29 -->
 
 # Recording a design decision
 

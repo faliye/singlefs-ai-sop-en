@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:5a0d1bf45a5424294f4d3bcfc6bb232be8aecf52a3062b9b9adb6ed7c8540232 -->
+<!-- generated-from: rules/kb-discipline.md sha256:121cf2491ed911c27475b455812300e1f018a45bc53d668383b9b5955f0655ac -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -36,11 +36,27 @@ and followed by 的, 是, 保留, a numeral, 第 (an ordinal) or an item number,
 ("listed / copied / attached / placed above or below"). "the four points above it", "the units below a multi-level tree"
 and "the line below each heading" describe physical positions and are not judged. The exact patterns are the ones in `scripts/doc-lint.sh`.
 "The above" and "the following" (以上 / 以下) are checked only in forms like "the following is" and "the several items above";
-"earlier" / "later" (前面 / 后面) and "over" / "under" (上方 / 下方) are **outside the gate**.
+"earlier" / "later" (前面 / 后面) are **outside the gate**. "over" / "under" (上方 / 下方) are checked
+only in the two forms that carry 见 ("see above", "see below"): with 见 in front they can only mean a
+position in the document, while the bare words mostly point at a named physical position
+("below the field table", "the comment above `min`") and are not judged.
 
 "before / after this code" and numeric thresholds ("4 KiB and above"), and 上方 / 下方 mostly pointed at named positions ("below the field table").
 The same measurement found 103 bare forms outside the old criteria, and read one by one, every one was a genuine reference.
 Writers still must not use these words to point elsewhere in the document; that half is checked by people.
+
+**References to time are equally forbidden** — "this round", "that round", "the previous round".
+A positional reference that points the wrong way can still be spotted; a temporal one cannot —
+when "measured this round: green" comes back alone, which round it was is unknowable, and the model
+fills one in anyway.
+⇒ Write the anchor: a date plus "that round", or the number of the experiment in question. A sentence that genuinely means any round should be rewritten without the reference
+("the round that ran it" becomes "the run that produced this artefact").
+
+The gate's criterion is **whether this line, or the nearest heading above it, carries a date**; if so it
+passes. Three things are not checked: "the next round" means any round yet to happen and is a generic by
+nature; "this time" / "last time" hang mostly on technical objects (this diff, last scrub's watermark) and
+are self-sufficient; and every entry in a history section hangs under a dated heading, which body scanning
+stops at anyway. Compounds such as 样本轮 ("sample round") do not count.
 
 **Self-references are equally forbidden** — "this entry", "this decision", "this
 experiment", "that decision", "this invariant", "this section", "this table", "this
@@ -52,7 +68,7 @@ not use it to point at the document; that half is checked by people.
 A self-reference is sneakier than a dangling reference: a dangling reference at least
 points in a direction, while a self-reference points at **"here"** — and the item
 retrieval hands back **has no "here"**. It has already been lifted out of the file; the
-`## D22 How unit atomicity composes` heading that item sits under does not travel with it. So when
+`## <number> <short name>` heading that item sits under does not travel with it. So when
 "this decision also rules that K may not be a format constant" comes back alone, not one
 word remains about whose decision that was.
 
@@ -60,14 +76,14 @@ word remains about whose decision that was.
 
 | Referring to | Write it as |
 |---|---|
-| A numbered entry | `D22 (how unit atomicity composes)` — the same shape as rule 5 |
+| A numbered entry | write it as "number (short name)" — the same shape as rule 5 |
 | A section | Its heading |
 | A document | Its filename |
 
 **This is the dual of rule 5, "A number can index a thing, it cannot name it".** Rule 5
 governs "citing another number without writing its short name"; this one governs "talking
 about yourself without even writing the number". Only together do they close — without
-this one, rewriting `D22 (how unit atomicity composes)` as "this decision" would *pass*
+this one, rewriting "number (short name)" as "this decision" would *pass*
 the gate.
 
 **Not covered**: "this project", "this repository", "this round", "this machine" refer to
@@ -130,27 +146,15 @@ number **does not stand on its own** — it leaves the definition somewhere else
 leaves nothing but a symbol at the point of use. So **whoever cites it can change its
 meaning without noticing**, because not one word will look out of place.
 
-⇒ **Carry the name at every citation**: write "O2 (independent parser + checker)",
-never just "O2".
+⇒ **Carry the name at every citation**: write it as "number (short name)", never the
+number alone.
 ⇒ **A number gets exactly one definition**; everywhere else links to it (a direct
 corollary of clause 4 of this file, "A contradiction is worse than a gap" — **note that
 this citation carries the name too**).
 
-Observed: one decision document numbered three verification means O1/O2/O3 and gave each
-its definition. Afterwards, **two other documents, using that same number, each pointed
-at something other than the original sense** — the original sense is "independent
-parser + checker", judging a **single** image only; one of them required it to
-"implement journal replay over again", the other required it to "compute the same answer
-independently and then compare byte for byte". Both of the latter need a **second
-input** and are **not, at the type level, the thing the original sense named** — and
-nowhere did anything look wrong.
-
-**The cost was not on paper**: one of those documents went on to write a backward
-criterion on that basis — "if the number of events caught by X but not by **the
-checker** is 0, that ground is worth zero" — while in the original sense **X is the
-checker**. ⇒ Read literally, that criterion is always 0 and therefore
-**unfalsifiable**, and it was written precisely to make another ground falsifiable.
-**A gate criterion was hollowed out by a number.**
+The same number meaning something else in two other documents is the failure this rule
+guards against: nowhere does anything look wrong, and a criterion written on that basis
+turns into a tautology nothing can falsify.
 
 ⇒ **The criterion**: substitute every number in the text with its defining sentence —
 does the sentence still read? If it does not, the citation drifted long ago, and the

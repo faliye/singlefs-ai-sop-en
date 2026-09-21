@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:e785f5234c9b9068e5f88280608eb7d579ebbfc57503608f7aa0349cba74c530 -->
+<!-- generated-from: rules/show-me-test.md sha256:5bef03e601fc7c431b2396d347c2bc28bf08becdcbe222341a1e97445a856f78 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -174,8 +174,7 @@ Put together, a miscounted statistic can stay green in the gate indefinitely, an
 
 **Project-local stages follow the same rules as shared ones.** They reject submitters
 just like shared stages, so they are subject to `gate-lint` and `shell-lint` too —
-`gate.sh` hands `.claude/gate.d/` to both lints (the first scan over singlefs's local
-stages found 7 rejections with no way out).
+`gate.sh` hands `.claude/gate.d/` to both lints.
 
 ⚠️ **The reach stops at `.claude/gate.d/`.** Scripts elsewhere in the project (research scripts, hooks) reject people just the same, yet sit outside the reach of these two lints.
 ⇒ If a project has such directories, hook up a local stage in `.claude/gate.d/` that hands them to both lints, setting `GATE_LINT_DIR` and `SHELL_LINT_DIR` respectively to the target directory when calling them —

@@ -4,6 +4,49 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.55 — 2026-09-21
+
+**0.0.54 widened the reference checks to normative texts and caught the work objects along with them; singlefs's temporal-reference check is taken upstream.**
+
+Rules (`rules/`):
+- `kb-discipline.md` clause 1 gains **temporal references**: "this round", "that round", "the previous
+  round" are forbidden; write the anchor instead (a date plus "that round", or the experiment's number). The gate's
+  criterion is whether this line, or the nearest heading above it, carries a date. Three are not checked:
+  "the next round" is a generic; "this time" / "last time" hang on technical objects; history entries all
+  hang under dated headings.
+- "over" / "under" in clause 1 move from "outside the gate" to **checked in the two forms carrying 见**
+  ("see above", "see below"). The bare 下一节 ("the next section") is added too, narrowed symmetrically
+  with 上一节 so that "the next node" and "the next tick" are excluded.
+- `rules-discipline.md` clause 7 now states how normative texts differ from kb: self-reference is judged
+  only for words naming a document structure; domain objects ("this experiment", "this decision") are not,
+  because a normative text is about how to handle those objects; temporal references are not judged either,
+  since a rule holds for every round.
+- `rules-discipline.md` gains clause 8, "The body carries nothing specific to one consumer": the body may
+  not name a project that uses these rules, nor its paths or file names, nor use its decision or experiment
+  numbers as examples. The consumer list is registered in `I18N` under `consumers=`. All three languages were
+  swept against it: 3 named references rewritten, 5 downstream numbers replaced by the generic "number (short
+  name)" form, and the project name in skill descriptions replaced by "this project".
+
+Scripts (`scripts/`):
+- The self-reference patterns in `doc-lint.sh` are split in two. 0.0.54 applied the kb set verbatim to
+  normative texts and misjudged 5 places in singlefs's `.claude/agents/` and `.claude/rules/`.
+- Two forms added to the contextual-reference patterns: "see above" / "see below" and the bare 下一节.
+  Both were judged only by singlefs's local stage `20-kb-shape.sh`; upstream had missed them.
+- **The temporal-reference check is taken upstream** from singlefs's local stage
+  `.claude/gate.d/25-kb-deictic.sh`: the criterion is general (it governs how documents are written and does
+  not depend on the filesystem), so it now lives in `doc-lint.sh`, for `kb/*.md` only. Compounds like 样本轮
+  are excluded on the left boundary — measured against singlefs's gate fixtures.
+- `rules-lint.sh` gains an eighth criterion: a consumer project's name in a rule body goes red. The list is
+  read from **the scanned repository's** `I18N` (`consumers=`), with the package's own `family=` string
+  stripped first — an upstream script does not hard-code a downstream name. A project root has no `I18N`,
+  so the criterion has nothing to judge when a project scans its own rules, and the success line says so.
+  New fixtures `rules-lint/consumer` (red) and `consumerok` (green).
+- New fixtures `doc-lint/kbround` (red) and `kbroundok` (green); the `selfok` fixture gained a date anchor.
+
+How these were shown to fail: run against singlefs's 443 files, every reference-class red disappeared with
+no false positives; the temporal check was cross-checked against its predecessor on the same kb set. 371
+selftest cases pass.
+
 ## 0.0.54 — 2026-09-21
 
 **Freezing evidence binds this round only; a change that did not reach the whole repository must register every file it skipped; and the body of a normative text may not point at a position.**

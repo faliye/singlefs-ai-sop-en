@@ -51,8 +51,7 @@ only `bad` cannot find.
 
 The third row covers **a project's own local stages**. Most of them do not source
 `lib.sh`; they `echo "  ✗ …"` directly, or put the criterion inside embedded python:
-`print('  ✗ …')` — neither of the first two rows reaches them. Measured on singlefs's
-local stages: of 46 such rejections, 14 had no next step at all.
+`print('  ✗ …')` — neither of the first two rows reaches them.
 
 The window is not 5 lines here: python often prints one `✗`, then loops through the
 offending items, and only then gives the remedy — 5 lines would misjudge the whole

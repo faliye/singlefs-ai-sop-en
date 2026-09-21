@@ -1,4 +1,4 @@
-<!-- generated-from: rules/code-discipline.md sha256:18ead1973ba26425f0ed486a35ecedcb2137cb89b02f91f77dbe1f8bdcac7776 -->
+<!-- generated-from: rules/code-discipline.md sha256:743aa4d67cd2227966260be93ff456ef561a3379086d71fb85dd0ba9d72a3f9a -->
 <!-- doc-lint:rule-definition -->
 # Code discipline: how machine-first lands in code
 
@@ -70,7 +70,7 @@ crc  # cyclic redundancy check
 The registry is that abbreviation's single authoritative definition; everywhere else follows it, and
 nobody writes a second one. **Single letters may not be registered**: one letter has no single meaning.
 
-**The project's own numbers** (experiment E57, decision D22 and the like, registered in the kb), when
+**The project's own numbers** (experiment and decision numbers registered in the kb, and the like, registered in the kb), when
 used as one segment of a name, are registered as a class — "this letter followed by digits":
 
 ```text

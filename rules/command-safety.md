@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:9b027b70a29465e89c54624a2bb4991c6d830b74fa67341c1ebc3e0ce53c2d08 -->
+<!-- generated-from: rules/command-safety.md sha256:7b57794d1857e536050d6e5d4dfa429e3348702318081facf091c92c8529e598 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -123,8 +123,8 @@ its own ceiling from memory and devices.
 
 So there are only two ways to collect: take the exit code with `wait "$pid"` one at a time, or have each
 item drop its exit code into its own file and read them in a fixed order when collecting.
-singlefs's `.claude/gate.d/55-qemu-first-transaction.sh` is the latter: three VMs run at once, each writes
-its exit code to `$work/<mode>/vm-exit`, and collection judges them in the order of the mode table.
+For the latter: each parallel item writes its own exit-code file, and collection judges them in the order
+of the table the work was dealt from.
 
 S6 in `scripts/shell-lint.sh` judges this one: a `wait` with no arguments in command position turns red.
 Where the exit code really is collected elsewhere, write `# shell-lint:exit-collected <how it is collected>`

@@ -64,7 +64,6 @@ been asked, or that what you wrote down is what the code does today.
 Which tool to use, how to show its verdicts have discriminating power, and how to bind the formal
 model you wrote to the code are all bound up with the thing under test, so **the project decides,
 tests and verifies them itself**, in its project-local rules. The shared gate carries none of this layer.
-Basis: singlefs judges its memory-ordering declarations with herd7 / LKMM, and records the tool version in its `.claude/kb/verification-build.md`.
 
 - **What it holds up**: "exhaustiveness is machine-checkable", and what follows
   from it — "prefer exhaustive explicit branches" and "only a bounded control-flow

@@ -1,8 +1,8 @@
 ---
 name: crash-test
-description: Run singlefs's verification suite — crash-point replay, model-based differential testing. Use it to judge whether a write path is correct.
+description: Run this project's verification suite — crash-point replay, model-based differential testing. Use it to judge whether a write path is correct.
 ---
-<!-- generated-from: skills/crash-test/SKILL.md sha256:dbd0f340438a398c80193ae3f618a6f81eaa1b50cb43baf65fc605f1b3fe6209 -->
+<!-- generated-from: skills/crash-test/SKILL.md sha256:6726d4f016f710594519a9ccfa5d4b9a463267786faf7e934ba37713d304336e -->
 
 # The verification suite
 

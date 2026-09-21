@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:57775e095c1f47e4d74b9fd7cd7b438c41adfe7f678525f67aabd54108e376aa -->
+<!-- generated-from: rules/session-wrapup.md sha256:5a6e9a511ec16a47f56ef365099918be3739780edf097d0c667a0d0c95cc8eaf -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -38,9 +38,8 @@ Where to change it — look at what the item governs:
 - **How the filesystem is designed** → change the project's own `kb/`,
   `.claude/rules/`, or the project's `CLAUDE.md`
 
-**When in doubt, keep it in the project.** singlefs is this SOP's only user, so
-"would another project need it" is not a criterion — there is no other project to
-look at, and anyone can answer "yes".
+**When in doubt, keep it in the project.** "Would another project need it" is not a
+criterion — anyone can answer "yes", and then everything gets pushed upstream.
 
 **Do not write it into a session's private memory.** A session's own memory (for example Claude Code's memory) lives only on this machine and is seen only by sessions on it:
 other contributors cannot see it, and subagents that do not inherit the project instructions cannot read it either. So pitfalls and conventions that someone else could run into

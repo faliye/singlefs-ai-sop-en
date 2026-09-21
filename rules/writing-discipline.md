@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:0d0d6cd3fa557621c41d4bb39014acfbe35d01de7357e7a078e7768772339d18 -->
+<!-- generated-from: rules/writing-discipline.md sha256:e86857c382ec078d3446d5c884142f78216097596e3ea50e304523514978a987 -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -69,7 +69,7 @@ Three forms of going too far, each defensible as "well, it is shorter":
 |---|---|
 | "measured 3.26×" | **The basis**: what hardware, what workload, what block size. A number without its basis cannot be re-checked, which is the same as not having measured |
 | "rejected" | **The next step**: `sop-first.md` requires every rejection to carry a `howto`. Dropping it is shorter, and turns the gate back into a sieve |
-| "per D22 (how unit atomicity composes)" | **The grounds**: why it was settled that way. Three months on, nobody knows what that sentence rests on |
+| "per that one decision" | **The grounds**: why it was settled that way. Three months on, nobody knows what that sentence rests on |
 
 **The reverse test pairs with the forward test; a sentence must pass both**:
 

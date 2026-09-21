@@ -1,4 +1,4 @@
-<!-- generated-from: rules/rules-discipline.md sha256:c08b7d842ef43b418d3db7f093c61794cd840bd12c507b442afe4865aa98cff3 -->
+<!-- generated-from: rules/rules-discipline.md sha256:2126b3daf2cb9e83e070e93eaee4c7de68a28ec455af19ef60b3f3f9d259d85b -->
 <!-- doc-lint:rule-definition -->
 # Rule-file discipline
 
@@ -71,12 +71,32 @@ nor self-references such as "this clause", "this section", "this table", "this d
 Write the position as a name: a section becomes its heading, a table becomes the thing it judges,
 a fact elsewhere becomes a link to the file it lives in.
 
-The scope is `rules/*.md`, `CLAUDE.md`, `agents/*.md` and `skills/*/SKILL.md`; the criterion is the same
-one `kb/*.md` is held to, and the per-word scope is whatever `kb-discipline.md` clause 1 states.
+The scope is `rules/*.md`, `CLAUDE.md`, `agents/*.md` and `skills/*/SKILL.md`. For positional
+references the criterion is the same one `kb/*.md` is held to, with the per-word scope in
+`kb-discipline.md` clause 1.
+
+Self-reference is judged only for the words that name a document structure: "this section", "this
+chapter", "this table", "this document", "this clause". Domain objects — "this experiment", "this
+decision", "this invariant" — are **not** judged: a normative text is about how to handle a decision or
+an experiment, so "this experiment" there names the object being worked on, not a position in the text.
+References to time ("this round") are not judged either: a rule holds for every round, so "this round"
+there is a generic. Both remain judged in `kb/*.md`.
+
 When a rule file carries the `<!-- doc-lint:rule-definition -->` marker, examples inside backticks
 and 「」 are exempt; the body itself is still judged.
 
 Enforced by `scripts/doc-lint.sh`.
+
+## 8. The body carries nothing specific to one consumer
+
+These rules are read by every consumer. The body may not name a project that uses them, nor its paths,
+nor its file names, and may not use its decision or experiment numbers as examples. Write examples in a
+form that names no one: a wiring path like `.claude/gate.d/` is a shared convention and may be written;
+a specific `.claude/gate.d/55-xxx.sh` may not.
+
+The consumer list is registered in `I18N` under `consumers=`, in one place and copied nowhere else.
+`scripts/rules-lint.sh` judges the names; numbers and file names used as examples are beyond a machine
+and are left to review.
 
 ## What the gate covers
 
@@ -87,7 +107,7 @@ links with no deterrent. It scans this package's `rules/`; a project hands its o
 one per line in the project root's `.claude/rules-lint-exclude`; delete a line once that file is done —
 the exclusion list only shrinks.
 
-Clause 7 is judged by `scripts/doc-lint.sh`, not by `rules-lint`.
+Clause 7 is judged by `scripts/doc-lint.sh`, not by `rules-lint`; the names half of clause 8 is judged by `rules-lint`.
 
 **What it cannot cover**: the line in clause 2 (which sentence is criterion and which is argument), and
 whether the link under the deterrent points at the right place. Those are
