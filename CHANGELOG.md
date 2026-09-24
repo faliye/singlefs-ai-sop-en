@@ -4,6 +4,47 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.57 — 2026-09-25
+
+**Before adding a gate or hook, look for an existing one: a stop hook blocks the agent when it finishes and makes it self-check, and the gate stage "Gate overlap check" judges it again before commit.**
+
+New rule (`rules/sop-first.md`, "Before adding a gate or hook, look for an existing one"):
+- If an existing one covers the same thing, append to it; if two judge the same objects, merge them; extract shared logic into a library.
+  If a new one really has to stand alone, write `# gate-similar: <existing> <why not merged into it>` in it for each one compared.
+- A new hook lists every event it attaches to with `# hook-events:` in its header.
+
+New scripts:
+- `scripts/claude-hooks/gate-reuse-check.sh` (stop hook, on `Stop` and `SubagentStop`): when the main agent or a subagent finishes, it looks only at the gates and hooks
+  that this session itself wrote since it started. A missing declaration, an unnamed existing one on the same trigger or with very similar text, or a wholesale copy
+  blocks the stop. The same judgement blocks once per continuation; a changed one blocks again.
+- `scripts/gate-overlap.py` (gate stage "Gate overlap check", `门禁查重`): all the judging lives here and the stop hook calls it. Existing files are left alone; only what
+  is added or changed is judged. "Wholesale" means 8 consecutive identical lines after dropping blank, comment and short lines and collapsing whitespace.
+  `--list` prints the existing gates and hooks with their triggers.
+- `scripts/hook-registrations.py`: the one place that reads hooks from settings.json and decides which hook a registered command points to; shared by
+  `hooks-registered.sh` and `gate-overlap.py`. `hooks-registered.sh` used to match by substring, so `guard.sh` counted as registered through `old-guard.sh`.
+
+`hooks-registered.sh` ("Tool-layer gates", `工具层的闸`):
+- When a hook declares `# hook-events:` in its header, every listed event needs a registration pointing to it. Registered on Stop but not on SubagentStop, the gate is
+  simply absent for subagents.
+- An unregistered hook is reported with the events it needs; a hook from the installed copy is only ever told to be registered, never deleted.
+  An unreadable settings.json is reported as a broken file.
+
+Sweep: the seven stages taken upstream in 0.0.56 fall inside this version's diff window, so each got its `gate-similar`. Two duplications that have not been
+extracted are stated as they are: three diverged copies of the function that reads `.claude/doc-lint-exclude`, and registry-heading parsing written once here and once in doc-lint.
+
+The package enforces it on itself: each of the three language repositories gets a `.claude/settings.json` registering the package's two hooks.
+
+**Upgrade step**: consumer projects register `gate-reuse-check.sh` once on `Stop` and once on `SubagentStop` in `.claude/settings.json` (the lines are in its header);
+until then "Tool-layer gates" is red.
+
+Fixes from another session merged into this version:
+- `gate.sh --staged` says on a green run that gate-ok was not moved forward this time, and how to move it.
+- `script-modes.sh` resolves each directory against its own repository root: under `--staged` the project sits in a temporary worktree while the copy stays in the
+  real repository, and running `ls-files` for one repository from the other's root reported "found none".
+- `stage-selftest.sh` makes the stage directory absolute and clears `GATE_DIFF_BASE` for the samples.
+
+Self-test grows from 395 to 427 cases; the stop hook carries its own 13-case self-test; all 21 mutations tried were caught.
+
 ## 0.0.56 — 2026-09-21
 
 **The consumer's name is now gone from script comments too; twelve of its local checks are taken upstream; and a use-before-definition in 0.0.55 that cut downstream gates in half is fixed.**
