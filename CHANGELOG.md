@@ -4,6 +4,49 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.58 — 2026-09-26
+
+**Before a subagent hands back, it deletes the build directories and repository copies it created, and a hook enforces it; a test harness deletes the images it created, judged by the gate stage "No temporary files left behind"; pushing master now verifies everything first and only then connects to the remote.**
+
+New rules:
+- `rules/session-wrapup.md` item 5, "Before a subagent hands back, it deletes the build directories and repository copies it created": delete the build directories created this time (`target`, `CARGO_TARGET_DIR`, caches carrying `CACHEDIR.TAG`) and repository copies (clones, copied repositories, git worktrees);
+  do not delete reports, artifacts to be committed, replay material the main agent will check, what others created, or anything inside the project root. `du -sh` before deleting and write one line saying what was deleted and how big; for anything not deleted, one line each: "Not deleted <full path>: <why>".
+- `rules/command-safety.md`, "Test images always go in a temporary directory": the harness that creates an image deletes it itself when the test ends (Drop guard, `trap … EXIT`), and keeping the scene is switched on explicitly;
+  a cache meant to be reused across runs goes under `${GATE_CROSS_RUN_TMPDIR:-${TMPDIR:-/tmp}}`, not in `$TMPDIR`.
+- `rules/sop-first.md` item 6: a hook that should fire only for a particular tool writes `hook-events` as `<event>:<tool name>` and is registered on a matcher that recognises that tool.
+
+New scripts:
+- `scripts/claude-hooks/handback-scratch-check.sh` (on PreToolUse of the handback tool `SubagentHandback`, and on `SubagentStop`), with the judgement in `scripts/handback-scratch.py`:
+  ownership is decided by time window — a build directory, worktree or repository copy in a temporary directory, created while one of this subagent's own tool calls had not finished (statx birth time; a background command's window extends to its completion notice) and mentioned in its calls,
+  that is still there at handback while the report has no line for it, stops the handback, with the list and how to delete each (`git worktree remove --force` for worktrees).
+  Shared directories (the temporary root, `claude-<uid>`, the session and scratchpad levels) and anything inside the project root are not judged; an unreadable transcript is reported as "cannot judge", not passed as clean.
+- `scripts/session-transcript.py`: the one place that reads Claude Code transcripts, shared by `gate-overlap.py` and the new judgement.
+- `scripts/claude-hook-lib.sh`: the one place a hook takes fields out of its input; `gate-reuse-check.sh` now calls it.
+
+`gate.sh`:
+- Each run gives the stages a `TMPDIR` of that run's own (`gate-run.XXXXXX`); caches reused across runs use `GATE_CROSS_RUN_TMPDIR`, and a nested run inherits the outer one.
+- New closing stage "No temporary files left behind" (`跑完没留下临时文件`): if every other stage is green and something is left, it goes red with names and sizes, and is deleted on exit;
+  if some stage went red, this item is recorded as not judged this run and the whole directory is kept for the scene (with a `.kept-by-gate` marker); per project root only the latest 3 are kept, and an older one that cannot be deleted only warns and does not break the gate.
+
+`hooks-registered.sh` ("Tool-layer gates"): recognises `<event>:<tool name>` in `hook-events` and checks the registration sits on a matcher that recognises that tool; `gate-overlap.py` takes the matcher into account when comparing triggers as well.
+
+Pushing (merging changes another session had left in the working tree):
+- `scripts/push-all.sh` is the only way to push master: it verifies every language repository first (on master, clean working tree, same VERSION, gate green), connects to the remote only after that, and pushes the verified commit of each one; if any repository's HEAD changed after verification, none is pushed.
+- `scripts/githooks/pre-push` only blocks and no longer verifies: a direct `git push` of master is refused on the spot and pointed at push-all.sh; other refs pass as before.
+  Previously it verified inside the hook: `git push` connects to the remote first and runs the hook afterwards, the three gates take over ten minutes, the idle SSH connection was cut, and in the 0.0.57 push zh did not make it.
+- The push paragraph of `CLAUDE.md` in all three languages follows.
+
+This repository itself is covered too: the `.claude/settings.json` of all three language repositories registers the new hook in both places.
+
+**What upgrading requires**:
+- Register `handback-scratch-check.sh` twice in `.claude/settings.json`: `PreToolUse` (matcher `SubagentHandback`) and `SubagentStop`, as written in its header; missing either one turns "Tool-layer gates" red.
+- Caches meant to be reused across runs (build directories for mutation testing, download or conversion caches and the like) move to `${GATE_CROSS_RUN_TMPDIR:-${TMPDIR:-/tmp}}`; whatever is left in `$TMPDIR` is failed by "No temporary files left behind" and deleted.
+- Temporary directories and images created by stages, self-tests and test harnesses are deleted by whoever created them when they finish.
+
+The self-test grew from 427 to 438 cases; the handback hook carries its own self-test of 55 situations, and gate-reuse-check's 13 still pass.
+Mutations: 14 on `gate.sh` and `hooks-registered.sh`, 47 on the handback hook's judgement and the transcript library; every one was caught.
+Three rounds of adversarial review were run and everything they hit was fixed; a dry run over 60 real subagent transcripts stopped 4, each checked by hand and each rightly stopped.
+
 ## 0.0.57 — 2026-09-25
 
 **Before adding a gate or hook, look for an existing one: a stop hook blocks the agent when it finishes and makes it self-check, and the gate stage "Gate overlap check" judges it again before commit.**

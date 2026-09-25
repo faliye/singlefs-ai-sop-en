@@ -1,11 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:7b57794d1857e536050d6e5d4dfa429e3348702318081facf091c92c8529e598 -->
+<!-- generated-from: rules/command-safety.md sha256:99e78c73e52cdfcd3a2f148d6fb96e61010929fba6b16193283e2fafaef91bac -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
 Six of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
 by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
 subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
-an unguarded variable path**, and **a `wait` with no arguments**. The rest are still prose, because the criterion for
+an unguarded variable path**, and **a `wait` with no arguments**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
 can and cannot prove" — what is not done has to be said, not glossed over).
 
@@ -243,6 +243,16 @@ check the exit code before doing anything with it.
 Never inside the repository. Accidentally committing a multi-gigabyte image into git
 is an irreversible nuisance. Image paths come from an environment variable, defaulting
 to `${TMPDIR:-/tmp}`.
+
+**The harness that creates an image deletes it itself when the test ends**: on success, on failure and on panic alike. Rust uses a Drop guard; shell uses `trap … EXIT`.
+Keeping it to look at the scene is switched on by an explicit switch (an environment variable), and the path is printed when it is kept; without the switch it is deleted.
+A gate stage that goes red may leave its scene in `$TMPDIR` and name the path in its remedy.
+A cache meant to be reused across runs (build output and the like) is not an image: put it under `${GATE_CROSS_RUN_TMPDIR:-${TMPDIR:-/tmp}}`, not in `$TMPDIR`.
+
+`gate.sh` checks this: each run gives the stages a `TMPDIR` of that run's own, and at the end looks at what is left in it (the stage "No temporary files left behind", `跑完没留下临时文件`):
+if every other stage is green, whatever is left goes red, listed by name and size, and is deleted on exit; if some stage went red, this item is recorded as not judged this run, and the run's temporary directory is kept whole with its path printed — delete it yourself once you have looked.
+Of the directories kept this way on a red run, only the latest 3 are kept; older ones are deleted by a later run.
+What it cannot see: harnesses that hard-code `/tmp` instead of going through `TMPDIR`, tests run by hand outside the gate, and anything created by child processes still running after the gate was interrupted.
 
 ## Look before running anything destructive
 

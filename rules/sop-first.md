@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:977f796585ea203d5377cc4242890f1849d671d03bc8a2fff13fa41070144dee -->
+<!-- generated-from: rules/sop-first.md sha256:7ae9f9cb294449321d3aeea77d638758ee469e124257a8fba784d4d9f302e7ea -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -96,7 +96,7 @@ Before adding a gate or a hook, check whether an existing one already covers the
 4. If the new one really has to stand alone, name in the new file each existing one you compared it with and why it is not merged in: `# gate-similar: <existing file name> <why not merged into it>`; if nothing is similar, write `# gate-similar: 无 <what you checked>`.
    Every existing hook on the same event with an overlapping matcher, and every existing gate or hook that is textually very similar, must be named; `无` does not count for them.
 5. If an identical passage really has to stay in two files, write `# gate-overlap:copy-kept <the other file name> <why it is not extracted>` in one of them.
-6. A new hook writes `# hook-events: <event> …` in its header, listing every event it must be attached to, and is registered once per event in `.claude/settings.json`.
+6. A new hook writes `# hook-events: <event> …` in its header, listing every event it must be attached to (one that should fire only for a particular tool is written `<event>:<tool name>`), and is registered once per event in `.claude/settings.json`; one written with a tool name is registered on a matcher that recognises that tool.
 
 ### Who checks
 
@@ -105,6 +105,6 @@ Before adding a gate or a hook, check whether an existing one already covers the
   Both the main agent and subagents are covered: the project registers the hook once on `Stop` and once on `SubagentStop` in `.claude/settings.json`; the registration is spelled out in the hook's header.
 - **Before commit**: the gate stage "Gate overlap check" (`门禁查重`, `scripts/gate-overlap.py`) judges the gates and hooks added or changed in the diff window: whether `gate-similar` and `hook-events` are written, whether the named files are existing gates or hooks, whether each reason is long enough, whether everything that must be named is named, whether added lines duplicate an existing file wholesale, and whether `copy-kept` is well formed.
   The threshold for "wholesale" is whatever `CLONE_MINIMUM_LINES` says in that script.
-- The gate stage "Tool-layer gates" (`工具层的闸`, `scripts/hooks-registered.sh`) checks that the stop hook is registered and that every event in `hook-events` is attached.
+- The gate stage "Tool-layer gates" (`工具层的闸`, `scripts/hooks-registered.sh`) checks that the hooks are registered, that every event in `hook-events` is attached, and that one written with a tool name is attached on a matcher that recognises that tool.
 
 Whether the named file really is the closest match, and whether the reason for not merging holds, the gate cannot judge; that is left to review.

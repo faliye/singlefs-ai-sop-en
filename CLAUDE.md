@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:18625b4829a43e3fba01e7c300a9f5266ab7a4aa4a45451d67e6eedb3678671a -->
+<!-- generated-from: CLAUDE.md sha256:920d578d998b957d2d67153b845dd72b37f3b4bb3725c80cf4af10cf0f12b773 -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -28,14 +28,12 @@ behaviour of `scripts/` does.**
 the person making the change is the one who guarantees they agree. The gate can only
 see that a hash does not match — not whether the editions say the same thing.
 
-**Pushing goes through a hook that checks and pushes every edition together.** Run
-`git config core.hooksPath scripts/githooks` once in each language repo; after that, `git push` in any of
-them first checks every language repo (on master, clean working tree, same VERSION, gate green) and
-only then pushes them all. See `scripts/push-all.sh`. Pushing any other ref (a feature branch, a tag) does
-not trigger it: only the ref you named gets pushed.
-
-⚠️ **Do not probe this path with `git push --dry-run`**: the hook cannot tell a dry run from a real one, so
-the run that pushes master pushes the other two language repos **for real**.
+**Master is pushed only through `bash scripts/push-all.sh`, which checks and pushes every edition together.**
+It first checks every language repo (on master, clean working tree, same VERSION, gate green), connects to
+the remotes only after that, and pushes the commit it checked in each one; if any repo's HEAD moved after
+the check, it pushes none of them. Run `git config core.hooksPath scripts/githooks` once in each language
+repo: the hook refuses a direct `git push` of master on the spot and points to push-all.sh. Pushing any
+other ref (a feature branch, a tag) goes through the hook untouched: only the ref you named gets pushed.
 
 **What gets translated and what gets copied verbatim** turns on one question: is there
 prose written for people in it? The two lists live in `scripts/manifest.sh`

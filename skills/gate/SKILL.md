@@ -2,7 +2,7 @@
 name: gate
 description: Run this project's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:7394a65a0a358685ec20dd3d22b475ae27603354e01c2da9d3452ab9c6f4c5fa -->
+<!-- generated-from: skills/gate/SKILL.md sha256:c5c2edf8bce8a5f407ac9cd7eb42c076585cda2f19330e6104189dc2260b271c -->
 
 # The acceptance gate
 
@@ -33,6 +33,7 @@ bash .claude/scripts/gate.sh --staged # only HEAD + the index: for several sessi
 | Build and unit tests | Genuinely broken, or cargo is missing. clippy runs with `-D warnings`, and a `_ =>` arm on an enum that is a closed set is refused as well |
 | Project-local stages | Some local check in `.claude/gate.d/` failed, or could not be read; a red "覆盖声明（…）" (coverage declaration) means a `# gate-covers:` line names an item that is not on the list |
 | Working tree unchanged during the run | Files in the working tree changed while the gate ran (you were still editing, or another session was), so the stages did not all read the same version. Wait until the edits stop and rerun, or use `--staged` |
+| No temporary files left behind | Some stage (or a test or harness it started) created something in this run's `TMPDIR` and did not delete it when it finished; names and sizes are listed in that section. Have whoever creates it delete it when it finishes; a cache meant to be reused across runs goes under `${GATE_CROSS_RUN_TMPDIR:-${TMPDIR:-/tmp}}`. When another stage went red this item is recorded as not judged this run, and the temporary directory is kept whole for you to look at the scene (only the latest 3 are kept; older ones are deleted by a later run). See `rules/command-safety.md`, "Test images always go in a temporary directory" |
 
 **Three stages run only in the SOP repository itself** (invisible to consuming projects):
 cross-language sync, version discipline, and CHANGELOG continuity.

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:5a6e9a511ec16a47f56ef365099918be3739780edf097d0c667a0d0c95cc8eaf -->
+<!-- generated-from: rules/session-wrapup.md sha256:047267c7bcf442c355227adddc8f7f6914bb22825644c22c92fec20248c50a36 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -94,3 +94,25 @@ through them before wrapping up:
 If you collide on a number and it can be made into a check that goes red, make it one
 (`rules/show-me-test.md`, "turn traps you have hit into checks that fail"); on the
 project side, just follow the numbering shape the history files already use.
+
+## 5. Before a subagent hands back, it deletes the build directories and repository copies it created
+
+The repository copies a subagent made in its scratch directory, and the build directories it compiled into with its own `CARGO_TARGET_DIR`, are deleted by the subagent itself before it hands back:
+
+- **Delete**: the build directories this subagent created this time (`target`, the directory `CARGO_TARGET_DIR` points at, and any other cache carrying `CACHEDIR.TAG`) and its repository copies (clones, copied repositories, git worktrees).
+  Remove a worktree from its source repository with `git worktree remove --force <path>`, so the registration there goes too; `rm -rf` the rest.
+- **Do not delete**: reports, artifacts that are to be committed, replay material the main agent still has to check; anything a predecessor, the main agent or another agent created, even in the same scratch directory;
+  anything inside the project root (the project's own `target`, worktrees Claude Code created inside the project) — those belong to the main agent.
+- Before deleting, record the size with `du -sh`; the handback report carries one line saying what was deleted and how big each was.
+- For anything not deleted, the handback report carries one line per path: "Not deleted <full path>: <why>". Merely citing the path as a source ("ran on the copy at …") does not count.
+
+The hook `scripts/claude-hooks/handback-scratch-check.sh` checks this, attached in two places:
+
+- PreToolUse of the handback tool (`SubagentHandback`): stops the handback before it happens. If a build directory, worktree or repository copy that sits in a temporary directory, was created while one of this subagent's own tool calls had not yet finished,
+  and was mentioned in its calls, is still there, and the report being handed back has no line for it, the handback is refused and the list is given to the subagent.
+- SubagentStop: the fallback when the subagent stops without going through the handback tool. A delivered handback report that carries the line lets it through (a refused handback does not count);
+  after a stop is blocked, writing the line in the reply or in a written report and then stopping lets it through (merely running du, ls or Read on it does not count).
+
+The project registers both in `.claude/settings.json`; how to write them is in that hook's header.
+What it cannot recognise still has to be deleted: paths that live only in a variable, directories a script created internally that no call mentions, anything more than one level below a directory it created,
+source copies with no `.git` that were never built in, and anything created by a detached process (`nohup`, `setsid`, `&`) after the call returned. Whether the report carries the line saying what was deleted and how big, it does not check.
