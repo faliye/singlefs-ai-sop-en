@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:920d578d998b957d2d67153b845dd72b37f3b4bb3725c80cf4af10cf0f12b773 -->
+<!-- generated-from: CLAUDE.md sha256:350acd12b48315b929868d2f0ebbb3d32663e5cbf22457d30fc454b851c4778d -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -56,6 +56,7 @@ coverage check.
 @rules/verify-before-claiming.md
 @rules/pushback-discipline.md
 @rules/command-safety.md
+@rules/preflight-discipline.md
 @rules/session-wrapup.md
 
 ## Where a thing belongs

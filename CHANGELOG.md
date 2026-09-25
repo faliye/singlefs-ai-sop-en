@@ -4,6 +4,50 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.59 — 2026-09-26
+
+**Every script states at its head when it should be called and when it must not be, and checks that before doing any work: an unmet condition makes it refuse (exit code 78), only `--force` makes it run anyway, and such a run is recorded as forced; for gate stages, gate.sh checks the conditions before starting the stage and does not start it if they are unmet.**
+
+New rules:
+- `rules/preflight-discipline.md`, "Admission and run conditions": the file head declares `admission:` (when it should be called — whether this call can tell anything new) and `run-condition:` (when it must not be called — whether the environment can carry it), at least one line of each; with several lines, all must hold.
+  Forms: `always <reason>`, `inputs-changed <path…> [env:<variable>…] [arguments]`, `check <command> :: <remedy>`, `none <reason>`, `command <executable…>`, `single-instance`.
+  An experiment's admission is `inputs-changed`, listing code, decisions and preregistration: if none of them changed since the last successful run, a rerun is refused; several `inputs-changed` lines are merged into one set of inputs.
+- It covers every script: this package's `install.sh` and `scripts/` (hooks included), and the project's `.claude/gate.d/`, `.claude/scripts/`, `.claude/hooks/`, plus the experiment directories the project registers in `.claude/preflight-dirs` (.sh, .py and .rs are all judged).
+  Libraries and fixtures are listed one by one in an exclusion table (`PACKAGE_EXCLUDED` for this package, `.claude/preflight-exclude` for the project); wrappers that only exec a shared script are not judged separately.
+- `CLAUDE.md` in all three languages and the project template `templates/CLAUDE.project.md` include the rule; the glossary gains "admission condition", "run condition" and "forced run".
+
+New scripts:
+- `scripts/preflight.py`: parses the declarations, evaluates them, and records the input fingerprint of the last successful run (under `sop-preflight/` in the repository's common git directory) — the only place that does so.
+  What is recorded is the fingerprint judged at the start; nothing is recorded if a recomputation at the end differs (the inputs were edited during the run), or if the run was forced or failed.
+  The subprocesses that evaluate conditions do not read the caller's standard input (a hook's JSON and the refs git feeds pre-push are there) and do not inherit the `GIT_*` variables a git hook leaves behind; without git it carries on as "not in a git repository" instead of crashing.
+- `scripts/preflight.sh`: the shell side, `preflight` and `preflight_record_success`, defining functions only and changing no shell options. lib.sh sources it;
+  hooks and pre-push source it directly, so judging conditions does not add set -e and gawk to their dependencies. One line to copy at the head: `preflight "${BASH_SOURCE[0]}" "$@"; set -- ${PREFLIGHT_ARGUMENTS[@]+"${PREFLIGHT_ARGUMENTS[@]}"}`;
+  the script path and the path of preflight.py are made absolute first, so a script that later cds elsewhere still records its fingerprint. Without python3 nothing can be judged, so it refuses (78), and `--force` runs anyway.
+- `scripts/preflight-lint.py`, new gate stage "admission and run conditions" (`准入与运行条件`): whether both kinds are declared, whether the forms are recognised, whether they come before the code, whether the `inputs-changed` paths exist,
+  whether `preflight` is called first (shell: lib.sh or preflight.sh sourced before it, and only set options / source / whole-line assignments; python: the first statement under `__main__`,
+  with no top-level statement before it reading the arguments or standard input, starting a subprocess or opening a file; Rust: the first statement of `fn main`), whether a script with `inputs-changed` calls `preflight_record_success`, and whether the tables point at something; only the lines install.sh lays down count as a wrapper.
+
+`gate.sh`:
+- Accepts `--force`; before starting each stage it checks that stage's conditions, and if they are unmet it does not start it and the summary records "not run this time" with the unmet conditions.
+- `gate.sh --force` passes `--force` to the stages whose conditions are unmet; such a stage is recorded as "run by force", not as a pass, and does not count as covering any not-implemented item.
+- Whether a stage starts is decided by the gate's check alone: a stage that exits 78 after starting (including a 78 passed up from a script it called) is recorded as failed.
+- If any stage ran by force, or was not started for a reason other than "inputs unchanged", gate-ok is not advanced and the closing line does not say "all passed"; the exit code only reflects whether any stage failed.
+- When the project has no `.claude/preflight-dirs`, the summary records the experiment-script category as "not checked this time".
+
+This repository follows it too: 28 scripts under `scripts/`, 4 hooks and `install.sh` all declare their conditions and check them first; `env.sh` also checks for python3.
+The admission of `selftest.sh` is `inputs-changed ./ ../I18N ../install.sh ../VERSION ../templates ../agents ../skills`: if these are unchanged since the last pass, the gate records "discriminating power" (`门禁判别力`) as "not run this time" instead of rerunning it.
+`stage-selftest.sh` feeds fixtures to local stages that declare conditions with `--force`: fixtures only test whether the stage judges correctly, so "inputs unchanged" must not block them, and such runs are not recorded as successes.
+
+**What an upgrade needs**:
+- Check every gate stage, project script, hook and experiment against `rules/preflight-discipline.md`: declare both kinds of condition at the head and call `preflight` first; experiments declare `inputs-changed` and record the fingerprint after a successful run.
+- Create `.claude/preflight-dirs` registering the experiment directories (create it even without experiments, with one comment line); list libraries, fixtures and not-yet-converted scripts one by one in `.claude/preflight-exclude` with reasons, deleting a line as each is done.
+- Add `@.claude/singlefs-ai-sop/rules/preflight-discipline.md` to the project's `CLAUDE.md` (without it the document-discipline stage goes red).
+- Experiments that write artifacts write `PREFLIGHT_FORCED` into them; cite a forced run's artifact as forced. The project writes the `preflight` function for Rust experiments itself; the contract is in the rule's "Check first, at the head" section.
+
+The selftest grows from 438 to 496 cases; mutations 38 (gate.sh 9, preflight.py 10, preflight.sh 5, preflight-lint.py 13, stage-selftest.sh 1), all turning the selftest red; 37 in the case they were aimed at, and 1 (the guard that skips recording a forced run) in the "--force runs anyway" case, since the fingerprint hand-off already covers the behaviour and only the message shows the difference.
+One adversarial review round hit 11 points (inputs edited during a run recorded as tested, only the last `inputs-changed` line honoured, a 78 passed up after a stage started taken as "not started", fingerprints lost after a cd, a crash without git, and others); each was fixed and has a case watching it.
+
+
 ## 0.0.58 — 2026-09-26
 
 **Before a subagent hands back, it deletes the build directories and repository copies it created, and a hook enforces it; a test harness deletes the images it created, judged by the gate stage "No temporary files left behind"; pushing master now verifies everything first and only then connects to the remote.**

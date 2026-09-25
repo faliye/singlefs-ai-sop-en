@@ -1,4 +1,4 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:a13665de77df53b52b0bb603f16ab069a1c9395f79f023b394c33d81dc63b6a3 -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:01eb1219ec61e91e52bff7e6336ed33972387ab0ea31266b24265c0ba5d6b041 -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
@@ -20,6 +20,7 @@ the main line. No longer.>
 @.claude/singlefs-ai-sop/rules/verify-before-claiming.md
 @.claude/singlefs-ai-sop/rules/pushback-discipline.md
 @.claude/singlefs-ai-sop/rules/command-safety.md
+@.claude/singlefs-ai-sop/rules/preflight-discipline.md
 @.claude/singlefs-ai-sop/rules/session-wrapup.md
 
 **Rules specific to filesystem design** (transactions, crash consistency, on-disk
