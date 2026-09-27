@@ -29,13 +29,6 @@ know what it settled on**. Before using a decision to build a model, write a che
 overturn some other conclusion, **you must read its definition word for word** — not
 model it from memory.
 
-Observed: an experiment set out to test whether some decision would break under a new
-scenario. The model was built from two possible readings of the decision's wording,
-both readings showed a failure, and the decision was overturned on that basis. **The
-decision's own text already spelled out a third reading** — under it the error rate is
-exactly zero, so the conclusion pointed the wrong way entirely. In hindsight: the
-status column got checked, the definition never got read.
-
 **What to do**: before using a decision in any derivation, paste its defining sentence
 verbatim into your notes or experiment comments. If you cannot paste it, you were
 working from memory.
@@ -45,6 +38,11 @@ working from memory.
 This one is the hardest to catch yourself, because **the "check now" step really did
 happen**: you ran the command, you read the file, you are holding a proposition you
 genuinely verified. **The error is that the sentence you then said is wider than it.**
+
+| What you checked (narrow, true) | What you said (wide, false) | Cost |
+|---|---|---|
+| "`sudo` was blocked by the sandbox" | "no root, so this observation cannot be made" | Another path in the same repo **needs no such permission**, and the docs say word for word "measured and passing" ⇒ **a whole round with zero observations, and the reason recorded for it is false** |
+| "this object is not listed in the enumeration of some class rule" | "nothing in the whole repo covers this cell" | **The class membership is written in two other files**, and that class rule covered the object all along ⇒ the whole experiment set up on that basis is void, and the same debt **was written wrong twice in a row** |
 
 Both have the same shape: **what was verified is one path / one file; what was asserted
 is all paths / the whole repo.**
@@ -92,4 +90,4 @@ that evidence requirements are met, not semantic correctness).
 - If you cannot say "this is the command I learnt it from", the sentence must be
   written as **conjecture**, not as fact.
 - Factual corrections from someone else **also get checked** — neither accepted
-  wholesale nor argued with; check, then state the result plainly.
+  wholesale nor rushed to rebut; check, then state the result plainly.

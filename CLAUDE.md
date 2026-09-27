@@ -84,13 +84,13 @@ single file to fix.
 
 ## How a project hooks in
 
-The project does not copy this repository's content. Each of the three layers has its
+The project does not copy this repository's content. Each layer has its
 own hook-up (**no symlinks**):
 
 | Layer | How it hooks in |
 |---|---|
 | rules | The project's `CLAUDE.md` references `@.claude/singlefs-ai-sop/rules/x.md`; no copy is kept in the project |
-| Project-local rules | Put them in `.claude/rules/x.md` and reference them as `@.claude/rules/x.md`. They do not go upstream |
+| Project-local rules | Put them in `.claude/rules/x.md` and reference them as `@.claude/rules/x.md` in the project `CLAUDE.md`. They do not go upstream |
 | skills | The project's `.claude/skills/<name>/SKILL.md` is a **stub**: frontmatter plus a pointer to the shared body |
 | agents | The project's `.claude/agents/<name>.md` is a **stub**: frontmatter plus a pointer to the shared body. Conventions in `agents/INDEX.md` |
 | scripts | The project's `.claude/scripts/x.sh` is a **wrapper**: set up the environment, then `exec` the shared script |

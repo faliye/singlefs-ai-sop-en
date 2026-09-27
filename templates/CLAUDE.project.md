@@ -66,8 +66,8 @@ Green means the evidence requirements are met, not that the semantics are right 
 
 ## What is particular about this project
 
-<One to three items; only what changes how you work. Put the reasoning in kb and leave
-signposts here.>
+<One to three items; only what changes how you work. Put the detailed criteria in kb and leave
+only a signpost here.>
 
 ## The one-paragraph version
 

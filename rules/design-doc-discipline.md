@@ -1,4 +1,4 @@
-<!-- generated-from: rules/design-doc-discipline.md sha256:f277f9947819d76e8d8d2fcef88674583ace9ab71a18942cfe8e65e033afdee6 -->
+<!-- generated-from: rules/design-doc-discipline.md sha256:aff80a1ea4c453f314892511806881c27bb5cef3baa955ee47faf89fa7c4b83a -->
 <!-- doc-lint:rule-definition -->
 # Design document discipline
 
@@ -20,11 +20,6 @@ the end:
 ### YYYY-MM-DD
 - Was X / now Y / basis for the change: Z
 ```
-
-**Why**: history mixed into the body means a reader cannot tell at a glance which
-value is current. After a few rounds, even "what is it now" needs archaeology to
-answer — and the archaeology is often wrong. This project runs for years; that cost
-compounds.
 
 **Corollaries**:
 - Changed a decision? **Edit the body directly.** Do not annotate "(was X)" beside it.

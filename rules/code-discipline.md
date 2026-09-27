@@ -45,15 +45,10 @@ Names fixed from outside are not ours to decide: implement `Display` and the met
 | **A name stands on its own, without the module path** | Write `block::BlockAddress`, not `block::Address`: after the `use`, the call site has only `Address`, and the model cannot see the path. This is **deliberately making the name carry namespace information**; the cost is that type names form a hand-made namespace (`BlockAddress`, `JournalAddress`, `LogicalAddress`…), and we accept that cost. The reason is that the path is absent from retrieval results and call sites — not that "longer names are better" |
 | **A new meaning gets a new name** | Shadow a name only when the meaning stays the same; when raw data becomes verified data, or a byte count becomes a block count, pick a new name |
 
-### Why an abbreviation is pure loss
-
-It saves characters and drops meaning, and the model cannot recover it — worse, it will fill it in.
-`cnt` means block count in one place and retry count in another, and the model that retrieves one of
-them will not say "I can't tell"; it will proceed on the most common reading. In a filesystem, `ext`
-can be extent or extension; `gen` can be generation or generator.
+### No abbreviations; the criterion is whether there is one authoritative definition
 
 **The criterion is "is there one authoritative definition", not "will everyone recognise it".**
-So Rust keywords and primitive type names (`mut`, `fn`, `str`, `u64`) are not abbreviations — the
+Rust keywords and primitive type names (`mut`, `fn`, `str`, `u64`) are not abbreviations — the
 language reference is their one definition; the project's own domain abbreviations (`lba`, `crc`) may
 be used only once registered.
 
@@ -70,8 +65,8 @@ crc  # cyclic redundancy check
 The registry is that abbreviation's single authoritative definition; everywhere else follows it, and
 nobody writes a second one. **Single letters may not be registered**: one letter has no single meaning.
 
-**The project's own numbers** (experiment and decision numbers registered in the kb, and the like, registered in the kb), when
-used as one segment of a name, are registered as a class — "this letter followed by digits":
+**The project's own numbers** (experiment and decision numbers registered in the kb, and the like), when
+used as one segment of a name, are registered as a class — "a letter followed by digits":
 
 ```text
 e<数字>  # experiment numbers, registered in .claude/kb/experiments.md

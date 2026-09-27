@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:02c565213f83bedd2c2b8915217ff01f49d2bf7b167cfb357d49dc11471db03f -->
+<!-- generated-from: rules/machine-first.md sha256:4601df3769a0154db9dac60543e303673d4fa998006075e39dcc7cf141fd8b8c -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -13,9 +13,6 @@ through the criterion again; the ones that fail are dropped.
 ## Stance: inherit sceptically, not by default
 
 The default attitude toward established "best practice" is **doubt**, not compliance.
-The reason is in `engineering-philosophy.md`, "Why the old commandments need re-deriving", and is
-not repeated here: most of these principles are floors set to the limit of the human brain, and
-that limit is no longer the constraint.
 
 This does not mean they are all wrong — it means **their reasons must be re-checked**,
 and "everyone does it this way" is not one of them.
@@ -31,8 +28,7 @@ premises, not at the "relaxed" and "kept" tables.**
 ### Premise 1: context windows are now in the 2×10⁵ – 10⁶ token range
 
 Three tiers: 200K / 500K / 1M. The 1M tier holds one crate together with its
-tests, its kb, and its decision record in a single window. Basis: this round of
-work on this repository runs in a 1M-tier session. Other vendors' numbers are not
+tests, its kb, and its decision record in a single window. Other vendors' numbers are not
 written down here — a number you cannot check on the spot is not evidence.
 
 **Calibration**: this is the **advertised window ceiling**, not "the same accuracy
@@ -77,7 +73,7 @@ relaxation is withdrawn on the spot:
 
 | What you observe | What is withdrawn |
 |---|---|
-| The model drops a mid-context fact at this project's actual scale — misses a constraint already in the window | The "keep PRs small" relaxation; go back to slicing at a size that fits |
+| At this project's actual scale, the model misses a constraint that is already in its context | The "keep PRs small" relaxation; go back to slicing at a size that fits |
 | Generated duplicate code no longer matches its generator | The "DRY" relaxation; back to no duplication |
 | The verdict of the tool the project uses to exhaust interleavings contradicts what real hardware shows | "Exhaustiveness is machine-checkable"; that tool demotes to reference and stops being a gate |
 

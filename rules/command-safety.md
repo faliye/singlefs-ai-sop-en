@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:99e78c73e52cdfcd3a2f148d6fb96e61010929fba6b16193283e2fafaef91bac -->
+<!-- generated-from: rules/command-safety.md sha256:d2b65e0a9121ed25f126c3edffa08f71dd0e352a06ed8aa6b128c0082bed1702 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -78,7 +78,8 @@ So:
   Whether it ends and how it is handled is decided by whoever dispatched it, after looking. A tool that decides "timed out, kill it" also kills work that was still making progress.
   A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4: refuse, before writing, to overwrite an untracked file).
 - **Before waiting for a line in a log, make sure that line is really written to that file.**
-- In sessions such as Claude Code, when two model calls are too far apart the prompt cache expires and the whole context has to be written again.
+- In sessions such as Claude Code, when two model calls are too far apart the prompt cache expires and the whole context has to be written again:
+  put long work in the background and come back to re-check it periodically, instead of idling in the foreground.
 
 ## Within one script, run the checks in parallel when they can be
 
@@ -92,10 +93,8 @@ it went red, and what `sop-first.md` asks for — "runs locally, and judges the 
 fails on the spot.
 
 
-**Once it is fast, look again at where the remaining time goes.** In that same measurement, 10 s of those
-21.4 s was **one** case idling (what it verifies is precisely that `wait` does not return once the timeout
-logic is broken). That wait is deliberate, not a matter of parallelism, and no amount of extra machine
-saves it — **parallelism cures "waiting for subprocesses one at a time"; it does not cure "whether the
+**Once it is fast, look again at where the remaining time goes.** What remains may be a case idling on purpose (one that verifies, say, that `wait` does not return once the timeout logic is broken);
+that is not a matter of parallelism, and no amount of extra machine saves it — **parallelism cures "waiting for subprocesses one at a time"; it does not cure "whether the
 waiting is justified".**
 
 **These three do not go parallel**:
@@ -108,6 +107,10 @@ waiting is justified".**
 
 Take the degree of parallelism from `nproc`, do not hard-code it; heavy work such as VMs and builds gets
 its own ceiling from memory and devices.
+The cargo commands the shared scripts start (`scripts/check.sh`) run through the prefix registered in `.claude/cargo-command-prefix` at the project root:
+one line `<command and arguments>  # reason`, split on whitespace with no quoting, relative paths taken from the project root, each cargo command going through it once.
+If the file exists but yields no usable prefix, that is red; it never falls back to running without the wrapper:
+words that look like paths (containing `/`, or ending in `.sh` or `.py`; options starting with `-` and assignments containing `=` do not count) must exist, and a dry run of the prefix (`<prefix> true`) must succeed; under `gate.sh --staged`, a registration present in the source repository but missing from HEAD plus the index is red as well.
 
 ## Parallelism must not swallow the failures
 
@@ -190,6 +193,8 @@ results forever while the exit code stays 0 — green light, wrong answer.
 
 Under `set -u` it is worse: the reference is not an empty value, it is an immediate
 "unbound variable" that **takes the script down before it prints its diagnosis**.
+Not one line of the `howto` gets printed, and those are exactly the lines to read when the harness is lying.
+A reminder comment does not stop this; it is a check that goes red in `scripts/shell-lint.sh`.
 
 ## After a script edits a file, read it back — a compiler warning is a free signal
 
@@ -205,10 +210,7 @@ exit code is 0.
    whether the behavior changed.
 
 ⚠️ **A compiler or linter warning is the cheapest signal for this failure mode — never
-wave it off.** Observed: a replacement failed to take because of an indentation
-mismatch, leaving a method as dead code. Every build reported it `never used`, and
-that warning was ignored for a whole round — while the conclusion drawn from that
-code **pointed in the wrong direction.**
+wave it off.**
 
 ## Three silent failures at a process boundary
 

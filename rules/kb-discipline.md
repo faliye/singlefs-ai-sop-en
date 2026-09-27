@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:121cf2491ed911c27475b455812300e1f018a45bc53d668383b9b5955f0655ac -->
+<!-- generated-from: rules/kb-discipline.md sha256:00bc459a12f0ec5ece39151e9b467b2c8c6bcdd1868f7ccc1734c1dc54d5e98a -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -41,11 +41,7 @@ only in the two forms that carry 见 ("see above", "see below"): with 见 in fro
 position in the document, while the bare words mostly point at a named physical position
 ("below the field table", "the comment above `min`") and are not judged.
 
-"before / after this code" and numeric thresholds ("4 KiB and above"), and 上方 / 下方 mostly pointed at named positions ("below the field table").
-The same measurement found 103 bare forms outside the old criteria, and read one by one, every one was a genuine reference.
-Writers still must not use these words to point elsewhere in the document; that half is checked by people.
-
-**References to time are equally forbidden** — "this round", "that round", "the previous round".
+**References to time are equally forbidden** — "this round", "the current round", "the previous round", "the round before", "last round".
 A positional reference that points the wrong way can still be spotted; a temporal one cannot —
 when "measured this round: green" comes back alone, which round it was is unknowable, and the model
 fills one in anyway.
@@ -56,10 +52,10 @@ The gate's criterion is **whether this line, or the nearest heading above it, ca
 passes. Three things are not checked: "the next round" means any round yet to happen and is a generic by
 nature; "this time" / "last time" hang mostly on technical objects (this diff, last scrub's watermark) and
 are self-sufficient; and every entry in a history section hangs under a dated heading, which body scanning
-stops at anyway. Compounds such as 样本轮 ("sample round") do not count.
+stops at anyway. Compounds such as 样本轮 ("sample round") do not count: when the character to the left is 样, it is not judged.
 
 **Self-references are equally forbidden** — "this entry", "this decision", "this
-experiment", "that decision", "this invariant", "this section", "this table", "this
+experiment", "that decision", "that experiment", "this invariant", "this section", "this chapter", "this table", "this
 file", "this document".
 Of these, "this file" is outside the gate: doc-lint's self-reference word list has no "file"
 ending, and a genuine self-reference almost always says "this document". Writers still must
@@ -87,18 +83,12 @@ this one, rewriting "number (short name)" as "this decision" would *pass*
 the gate.
 
 **Not covered**: "this project", "this repository", "this round", "this machine" refer to
-the project, not to a location in a document. The trailing-character exclusions are set
-from real corpora (a kb really does contain "that node", "that condition", "this entry
-in the table"); without them they would be false reds.
+the project, not to a location in a document. The gate judges a self-reference only at the start of a sentence or right after punctuation;
+compounds such as 样本文档 ("sample document"), 成本表 ("cost table") and 三本文档 ("three documents") do not count —
+without that restriction, false reds would outnumber real violations
 
-⚠️ **In this edition these two checks are not implemented.** They are word lists, and
-the only word list that exists is the Chinese one; inventing an English one would
-multiply the false-positive surface rather than reduce it. `scripts/doc-lint.sh`
-reports both as **unimplemented** for this language rather than passing silently
-(`show-me-test.md`: the gate must not pretend to pass). Until a word list exists,
-these two kinds of violation are not stopped — green does not mean they were checked.
-The structural checks (fences, the position of the revision-history section,
-numbering) are language-independent and do run.
+Enforced by `scripts/doc-lint.sh`, with the criteria chosen by this package's language: Chinese judges all three; Japanese judges positional references and self-references, recognising dedicated words such as 上記, 前述, 本節 and 本文書,
+with temporal references not implemented; English implements none of the three. What is not implemented is reported explicitly as **unimplemented**, never passed silently.
 
 ## 2. Every entry carries its source and status
 
@@ -149,8 +139,7 @@ meaning without noticing**, because not one word will look out of place.
 ⇒ **Carry the name at every citation**: write it as "number (short name)", never the
 number alone.
 ⇒ **A number gets exactly one definition**; everywhere else links to it (a direct
-corollary of clause 4 of this file, "A contradiction is worse than a gap" — **note that
-this citation carries the name too**).
+corollary of item 4, "A contradiction is worse than a gap").
 
 The same number meaning something else in two other documents is the failure this rule
 guards against: nowhere does anything look wrong, and a criterion written on that basis
@@ -200,6 +189,10 @@ read once every number is replaced by its defining phrase) is a semantic judgeme
 no machine decides that. Lowercase numbers (`o1`), citation
 forms other than putting the name in the link text, and whether a short name is a *good*
 name are all out of the gate's reach.
+
+One more is **known but not stopped**: put a `-`, `.` or `_` in front of a number (write `-D1`)
+and the gate no longer recognises it as a citation. It could be stopped, but at the cost of falsely
+rejecting a batch of normal citations in real kbs, so it is not stopped
 
 ## 6. Tables beat prose
 

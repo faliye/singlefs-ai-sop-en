@@ -48,7 +48,7 @@ consistent conventions — make verification easier, so they stay — **with the
 information, no longer hung on "readability".**
 **How this lands in code is spelled out in `code-discipline.md`**: no length cap on names,
 no abbreviations, no single letters; no cap on nesting depth, but a bounded path count;
-meaning goes into a type when it can, into a name when it cannot, and never into a comment.
+meaning that can go into a type does not go into a name, and meaning that can go into a name does not go into a comment.
 
 ## Corollary: where human attention should go
 

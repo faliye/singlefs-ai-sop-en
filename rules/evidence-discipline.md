@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:aaf59b21df8a35619e911e0f023174744c7370b678e14ef4f089e53bfea78089 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:3c1e2140f57c8b0c19c983e1454933ec85d04166654405b3b0191497dc7c95dc -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -53,11 +53,6 @@ The reason is mechanical: **every party takes it as a given, so an error in the 
 gets inherited by all of them together** — and they will still come back with an
 "agreement". **Agreement therefore stops being evidence.**
 
-Observed: a background brief stated that some production implementation "has no
-such-and-such field". One of the three parties itself found the opposite in the
-primary source — **and still used the brief's claim as the baseline for comparison.**
-The eventual agreement was three parties jointly inheriting the same error.
-
 **What to do**: before writing "implementation X works like this" into the brief,
 check it yourself. What you cannot check, mark "unverified", so every party knows not
 to treat that line as a given.
@@ -83,7 +78,7 @@ version control history.
 ⇒ **Old evidence is a reference, not a basis.** When an earlier conclusion is in doubt,
 re-verify it rather than digging up the old evidence: old numbers are bound to the build
 they were taken on, and whether they still hold today is answered only by running it today
-(see "all old data is only a reference" in this same file). Overturning an earlier
+(`kb-discipline.md` item 2, "All historical data is reference only"). Overturning an earlier
 conclusion means running the project's own inference discipline again, not confronting it
 with an old file.
 
@@ -134,8 +129,8 @@ data, not that implementation.
 | **Counter-evidence**: a scheme that appears in **no** production implementation is a signal demanding an explanation | **Positive proof**: a scheme appearing in a production implementation does not make it fit for this project |
 | **Mechanism**: decompose what they did into a mechanism, then argue that mechanism holds under this project's premises | **Transplanting**: carrying the conclusion over together with the premises it never wrote down |
 
-⚠️ **"No production implementation takes path X" is one of the most valuable external
-signals this project has** — it does not prove X is wrong, but it shifts the burden of
+⚠️ **"No production implementation takes path X" is the most valuable kind of external
+signal** — it does not prove X is wrong, but it shifts the burden of
 proof onto X's side: **to walk a path nobody has walked, you must say why nobody did.**
 
 ⚠️ **When citing another implementation, you must also write down one known difference
@@ -251,10 +246,7 @@ clauses written before the run.
 ## Quote an artifact by copying the line whole
 
 Paraphrase drifts, and it drifts one way — each retelling leans a little further toward
-what you wanted, and every single step still looks faithful. Measured: the same
-difference out of one artifact was misstated four rounds running — "identical" → "identical
-cell by cell" (three of the four cells were not) → "slightly less" (wrong direction) →
-"exactly 2 nodes" (extrapolating one saturated cell into a range). Nobody caught it.
+what you wanted, and every single step still looks faithful.
 
 ⇒ **Quote the artifact line whole, with its filename**; summarize only the one cell you
 computed yourself. The fix is not "be more careful" — care leaves no trace, copying does.
@@ -299,9 +291,7 @@ of the sweep; boundary not measured)"; otherwise widen the range and re-run unti
 ## When you write a new criterion, sweep it back over the entries already on the books
 
 **A criterion applied to half the cases will be used by the next person on the lenient
-half.** Measured: "no invariant may enter whose gate has no input" kept a new invariant
-out, while four already-registered invariants in the same family had no input either —
-the author swung the ruler only at the newcomer.
+half.**
 
 ⇒ Once the criterion is written, ask: **what does it say about the entries already
 registered?** No answer means you are not done writing it.

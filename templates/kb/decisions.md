@@ -8,7 +8,7 @@ decision, edit the body directly and put the basis into the closing "Revision hi
 
 ---
 
-## D1 <decision name, 24 characters or fewer> —— undecided
+## D1 <decision name, display width ≤ 48, CJK = 2> —— undecided
 
 <!-- This heading is the registration site for the number: the segment between the
      number and the "——" is its short name. Every citation elsewhere is written

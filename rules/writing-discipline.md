@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:e86857c382ec078d3446d5c884142f78216097596e3ea50e304523514978a987 -->
+<!-- generated-from: rules/writing-discipline.md sha256:e9d66c2f1bb64b9550310db547e403da9117f1836f0f6ed75be579f48c11175b -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -39,17 +39,17 @@ reviews it.** However solid the argument, that is not a reason to write all of i
 name what was lost, cut it — "it reads more smoothly" and "it looks more thorough" are
 not content.
 
-The cost of padding is not the space it takes, it is **dilution**: readers and retrieving
+The cost of padding is not the space it takes, it is that **the useful sentence gets buried**: readers and retrieving
 models alike have to pick the one useful sentence out of the filler, and the odds of
-missing it rise with length. **Every padded sentence downweights the real content.**
+missing it rise with length.
 
 The three most common are none of them "wrote something new": restating a point already
 made in different words, prefacing an unchallenged conclusion with a run-up, and writing
 the same criterion once positively and once negatively.
 
 **But brevity may not be bought with content** — evidence, the basis behind a number, and
-the next step (`sop-first.md`'s `howto`) may none of them be dropped. What to keep is in
-"Hard data does not count against the ruler" and "Cut these categories".
+the next step (`sop-first.md`'s `howto`) may none of them be dropped. What to keep is in two sections:
+"'Shorter is better' is not 'shorter is righter'" and "Hard data does not count against the ruler".
 
 ### "Shorter is better" is not "shorter is righter"
 
@@ -59,7 +59,7 @@ as an instruction executable on its own, and every deletion arrives with its def
 pre-written.
 
 **The two directions of error are asymmetric, so when in doubt, keep it**: verbosity
-demotes the content, and the reader still finds it after a few more seconds; over-cutting
+costs the reader a few more seconds, but they still find it; over-cutting
 makes content **disappear**, and the reader does not know what they are missing, so they
 cannot ask for it back.
 
@@ -85,7 +85,7 @@ take them and verify for themselves. They are evidence, not "please take my word
 |---|---|
 | numbers: hit/miss counts, before-and-after, timings | why this number matters and what it shows |
 | the reproduction command and its verbatim output | how I came to think of running that command |
-| the basis needed to re-run: version, config, hardware | the history of the experiment, which dead ends were tried |
+| the basis needed to re-run: version, config, hardware | which dead ends were tried |
 
 **Include only the few decisive numbers**; the full record stays in `kb/` or `records/`.
 
@@ -152,7 +152,7 @@ readability.
 
 **Plain does not mean opinion-free either.** "This shouldn't be settled yet", "this
 approach is wrong" — write exactly that. Saying it straight includes **stating the
-conclusion first**.
+conclusion outright**.
 
 ### Which half the gate handles
 
@@ -167,6 +167,5 @@ whether an explanation is bloated. Those need a person to read it aloud. So a gr
 word list does not mean this rule is being kept; it only means the most obvious traps
 were avoided.
 
-The word list is Chinese. In this edition the check reports **unimplemented** rather
-than passing silently — inventing an English word list would add false positives, not
-remove them (`show-me-test.md`: the gate must not pretend to pass).
+The word list is Chinese and covers Chinese only. In the English and Japanese repositories this check
+reports **unimplemented** explicitly rather than passing silently (`show-me-test.md`: the gate must not pretend to pass).

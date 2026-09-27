@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:5bef03e601fc7c431b2396d347c2bc28bf08becdcbe222341a1e97445a856f78 -->
+<!-- generated-from: rules/show-me-test.md sha256:c1fb5ab46868e68c5f0f8f5b394dbe3ada82785fccf1c3c345bc1ae666f9bf38 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -126,6 +126,12 @@ dangerous than a red one.
 **A project-local stage with nothing to judge this round exits 77**: `gate.sh` records it as "not run
 this time" — not a pass, and not coverage. A skip that exits 0 looks exactly like "judged and passed"
 in the summary, and the gate cannot tell the two apart; that half rests on whoever writes the stage.
+Shared stages follow the same rule: with nothing to judge they exit 77 (`Show me test` and the naming lint exit 3), and `gate.sh` starts them in a way that understands 77.
+
+**When a stage runs only part of its work, the skipped part is reported into the summary item by item**: cases skipped for a missing tool, samples not implemented for this language, local stages with no fixtures
+are reported with `report_not_run` from `lib.sh` (a stage that does not source `lib.sh` appends a line to `$GATE_NOT_RUN_FILE`, and writes nothing when that variable is absent: it is absent when the stage runs on its own or is fed fixtures),
+and `gate.sh` gathers them into the summary's "not run this time"; a warning printed only in the stage's own output does not count as reporting. A run that reported such a part is not recorded as "the last success" (`rules/preflight-discipline.md`),
+and a local stage that reported one does not count as covering its `# gate-covers:` item either.
 
 Likewise: **batch scripts must not swallow per-round failures** (`|| true` and
 friends), and output paths must not be reused across rounds. Put those two together
@@ -138,7 +144,9 @@ for a completion marker that could only have been produced by this run.
 little too narrowly and every object gets skipped at the first step — neither passing nor
 failing, and the tail still reports green with nobody able to tell.
 ⇒ A check that scans a set of objects must report **how many items it checked** in its
-success line; `gate-lint.sh` enforces this.
+success line; `gate-lint.sh` enforces this: it judges the last success line in the script,
+which must carry a quantity counted in the script (a variable that was accumulated, an array length, the result of `wc -l` / `grep -c`); a script that genuinely scans no objects writes its own comment line
+`# gate-lint:nocount <reason>`, with a reason of at least 8 characters.
 
 **Reporting "how many were checked" is not enough: "which were not checked" must be listed one by one too, and that list must be computed on the spot.**
 A stage can honestly report how many items it checked while missing a whole other half of its objects: both statements are true,

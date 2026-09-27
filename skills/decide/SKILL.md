@@ -46,7 +46,7 @@ are marked as not verified in this project.>
    Leave only the original sentence and, three months on, nobody knows what is
    actually holding it up.
 6. **Touch a clause a person settled, and you owe an open entry in `kb/checks-owed.md`.**
-   A "pending review" note in the body guarantees nothing will ever look at it again —
+   With only a "pending review" note in the body, nothing guarantees anyone will see it —
    and the person who settled it does not know their ruling changed. Name the decision
    and the item in the entry; clear it only once the review has happened.
 

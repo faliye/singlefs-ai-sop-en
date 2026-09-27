@@ -1,4 +1,4 @@
-<!-- generated-from: rules/rules-discipline.md sha256:2126b3daf2cb9e83e070e93eaee4c7de68a28ec455af19ef60b3f3f9d259d85b -->
+<!-- generated-from: rules/rules-discipline.md sha256:39c7c93f3a36a344616fc0c8acf08af78d1b3303d6c2084e9677ad09cef6cec3 -->
 <!-- doc-lint:rule-definition -->
 # Rule-file discipline
 
@@ -55,7 +55,7 @@ back into the context.
 
 ## 5. Rule files keep no history section
 
-`CLAUDE.md` and `rules/*.md` keep no `## History` section, not even at the end of the file.
+`CLAUDE.md` and `rules/*.md` keep no `## Revision history` section, not even at the end of the file.
 Shared rules record their history in `CHANGELOG.md`, one section per version.
 
 ## 6. Before adding a rule, ask whether it can become a check that fails
@@ -77,9 +77,9 @@ references the criterion is the same one `kb/*.md` is held to, with the per-word
 
 Self-reference is judged only for the words that name a document structure: "this section", "this
 chapter", "this table", "this document", "this clause". Domain objects — "this experiment", "this
-decision", "this invariant" — are **not** judged: a normative text is about how to handle a decision or
+decision", "the present experiment" — are **not** judged: a normative text is about how to handle a decision or
 an experiment, so "this experiment" there names the object being worked on, not a position in the text.
-References to time ("this round") are not judged either: a rule holds for every round, so "this round"
+References to time ("this round", "the current round") are not judged either: a rule holds for every round, so "this round"
 there is a generic. Both remain judged in `kb/*.md`.
 
 When a rule file carries the `<!-- doc-lint:rule-definition -->` marker, examples inside backticks
@@ -102,8 +102,9 @@ and are left to review.
 
 `scripts/rules-lint.sh` judges the part of clauses 1, 3, 4 and 5 that can be reduced to literal patterns —
 record sections, dated lines, explanatory paragraphs and half-sentences, lexical explanations, and history
-links with no deterrent. It scans this package's `rules/`; a project hands its own rules directory over with
-`RULES_LINT_DIR`, and the shared `gate.sh` runs that stage automatically. Files not yet swept are registered
+links with no deterrent. It scans this package's `rules/`, and also the project's `.claude/rules/` (or `.claude/agents/`
+when that directory does not exist): the latter is started by the `gate.sh` stage "Rule discipline (project-local)"
+(`规则纪律（项目本地）`), so the project wires up nothing of its own. Files not yet swept are registered
 one per line in the project root's `.claude/rules-lint-exclude`; delete a line once that file is done —
 the exclusion list only shrinks.
 
@@ -113,5 +114,6 @@ Clause 7 is judged by `scripts/doc-lint.sh`, not by `rules-lint`; the names half
 whether the link under the deterrent points at the right place. Those are
 semantic judgements — a person reads them aloud, and review catches the rest.
 
-⚠️ Its patterns are Chinese. In a repository of another language this check reports **not implemented**
+The criteria are chosen by this package's language. Chinese judges all seven; English and Japanese judge record sections, argument sections, dated lines, links without a deterrent, and consumer names,
+and recognise explanatory paragraphs and half-sentences only in the "label word plus colon" form (`Observed:`, `実測：` and the like); those opening with a conjunction, and lexical explanations, are reported explicitly as **not implemented** in these two languages,
 rather than passing silently (`show-me-test.md`: the gate must not pretend to pass).

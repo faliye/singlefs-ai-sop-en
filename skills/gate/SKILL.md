@@ -2,7 +2,7 @@
 name: gate
 description: Run this project's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:c5c2edf8bce8a5f407ac9cd7eb42c076585cda2f19330e6104189dc2260b271c -->
+<!-- generated-from: skills/gate/SKILL.md sha256:0ab33569c38c91e6dc3b9e6a850b2286d22e71b8387358ac6ab7405fc0592864 -->
 
 # The acceptance gate
 
@@ -79,10 +79,9 @@ After changing `gate.sh` or `doc-lint.sh`, **build an input that ought to be sto
 confirm it really goes red**:
 
 ```bash
-# Build a sample that should be rejected, feed it to doc-lint, confirm it goes red
+# Build a sample that should be rejected, feed it to doc-lint, confirm it goes red: a kb document missing its closing history section (a structural check, judged in a repository of any language)
 d=$(mktemp -d); mkdir -p "$d/kb"
-printf '# Decisions\n\nNode size is 16K (was 4K).\n\n## Revision history\n\n### %s\n- Created.\n' "$(date +%F)" \
-  > "$d/kb/decisions.md"
+printf '# Decisions\n\nNode size is 16K.\n' > "$d/kb/decisions.md"
 bash .claude/singlefs-ai-sop/scripts/doc-lint.sh "$d"; echo "exit code $? — expected 1"
 rm -rf "$d"
 ```
@@ -90,8 +89,7 @@ rm -rf "$d"
 ⚠️ **Build the sample in a separate directory; do not `>>` onto a real kb file.**
 Appended text lands after the "Revision history" heading, where the body scan has
 already stopped — the exit code is 0, which looks like "the check does nothing" when in
-fact the sample was built in the wrong place (measured on this very skill's own example
-during an audit).
+fact the sample was built in the wrong place.
 
 After changing a check, also run
 `bash .claude/singlefs-ai-sop/scripts/selftest.sh`: it uses the fixtures under

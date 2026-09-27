@@ -13,8 +13,7 @@ I/O, concurrency, timing, randomness; at least one must be present. With none of
 the thing under test is a deterministic model: the same binary run N times is
 byte-identical by necessity, **N=1 and N=5 carry exactly the same information**, and
 writing "consistent across N rounds" merely dresses determinism up as stress-test-grade
-evidence. Observed: three pure-arithmetic experiments all wrote "byte-identical across
-N=5 rounds", and the whole batch was later struck down on review.
+evidence.
 
 ⇒ For a deterministic experiment the only honest phrasing is "running N rounds proves
 there is no hidden state, not statistical stability"; its evidence strength comes from
@@ -134,11 +133,6 @@ When an experiment has N arms, running the positive control on just one of them 
 the other N−1 **never went through the gate at all** — and it is usually one of those
 un-gated arms that ends up producing the conclusion.
 
-Observed: an experiment had two rule arms; the positive control was run against only
-the first. Once run against the second, **it failed on the very control workload** —
-by the experiment's own discard clause it should have been discarded on the spot, but
-its numbers had already been written into a decision document.
-
 **What to do**: the control loop must iterate over the full set of arms, not "just run
 it against the first one". This is especially dangerous when an arm is added later —
 whoever adds it usually only touches the arm under test, and forgets the control loop
@@ -153,16 +147,7 @@ is wrong". In a cross-arm comparison the latter looks exactly like correctness �
 
 ⇒ **Next to every cross-arm assertion there must be an assertion that pins down an
 absolute value.** "The three arms have equal overhead" is not enough; you also need
-"the overhead is exactly N", with N derived by independent arithmetic.
-
-Observed: a three-arm experiment with 18 unit tests, one conservation check and one set
-of positive controls — **all of them cross-arm comparisons and nothing else**. Mutation
-testing was run three rounds in a row, and every round had entries where "not a single
-test went red". They all exposed the same shape: doubling an interval parameter,
-changing the accounting basis for record charging, making one arm perform no publish at
-all — all three arms went wrong **together**, and the cross-arm comparisons still came
-out equal. One of those errors left an arm **publishing not one root** across 200,000
-operations, and no check raised an alarm.
+the overhead is exactly N", with N derived by independent arithmetic.
 
 **What to do**: once you have written a cross-arm assertion, ask yourself "if all three
 arms were wrong **together**, who would notice". If you cannot answer, add one that
@@ -209,9 +194,6 @@ of code the conclusion rests on has been tested".
 ⇒ Never write "zero blind spots"; write "all N mutations were caught" and nothing more.
 And once the conclusion is written, go back and ask: **is the arithmetic this conclusion
 comes from covered by an assertion?**
-Observed: an experiment claimed "all 9 mutations caught, zero blind spots" while the
-arithmetic its conclusion came from had zero unit tests and zero mutations — had it
-been wrong, nothing would have raised an alarm.
 
 Two pitfalls that silently disarm mutation testing:
 
@@ -220,7 +202,6 @@ Two pitfalls that silently disarm mutation testing:
    compile time** and gets recorded as an "invalid mutant" instead of "caught" — an
    assertion that should have gone red is silently disarmed. Written as
    `assert_eq!(A, B + 240)`, both sides survive to runtime.
-   Observed: two mutations recorded as invalid both went red after the rewrite.
 2. **An equivalent mutant is not a blind spot; account for it separately.** A mutation
    that agrees with the original on every input can never be caught, and does not count
    as a miss. When you judge one equivalent, pin the equivalence down as a test for the

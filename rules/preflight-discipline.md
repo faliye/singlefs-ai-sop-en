@@ -1,4 +1,4 @@
-<!-- generated-from: rules/preflight-discipline.md sha256:85d69b77fa305080b373d73d0aeacc47b5fd7e36381c22c7b1d1e01752f39834 -->
+<!-- generated-from: rules/preflight-discipline.md sha256:ef097787d167f9e1f37000875d47a2a6c789df8d8e42cdceebbb1fa0129d9963 -->
 <!-- doc-lint:rule-definition -->
 # Admission and run conditions: decide whether it may run, then run it
 
@@ -29,7 +29,7 @@ In the comment block at the head of the file (after `#!`, before the first line 
 | Form | Condition met when |
 |---|---|
 | `admission: always <reason>` | Every call is meaningful. The reason says why, for example that it judges the whole repository as it stands now |
-| `admission: inputs-changed <path…> [env:<variable>…] [arguments]` | The script itself or a listed input has changed since the last successful run. Paths are relative to the repository root, or to the script's directory when they start with `./` or `../`; `env:<variable>` and `arguments` count an environment variable and this call's arguments as inputs. Several such lines are merged into one set of inputs |
+| `admission: inputs-changed <path…> [env:<variable>…] [tool:<executable>…] [arguments]` | The script itself or a listed input has changed since the last successful run. Paths are relative to the repository root, or to the script's directory when they start with `./` or `../`; `env:<variable>` and `arguments` count an environment variable and this call's arguments as inputs; `tool:<executable>` counts the real path it resolves to on `PATH` and the standard output of its `--version` as inputs, and being absent from `PATH` is one of its values. Each line lists at least one path; several such lines are merged into one set of inputs |
 | `admission: check <command> :: <what to do if not met>` | The command exits 0 |
 | `run-condition: none <reason>` | No requirement on the environment |
 | `run-condition: command <executable…>` | All of them are on `PATH` |
@@ -37,6 +37,7 @@ In the comment block at the head of the file (after `#!`, before the first line 
 | `run-condition: check <command> :: <what to do if not met>` | The command exits 0 |
 
 The reasons of `always` and `none` and the remedy of `check` are at least 8 characters.
+`none` is only for a script that truly has no requirement on the environment; one that needs a tool, a device or a permission writes `command` or `check`, rather than leaving the script to judge it itself.
 A `check` command runs under `bash -c` at the repository root (in the script's directory outside a git repository), with `PREFLIGHT_SCRIPT` and `PREFLIGHT_SCRIPT_DIRECTORY` in its environment, and cannot read the caller's standard input.
 Outside a git repository, whether the inputs changed cannot be judged: the script runs, and no fingerprint is recorded.
 Parsing and evaluating the declarations live in one place only, `scripts/preflight.py`; its behaviour is authoritative for the forms.
@@ -50,7 +51,7 @@ Parsing and evaluating the declarations live in one place only, `scripts/preflig
 | Rust and other languages | The first statement of `main` calls a function named `preflight`: it starts `python3 <spec copy>/scripts/preflight.py check <absolute path of the source file> [--force] -- <arguments…>` directly (not through `sh -c`) and exits with the same code if that is not 0; when the line on stdout starts with `met`, it keeps the fingerprint in its last field, and when it starts with `forced`, it treats the summary in its last field as `PREFLIGHT_FORCED` |
 
 A script that declares `inputs-changed` calls `preflight_record_success` after a successful run, before it exits (Rust runs `preflight.py record <source file> --fingerprint <fingerprint at start> -- <arguments…>`).
-What is recorded is the fingerprint judged at the start; nothing is recorded if the inputs changed by the end (someone edited them during the run), if the run was forced, or if it failed.
+What is recorded is the fingerprint judged at the start; nothing is recorded if the inputs changed by the end (someone edited them during the run), if the run was forced, if it failed, or if part of it was not run this time (reported through `report_not_run` in `lib.sh`).
 
 ## When a condition is not met
 
@@ -61,12 +62,12 @@ What is recorded is the fingerprint judged at the start; nothing is recorded if 
 
 ## How gate.sh orchestrates
 
-- Before starting any stage it checks that stage's conditions; if they are not met it does not start the stage, and the summary records "not run this time" (`本次未跑`) with the unmet conditions.
+- Before starting any stage it checks that stage's conditions. A stage whose only unmet condition is "inputs unchanged" is not started, and the summary records "not run this time" (`本次未跑`);
+  a stage with any other condition unmet is not started, is recorded as failed, turns the gate red, and has its unmet conditions and remedies listed.
 - `gate.sh --force` passes `--force` to the stages whose conditions are not met; a stage run that way is recorded as "run by force" (`强制跑过`) in the summary,
   not as a pass, and it does not count as covering any item on the not-implemented list.
 - Whether a stage starts is decided by the gate's check alone: a stage that exits 78 after it has started is recorded as failed.
-- If any stage was run by force, or was not started for a reason other than "inputs unchanged", gate-ok is not advanced this round and the closing line does not say "all passed";
-  the gate's exit code only reflects whether any stage failed.
+- If any stage was run by force, gate-ok is not advanced this round and the closing line does not say "all passed"; a forced run does not make the gate's exit code non-zero.
 
 ## Which half the gate covers
 

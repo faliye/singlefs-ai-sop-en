@@ -48,7 +48,7 @@ go into the project or into this SOP; private memory holds only the user's perso
 ## 3. Did any decision change?
 
 If this round overturned or settled any design decision, **write it into
-`kb/decisions.md` right away**, with what overturned it.
+`kb/decisions.md` right away**, with its basis.
 One missing decision record means that in three months "why did we decide this?" needs
 archaeology to answer.
 
