@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:047267c7bcf442c355227adddc8f7f6914bb22825644c22c92fec20248c50a36 -->
+<!-- generated-from: rules/session-wrapup.md sha256:80f1a1af4b72eebd58ee189a969667888f9f418970def2d7ec1a7f8cd49d4bb7 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -8,19 +8,15 @@ One line, three numbers: **which milestone we are at / whether the gate passes /
 evidence is still missing.** Status is always checked now (run `gate.sh`), never
 copied from the previous round's notes.
 
-**State at the same time how much this round added to that number.** Often it is 0: a
-null result, a decision overturned, or merely establishing that some piece of evidence
-is not yet obtainable. **Then write 0.** Counting other rounds' results into this one
-turns the progress table into something that only ever goes up, and it stops being
-useful.
+**State at the same time how much this round added to that number.** A null result, a
+decision overturned, or merely establishing that some piece of evidence is not yet
+obtainable: **write 0**. Do not count other rounds' results into this one.
 
 ## 1. Any script or command typed this round that should move into `scripts/`?
 
 The criterion is "**will it get copied a second time**", not "is it well written".
 
-**Turn traps you have hit into checks that fail, not into reminder sentences.**
-Writing "careful not to do Y while X" stops nobody typing commands by hand; a check
-that **refuses to run** at that moment does.
+**Turn traps you have hit into checks that refuse to run on the spot, not into reminder sentences.**
 
 Look the other way too: is anything in there no longer used? Delete it.
 
@@ -39,57 +35,43 @@ Where to change it — look at what the item governs:
   `.claude/rules/`, or the project's `CLAUDE.md`
 
 **When in doubt, keep it in the project.** "Would another project need it" is not a
-criterion — anyone can answer "yes", and then everything gets pushed upstream.
+criterion.
 
-**Do not write it into a session's private memory.** A session's own memory (for example Claude Code's memory) lives only on this machine and is seen only by sessions on it:
-other contributors cannot see it, and subagents that do not inherit the project instructions cannot read it either. So pitfalls and conventions that someone else could run into
+**Do not write it into a session's private memory** (for example Claude Code's memory). Pitfalls and conventions that someone else could run into
 go into the project or into this SOP; private memory holds only the user's personal preferences (when to commit, which language to reply in, and the like).
 
 ## 3. Did any decision change?
 
 If this round overturned or settled any design decision, **write it into
 `kb/decisions.md` right away**, with its basis.
-One missing decision record means that in three months "why did we decide this?" needs
-archaeology to answer.
 
 **A verdict reached by argument is also a decision change.** When weighing something up
 leads you to "this one should not be settled yet" or "keep the current approach", and
 that conclusion in substance overturns a sentence already written in `kb/decisions.md`,
 that is an overturn: record it on the spot, with the grounds.
-A verdict that lives only in the conversation while the decision file stays untouched
-leaves nobody, three months later, knowing why that sentence no longer holds.
 
 ## 4. Is another session in flight in the same repository?
 
-When several sessions work concurrently, four default assumptions stop holding. Go
-through them before wrapping up:
+When several sessions work concurrently, go through these one by one before wrapping up:
 
 - **"Everything in the working tree is mine" no longer holds.** Before committing, sort
-  the changes into "this round" and "not this round" and commit only your own. Sweeping
-  another session's work-in-progress into your commit means publishing, on their behalf,
-  something they had not finished verifying.
+  the changes into "this round" and "not this round" and commit only your own.
 - **"The gate went red = I broke something" no longer holds.** On a red, first check
   whether the files it names are part of this round's changes. If they are not, report
-  honestly "red, but not from this round" and do not fix it in passing — that is another
-  session's wrap-up, still unfinished.
+  honestly "red, but not from this round" and do not fix it in passing.
   When you cannot tell, run `bash .claude/scripts/gate.sh --staged`: it runs the whole gate
-  in a temporary worktree on HEAD plus the index only, so other sessions' unstaged changes
-  and untracked files stay out — whatever goes red there is what this commit brings in.
-  Conversely, when you run without `--staged` and the working tree changes while the gate runs (you are still editing,
-  or another session is), the stages do not all read the same version and the red/green summary corresponds to no version
-  at all; `gate.sh` fingerprints the working tree at the start and at the end and goes red when they differ.
+  in a temporary worktree on HEAD plus the index only; whatever goes red there is what this commit brings in.
+  When run without `--staged`, `gate.sh` fingerprints the working tree at the start and at the end and goes red when they differ.
   **Wait until the edits stop, or use `--staged`.**
 - **Shared numbering is first-come, first-served.** For history entry ordinals,
   experiment numbers and the like, look up the highest existing number before taking
   one. Edit shared files by targeted replacement only, never by rewriting the whole
-  file — a rewrite silently erases what a concurrent session has already written.
-- **"Creating a new file overwrites no one" no longer holds.** Another session may have taken the same number
-  minutes ago and written an uncommitted file with the same name, and a tool that writes whole files overwrites it
-  silently — something that never went into git is gone once overwritten. Create new files exclusively
-  (`set -o noclobber`, `open(path, 'x')`), and look up the number in the same command that writes the first file;
+  file.
+- **"Creating a new file overwrites no one" no longer holds.**
+  Create new files exclusively (`set -o noclobber`, `open(path, 'x')`), and look up the number in the same command that writes the first file;
   where the tool layer can stop it (a pre-write hook that refuses to overwrite untracked files), stop it there.
-- **"Commit only these paths" is not `git commit -- <path>`.** A commit given paths commits what those paths hold in the **working tree**, not in the index — when the same file also carries another session's uncommitted edits, they ride along.
-  And the index itself is shared: another session can put its files into it at any moment. So before staging, confirm `git diff --cached --name-only` is empty; after staging and before committing, check the list and each file's cached diff once more, then `git commit` with no paths.
+- **"Commit only these paths" is not `git commit -- <path>`.** A commit given paths commits what those paths hold in the **working tree**, not in the index.
+  Before staging, confirm `git diff --cached --name-only` is empty; after staging and before committing, check the list and each file's cached diff once more, then `git commit` with no paths.
 
 If you collide on a number and it can be made into a check that goes red, make it one
 (`rules/show-me-test.md`, "turn traps you have hit into checks that fail"); on the

@@ -1,8 +1,8 @@
 ---
 name: decide
-description: Record or change this project's design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checker.
+description: Record or change this project's design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checks that implement it.
 ---
-<!-- generated-from: skills/decide/SKILL.md sha256:3e0052a40d68bea7ba65f465894a0f7322f601ba2ff1d410c36a538ff4c39e29 -->
+<!-- generated-from: skills/decide/SKILL.md sha256:d90eff19163d4d2682a253015bcaf65013326d76169c6484d7c0fe3c4ecb95da -->
 
 # Recording a design decision
 
@@ -34,7 +34,7 @@ are marked as not verified in this project.>
 
 1. **A changed decision must state what overturned it**, and the old conclusion moves
    into the closing "Revision history" — no old conclusions in the body.
-2. **Changing the format means updating `kb/invariants.md` and the checker in the same
+2. **Changing the format means updating `kb/invariants.md` and the check that implements it in the same
    change.** A commit where the three disagree is not accepted.
 3. **Before settling a decision, go through `kb/pitfalls.md`** and confirm you are not
    walking back into the same trap.

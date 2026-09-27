@@ -4,6 +4,28 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.61 — 2026-09-27
+
+**The upstream no longer binds the consumer project's verification methods: the project registers its own methods for the unimplemented list, and shared rules, templates and skills no longer name them; every rule now states only criteria, steps, scope, defaults and pointers, with all explanation and argument removed.**
+
+The upstream does not bind the downstream:
+- The unimplemented list in `gate.sh` carries only two shared keys, "final criterion" and "naming discipline (shell)". The project registers its own verification methods in `.claude/gate-not-implemented.tsv` at the project root: one per line, tab-separated "key, what is missing, the reminder that still applies once covered (may be empty)". A missing column, an empty key or description, or a key that repeats a shared key or an earlier line is red (stage "project-registered unimplemented methods"). The closing coverage reminder is printed per key from the registry's third column.
+- `rules/test-discipline.md` drops the three sections on crash-point replay, model-based differential testing and "the checker is the specification", and `rules/evidence-discipline.md` drops "the backward-reasoning gap specific to filesystems"; the consumer project keeps these in its own rules.
+- `skills/crash-test` is removed; `GLOSSARY.md` drops the "crash-point replay" and "model-based differential testing" entries; the dmsetup description in `env.sh` becomes generic (it is still a hard requirement).
+- The remaining mentions of model-based differential testing, crash-point replay and "the checker" in rules, templates, skills and a script's remedy become "the project's checks" and "the project's own rigs"; the column in the `kb/invariants.md` template is renamed "check state".
+- The consumer project is no longer named: the "users" section and the licence line in `README`, "rules specific to filesystem design" in `templates/CLAUDE.project.md`, "another filesystem" in `verify-before-claiming`, and the experiment number in comments and fixture names of `relay-timing-lint.py`; `consumers=` is removed from `I18N`, so rules-lint's consumer-name check now records "nothing to judge".
+
+Rules condensed:
+- The three `CLAUDE.md` files gain one line: explanations and arguments are superfluous in `rules/`.
+- Each of the 16 rules drops argument, history, measured cases and repetition, keeping only criteria, steps, thresholds, scope and exceptions, defaults and pointers; headings and numbering are unchanged, and everything referenced elsewhere is still there. The Chinese source went from 2438 to 1861 lines.
+  An independent comparison of old and new afterwards restored lost criteria and meanings that had shifted (such as "may" turned into "must", or a prohibition that lost its condition), and the disposition "kept, reason rewritten" in the `code-discipline.md` tables became "kept". English and Japanese were changed file by file to follow the Chinese and re-stamped.
+
+**What to do on upgrade**:
+- If a local stage's `# gate-covers:` uses keys other than the shared ones (for example the project's own replay or differential-testing methods), first register those keys in `.claude/gate-not-implemented.tsv` at the project root; an unregistered key is judged "an item not on the list".
+- If the project's `.claude/skills/crash-test/SKILL.md` is a stub pointing at the shared body, turn it into the project's own body; if `.claude/install-owned` lists it, delete that line (install.sh no longer lays it down, and a listing for it is judged invalid and the version stamp is not refreshed).
+
+Self-test went from 598 to 600 cases; 5 mutations of the registry parsing, all red in the expected case (one of them reverts the column split to `IFS=$'\t' read`: two adjacent tabs merge into one, so with an empty second column the third is read as the description and the line is not red).
+
 ## 0.0.60 — 2026-09-27
 
 **A gate stage whose admission or run condition is unmet is now red (only "inputs unchanged" is still recorded as not run this time); a shared stage with nothing to judge always exits 77, and a stage that ran only in part reports the skipped parts into the summary; the cargo commands in check.sh can run through a prefix the project registers (a wrapper such as a memory cap); the rules discipline and the document discipline gain the checks that can be judged in English and Japanese, and the English and Japanese translations are aligned with the source file by file.**

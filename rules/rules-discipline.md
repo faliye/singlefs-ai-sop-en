@@ -1,4 +1,4 @@
-<!-- generated-from: rules/rules-discipline.md sha256:39c7c93f3a36a344616fc0c8acf08af78d1b3303d6c2084e9677ad09cef6cec3 -->
+<!-- generated-from: rules/rules-discipline.md sha256:f95c1cdb98da2cfb6cbd17ace317062af3deb53f4821fbfce54ea79fef1c89fe -->
 <!-- doc-lint:rule-definition -->
 # Rule-file discipline
 
@@ -16,13 +16,7 @@ Design documents follow `design-doc-discipline.md`; knowledge written for model 
 | What to do by default when unsure | What it used to be: old values, old practice, how it changed |
 | Which rule lives where: pointers to other rules, scripts or kb | How the gate's discriminating power was demonstrated, and the numbers |
 
-Rules are read whole into the context of every round of work. With argument and history mixed in,
-whoever executes them — person or model — must first sort out which sentence is the order and which
-is the background; sort it wrong and they act on the background.
-
 ## 2. Keep the criterion, move the argument out
-
-These two are the easiest to confuse. One line separates them:
 
 | | What it looks like | Where it goes |
 |---|---|---|
@@ -38,7 +32,7 @@ Do not leave a summary behind.
 ## 3. What moves out is deleted
 
 **No new home for it, and no copy written somewhere else.** A shared rule's history goes where it
-always did — `CHANGELOG.md`, one section per version. That is the only destination.
+always did — `CHANGELOG.md`, one section per version; that is the only destination.
 If a deleted argument is needed again, argue it again.
 
 **Once moved, leave nothing behind**: no "(was X)", no "this used to be…" in the body.
@@ -49,9 +43,7 @@ When the body points at history in `CHANGELOG.md`, `records/` or kb, put the det
 
 > History and evidence: the 0.0.53 section of `CHANGELOG.md`. **Do not read it unless you are tracing where this came from.**
 
-Write the deterrent as "do not read" — not one word of it may be dropped. A link without it is not allowed:
-readers and models follow a link by default, and following it loads the very thing you just moved out
-back into the context.
+Write the deterrent as "do not read" — not one word of it may be dropped. A link without it is not allowed.
 
 ## 5. Rule files keep no history section
 
@@ -60,7 +52,7 @@ Shared rules record their history in `CHANGELOG.md`, one section per version.
 
 ## 6. Before adding a rule, ask whether it can become a check that fails
 
-The criterion and the how-to are in the "Boundary" section of `sop-first.md`; not repeated here.
+The criterion and the how-to are in the "Boundary" section of `sop-first.md`.
 
 ## 7. No positional references in the body, and no self-reference
 
@@ -77,10 +69,8 @@ references the criterion is the same one `kb/*.md` is held to, with the per-word
 
 Self-reference is judged only for the words that name a document structure: "this section", "this
 chapter", "this table", "this document", "this clause". Domain objects — "this experiment", "this
-decision", "the present experiment" — are **not** judged: a normative text is about how to handle a decision or
-an experiment, so "this experiment" there names the object being worked on, not a position in the text.
-References to time ("this round", "the current round") are not judged either: a rule holds for every round, so "this round"
-there is a generic. Both remain judged in `kb/*.md`.
+decision", "the present experiment" — are **not** judged, and neither are references to time ("this round",
+"the current round"). Both remain judged in `kb/*.md`.
 
 When a rule file carries the `<!-- doc-lint:rule-definition -->` marker, examples inside backticks
 and 「」 are exempt; the body itself is still judged.
@@ -89,7 +79,7 @@ Enforced by `scripts/doc-lint.sh`.
 
 ## 8. The body carries nothing specific to one consumer
 
-These rules are read by every consumer. The body may not name a project that uses them, nor its paths,
+The body may not name a project that uses these rules, nor its paths,
 nor its file names, and may not use its decision or experiment numbers as examples. Write examples in a
 form that names no one: a wiring path like `.claude/gate.d/` is a shared convention and may be written;
 a specific `.claude/gate.d/55-xxx.sh` may not.
@@ -100,7 +90,7 @@ and are left to review.
 
 ## What the gate covers
 
-`scripts/rules-lint.sh` judges the part of clauses 1, 3, 4 and 5 that can be reduced to literal patterns —
+`scripts/rules-lint.sh` judges the part of clauses 1, 3, 4 and 5 that can be reduced to literal patterns:
 record sections, dated lines, explanatory paragraphs and half-sentences, lexical explanations, and history
 links with no deterrent. It scans this package's `rules/`, and also the project's `.claude/rules/` (or `.claude/agents/`
 when that directory does not exist): the latter is started by the `gate.sh` stage "Rule discipline (project-local)"
@@ -111,8 +101,7 @@ the exclusion list only shrinks.
 Clause 7 is judged by `scripts/doc-lint.sh`, not by `rules-lint`; the names half of clause 8 is judged by `rules-lint`.
 
 **What it cannot cover**: the line in clause 2 (which sentence is criterion and which is argument), and
-whether the link under the deterrent points at the right place. Those are
-semantic judgements — a person reads them aloud, and review catches the rest.
+whether the link under the deterrent points at the right place. Those rest on a person reading them aloud, and on review.
 
 The criteria are chosen by this package's language. Chinese judges all seven; English and Japanese judge record sections, argument sections, dated lines, links without a deterrent, and consumer names,
 and recognise explanatory paragraphs and half-sentences only in the "label word plus colon" form (`Observed:`, `実測：` and the like); those opening with a conjunction, and lexical explanations, are reported explicitly as **not implemented** in these two languages,

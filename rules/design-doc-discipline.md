@@ -1,12 +1,11 @@
-<!-- generated-from: rules/design-doc-discipline.md sha256:aff80a1ea4c453f314892511806881c27bb5cef3baa955ee47faf89fa7c4b83a -->
+<!-- generated-from: rules/design-doc-discipline.md sha256:dbe3b89b77beab2c73bab53ab1bd12b8b6fb716c61adbbbfd8c568c3230f7eda -->
 <!-- doc-lint:rule-definition -->
 # Design document discipline
 
 **Applies to**: README, design notes, `records/` — **things humans read through.**
 
-Narrative, argument and context are its job; it does not have to give way to
-machines. Being good to read is the goal here, not a compromise. Knowledge
-documents have their own set of rules: see `kb-discipline.md`.
+Give the context, make the argument, write it to be read; do not give way to machines.
+Knowledge documents for model retrieval follow `kb-discipline.md`.
 
 ## 1. Body text states only the current state; history goes to the end
 
@@ -27,9 +26,8 @@ the end:
   "was X / now Y / what overturned it" at the end.
 - No `~~strikethrough~~`, `[deprecated]`, `(superseded by XX)` in the body.
 - Same for code comments: write "why it is this way now", not "how it used to be".
-  **Pitfall comments in checking code are the exception** — "this bypass measurably
-  got through, hence this check" records why the check **exists now**; delete it and
-  the next person deletes the check as redundant. The criterion is what it points at:
+  **Pitfall comments in checking code are the exception** ("this bypass measurably
+  got through, hence this check"). The criterion is what it points at:
   pointing at **why this code looks the way it does now** → keep;
   pointing at **a version that no longer exists** → delete.
 
@@ -46,8 +44,8 @@ change" section of `writing-discipline.md`; they are not copied here.
 ## 3. Where persuasion is needed, persuade properly
 
 A design document answers "why should it be done this way" and "how do I get
-started". Both need setup, examples, and the trade-offs spelled out — **none of that
+started". Setup, examples and trade-offs spelled out for those two — **none of that
 is redundancy.**
 
 Criterion: with this paragraph removed, would the reader still agree? Could they
-still get started? Yes → it can go. No → it is load-bearing.
+still get started? Yes → it can go. No → keep it.

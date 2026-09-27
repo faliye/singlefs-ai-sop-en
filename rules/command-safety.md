@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:d2b65e0a9121ed25f126c3edffa08f71dd0e352a06ed8aa6b128c0082bed1702 -->
+<!-- generated-from: rules/command-safety.md sha256:965cd6acb9f17eddcba8ca972663ccbe3e867e56e4233b30d34e69a7b5a7a548 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -7,35 +7,26 @@ by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value o
 subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
 an unguarded variable path**, and **a `wait` with no arguments**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
-can and cannot prove" — what is not done has to be said, not glossed over).
+can and cannot prove").
 
 ## Before anything you cannot take back, think once more
 
-One question decides it: **after this step, can you get back?**
-
-Two kinds cannot, and they are handled differently:
+The criterion: **after this step, can you get back?**
 
 | Kind | Examples | What to do |
 |---|---|---|
 | **Throws away uncommitted work** | `git checkout <file>`, `git restore`, `git reset --hard`, `git clean` | `git stash` or `cp` a copy out first; use them only when you mean to discard *all* uncommitted changes to that file |
 | **Deletes data outright** | `rm -rf`, `> file`, `sed -i`, `rsync --delete`, `mkfs`, `dd` | Look at the target first (`ls` / `git status` / `lsblk`); guard variable paths with `${VAR:?}` |
 
+**Run throwaway experiments on a copy**, not in the working tree.
 
-**So: run throwaway experiments on a copy**, not in the working tree.
-
-**Scripts must never contain git's undo commands.** While a script runs, nobody is
-watching `git status`, and these commands have no undo. To get to a clean state inside
+**Scripts must never contain git's undo commands.** To get to a clean state inside
 a script, `git stash` first, or copy the whole repository and work on the copy.
 
-**`rm -rf` on a variable path needs an empty-value guard.**
-`rm -rf "$d/x"` with `$d` empty becomes `rm -rf /x`; written `rm -rf "${d:?}/x"`, the
-shell errors out before `rm` runs. (`rm -rf "$d"` with nothing after it is fine: empty
-gives `rm -rf ""`, which `rm` refuses.)
+**`rm -rf` on a variable path needs an empty-value guard**: write `rm -rf "${d:?}/x"`, not
+`rm -rf "$d/x"`. `rm -rf "$d"` with nothing after it needs no guard.
 
 ## `pkill -f` / `killall` are forbidden outright
-
-The pattern string appears in the wrapper's own command line, so it **kills your own
-shell.**
 
 To stop a process: `ps` first, look at it, then kill by **literal pid** in a separate
 second command; or hand it to `scripts/proc.py stop <pid>`: it sends TERM, sends KILL if the process is still there
@@ -43,18 +34,13 @@ after `--grace` seconds (default 10), and refuses when the target is the process
 For counting, use structured criteria from `/proc` and exclude your
 own process tree.
 
-**The same pattern string inside a wait loop is another form: it kills nothing, it spins forever.**
-With a wait like `until ! pgrep -f "X"; do sleep 5; done`, the pattern matches the shell command line the
-loop itself runs in, so `pgrep` always finds a match and the loop never exits — and nothing reports an error;
-from outside it just looks like "still waiting".
-⇒ To wait for a process to end, use its **literal pid**: `until ! kill -0 "$pid" 2>/dev/null; do sleep 5; done`;
+**Do not use `pgrep -f` in a wait loop either** (a wait like `until ! pgrep -f "X"; do sleep 5; done`).
+To wait for a process to end, use its **literal pid**: `until ! kill -0 "$pid" 2>/dev/null; do sleep 5; done`;
 for a background job you started yourself, use `wait`; for one you did not start (a daemon another script launched, say), have whoever starts it write its pid to a file and wait on that.
 If the pid was not recorded, find it with `scripts/proc.py find <executable-name> [--argument <argument>]`: it compares the executable name exactly instead of matching a pattern against the whole command line, and it does not list the process tree that issues the command;
 with the pid in hand, `scripts/proc.py wait <pid> --timeout <seconds>` waits for it to exit, and if it has not exited when time is up, lists the ones still alive and exits with code 3.
 The S3 check in `scripts/shell-lint.sh` turns every `pgrep -f` in command position in a script red (after `if` /
-`while` / `until` / `!` also counts as command position), without looking at whether the same line also has a `kill`:
-assign it to a variable and kill on the next line, or just count the matches, and the pattern still hits its own
-command line.
+`while` / `until` / `!` also counts as command position), without looking at whether the same line also has a `kill`.
 Commands typed by hand are refused before they run by `scripts/claude-hooks/pattern-process-guard.sh`, which uses the same criteria as shell-lint's S2 and S3 (`PATTERN_KILL_RE` and `PATTERN_PGREP_RE` in `scripts/lib.sh`),
 and when it refuses it gives the pid-based ways to do the same thing. It is a Claude Code PreToolUse hook; a project registers it once under `hooks.PreToolUse` in `.claude/settings.json`:
 
@@ -66,20 +52,15 @@ In a session where it is not registered, commands typed by hand still rely on th
 
 ## Once you start a background task or a subagent, re-check it on a schedule, and do not force it to end
 
-Long work may run long: a build, a full replay, or a job handed to a subagent can take hours and that is normal. What needs guarding against is **a wait nobody is watching**:
-the condition it waits for will never hold, and from outside all you see is "still running".
-
-
-So:
+Long work may run long, but someone has to be watching it:
 
 - **Anything started gets re-checked.** For a task started in the background or a subagent sent off, whoever dispatched it checks on a schedule: how long since its last action,
   whether it is sitting in a wait loop, whether the same command keeps running with byte-identical output, whether the files it writes are still growing.
 - **Keep detection separate from handling.** Tools that detect stuck or spinning work (hooks, watchdog scripts) only record and report; they do not block commands, kill processes, or stop subagents.
-  Whether it ends and how it is handled is decided by whoever dispatched it, after looking. A tool that decides "timed out, kill it" also kills work that was still making progress.
+  Whether it ends and how it is handled is decided by whoever dispatched it, after looking.
   A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4: refuse, before writing, to overwrite an untracked file).
 - **Before waiting for a line in a log, make sure that line is really written to that file.**
-- In sessions such as Claude Code, when two model calls are too far apart the prompt cache expires and the whole context has to be written again:
-  put long work in the background and come back to re-check it periodically, instead of idling in the foreground.
+- In sessions such as Claude Code, put long work in the background and come back to re-check it periodically, instead of idling in the foreground.
 
 ## Within one script, run the checks in parallel when they can be
 
@@ -87,23 +68,14 @@ So:
 subprocess to do its work (a build, a test run, a VM, a python process). Then run them in parallel,
 instead of waiting for them one at a time.**
 
-The cost of one at a time is that wall-clock time adds up item by item, and once a gate is slow nobody
-runs it locally any more: whoever submits switches to pushing and letting the remote tell them whether
-it went red, and what `sop-first.md` asks for — "runs locally, and judges the same as the remote" —
-fails on the spot.
-
-
-**Once it is fast, look again at where the remaining time goes.** What remains may be a case idling on purpose (one that verifies, say, that `wait` does not return once the timeout logic is broken);
-that is not a matter of parallelism, and no amount of extra machine saves it — **parallelism cures "waiting for subprocesses one at a time"; it does not cure "whether the
-waiting is justified".**
+Once it is fast, look again at where the remaining time goes: a case that idles on purpose (one that verifies, say,
+that `wait` does not return once the timeout logic is broken) is not saved by parallelism.
 
 **These three do not go parallel**:
 
-| Case | Why |
-|---|---|
-| A later item reads an earlier item's product | There is an ordering dependency; in parallel it reads something not finished being written |
-| They share one writable state | The same temp directory, the same target directory, the same device. To go parallel, give each item its own |
-| Each item is fast by itself | Starting a process costs a few milliseconds; when an item only runs for a few milliseconds, parallelism is a net loss |
+- a later item reads an earlier item's product;
+- they share one writable state (the same temp directory, the same target directory, the same device). To go parallel, give each item its own;
+- each item is fast by itself, running only a few milliseconds.
 
 Take the degree of parallelism from `nproc`, do not hard-code it; heavy work such as VMs and builds gets
 its own ceiling from memory and devices.
@@ -114,57 +86,31 @@ words that look like paths (containing `/`, or ending in `.sh` or `.py`; options
 
 ## Parallelism must not swallow the failures
 
-**A `wait` with no arguments always exits 0.** However many of that background batch went red, it says nothing.
-
-
-| How it is written | What the parent process sees |
-|---|---|
-| `for …; do check & done; wait` | **0** |
-| `\|\| bad=1` inside the background body, parent reads `$bad` | **0**. The background body is a subshell and the assignment does not come back — that is "an assignment in a subshell does not reach the parent process" |
-| Record `pids+=($!)` when starting, then `wait "$pid"` one at a time | **7** |
-| Each item writes its exit code to its own file, read them one at a time | It is there to read |
-
-So there are only two ways to collect: take the exit code with `wait "$pid"` one at a time, or have each
-item drop its exit code into its own file and read them in a fixed order when collecting.
-For the latter: each parallel item writes its own exit-code file, and collection judges them in the order
-of the table the work was dealt from.
+There are only two ways to collect: record `pids+=($!)` when starting and take the exit code with `wait "$pid"`
+one at a time; or have each parallel item write its own exit-code file, and judge them when collecting in the
+order of the table the work was dealt from.
+A `wait` with no arguments, and `|| bad=1` inside the background body with the parent reading `$bad`, collect no exit code.
 
 S6 in `scripts/shell-lint.sh` judges this one: a `wait` with no arguments in command position turns red.
 Where the exit code really is collected elsewhere, write `# shell-lint:exit-collected <how it is collected>`
-on that line, and the reason may not be left out — the same rule as `.claude/abbreviations` and
-`.claude/naming-lint-exclude`: to be let through, write down where the exit code went.
+on that line, and the reason may not be left out.
 
-**Output must not go straight to stdout.** When two background jobs print at once, the lines past the pipe
-buffer cut into each other, and a `✗` gets separated from the way out that follows it — which is exactly what
-`sop-first.md` asks every refusal to carry. The order also comes out different on every run, so the same
-input gives different output twice over and nobody can say which version is the real one.
-So each item writes its own file, and collection reads them back in the order the work was handed out.
+**No parallel item writes its output straight to stdout.** Each item writes its own file, and collection reads
+them back in the order the work was handed out.
 
-**However many items were handed out, that many have to come back.** After going parallel, one item not
-running is not an error: its file is not there, the loop turns one time fewer, and the end still reports green.
-Count them when collecting, and turn the whole thing red when the count does not match what was handed out
-(the item "result collection needs a completeness gate" covers the same thing).
+**However many items were handed out, that many have to come back.** Count them when collecting, and turn the
+whole thing red when the count does not match what was handed out.
 
-**After making something parallel, prove again that it can go red.** Making it parallel is itself able to turn
-a check that used to go red into a green one — a bare `wait` and `|| bad=1` inside a background body are exactly that.
-Do what `show-me-test.md` says: feed it an input that must go red, and see whether the parallel version still
-goes red. A parallelization that has not been proved again amounts to switching that check off.
+**After making something parallel, prove again that it can go red.** Do what `show-me-test.md` says: feed it an
+input that must go red, and see whether the parallel version still goes red.
 
 ## Do not use echo to fake success
 
-In `cmd 2>/dev/null; echo "done"`, that echo runs **unconditionally** — it prints
-"done" even when the sudo failed.
-
+Do not report success the way `cmd 2>/dev/null; echo "done"` does.
 Any command that changes state must be verified by **reading the state back**: after
 `systemctl stop X`, confirm with `is-active`; the exit code of `stop` is not enough.
 
 ## Result collection needs a completeness gate
-
-The program under test prints results and a script outside collects them — **losing a
-line on that path is silent**. Other things get mixed into the output (text written in by
-another process, escape sequences, a previous line left without its newline), and anchoring at
-start-of-line (`grep '^ANCHOR'`) quietly drops the line whose start got overwritten.
-What you see outside is "one item fewer", not "something failed".
 
 **Do this**: have the program under test report, on its final line, how many results it
 emitted; the collector compares the count and discards the round on a mismatch.
@@ -174,11 +120,7 @@ N results and emits N−1, and it must fail.
 ## A script with a gate hands over its output only after judging it
 
 When one script both produces a result and decides whether that result is usable, **the output goes to the caller only
-after the verdict**. Print the result to stdout first and run the gate afterwards, and the caller's redirect file already
-holds an output that was judged void — the file name was chosen by the caller and looks exactly like a valid artifact.
-The exit code reported the error, but the file stays, and the next person browsing the directory will not go back to
-check what the exit code was.
-
+after the verdict**.
 
 **What to do**: write the result to a temporary file first and output it only once the gate passes; on red, stdout stays
 empty. This gate must be shown to go red as well: change the script back to "output first, judge later", and the
@@ -187,54 +129,33 @@ self-test must go red.
 ## Assignments inside a subshell do not travel back to the parent
 
 In `rc="$(run_one ...)"`, any variable `run_one` assigns is **empty in the parent**.
-If result collection depends on that variable (a log path, say) it will collect zero
-results forever while the exit code stays 0 — green light, wrong answer.
-**Pass values through a file or an argument, not through a variable.**
-
-Under `set -u` it is worse: the reference is not an empty value, it is an immediate
-"unbound variable" that **takes the script down before it prints its diagnosis**.
-Not one line of the `howto` gets printed, and those are exactly the lines to read when the harness is lying.
-A reminder comment does not stop this; it is a check that goes red in `scripts/shell-lint.sh`.
+**Pass values through a file or an argument, not through a variable.** It is a check that goes red in `scripts/shell-lint.sh`.
 
 ## After a script edits a file, read it back — a compiler warning is a free signal
 
-When a script does a string replacement on code or docs, **a match that fails to hit
-does not error — it just does nothing.** An indentation off by one space, a changed
-quote style, a trailing space on the line — the replacement silently fails, and the
-exit code is 0.
+When a script does a string replacement on code or docs, two things to do:
 
-**Two things to do**:
 1. **The replacement must assert it hit something**: zero replacements is an error to
    raise, not "ran the script, so it's done".
 2. **Read back after editing**: grep for the new content, or just run it and see
    whether the behavior changed.
 
-⚠️ **A compiler or linter warning is the cheapest signal for this failure mode — never
-wave it off.**
+**Never wave off a compiler or linter warning.**
 
 ## Three silent failures at a process boundary
 
-`set -e`, `pipefail` and environment variables all go wrong where one process calls
-another, and the form is always the same: **the exit code is right, the criterion never
-ran.**
+| Form | How to write it |
+|---|---|
+| `inner; rc=$?` under `set -e` | Take the exit code inside an `if`: `if inner; then rc=0; else rc=$?; fi` |
+| `export X="$(cmd)"` / `local x="$(cmd)"` | Assign first, `export` second — write it as two lines |
+| An environment variable used for a handshake leaking into a child process | `unset` it as soon as it is read; clear it with `env -u` when starting a child process |
 
-| Form | Measured | How to write it |
-|---|---|---|
-| `inner; rc=$?` under `set -e` | The moment the inner one goes red the outer shell exits on that very line, so nothing after it runs — and red is exactly when the result matters most | Take the exit code inside an `if`: `if inner; then rc=0; else rc=$?; fi` |
-| `export X="$(cmd)"` / `local x="$(cmd)"` | `export` and `local` are commands, and their own exit code masks the command substitution's; a failing `cmd` counts as a success | Assign first, `export` second — write it as two lines |
-| An environment variable used for a handshake leaking into a child process | The variable the outer level set for the inner one is still in the environment, and a third level started by the inner one takes it as its own input — measured: two false reds when the gate self-test ran nested | `unset` it as soon as it is read; clear it with `env -u` when starting a child process |
-
-**So the criterion is "how many process levels does this value cross"**: cross one and you
+**The criterion is "how many process levels does this value cross"**: cross one and you
 have to ask whether it is still there at the next level, and whether it should be.
 
 ## The exit code of a pipeline is not the one you want
 
-`cmd | head` followed by reading `$?` gets `head`'s exit code, not `cmd`'s.
-`cmd | grep x && do_something` has the same problem — it is judging whether `grep`
-succeeded.
-
-The result is a **swallowed failure**: `cmd` already died, and the script keeps
-going, with every later step built on a result that does not exist.
+`$?` after `cmd | head`, and `cmd | grep x && do_something`, both judge the last stage of the pipeline, not `cmd`.
 
 **What to do**: to judge whether the earlier stage succeeded, use `${PIPESTATUS[0]}`,
 or skip the pipe altogether — capture the output into a variable or file first, then
@@ -242,8 +163,7 @@ check the exit code before doing anything with it.
 
 ## Test images always go in a temporary directory
 
-Never inside the repository. Accidentally committing a multi-gigabyte image into git
-is an irreversible nuisance. Image paths come from an environment variable, defaulting
+Never inside the repository. Image paths come from an environment variable, defaulting
 to `${TMPDIR:-/tmp}`.
 
 **The harness that creates an image deletes it itself when the test ends**: on success, on failure and on panic alike. Rust uses a Drop guard; shell uses `trap … EXIT`.
@@ -258,6 +178,5 @@ What it cannot see: harnesses that hard-code `/tmp` instead of going through `TM
 
 ## Look before running anything destructive
 
-A mistyped device name in `mkfs` / `dd` / `dmsetup remove` destroys real data.
-**The target device must come from a variable, and `lsblk` must print it for
+For `mkfs` / `dd` / `dmsetup remove`, **the target device must come from a variable, and `lsblk` must print it for
 confirmation first**; never hard-code a literal `/dev/sdX`.

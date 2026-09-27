@@ -1,89 +1,46 @@
-<!-- generated-from: rules/show-me-test.md sha256:c1fb5ab46868e68c5f0f8f5b394dbe3ada82785fccf1c3c345bc1ae666f9bf38 -->
+<!-- generated-from: rules/show-me-test.md sha256:34c0d560cd0640f43a6d90a77385659013881930451f11cdbd3d7fda28bf59b5 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
 > **Make every submitted patch review-worthy.**
->
-> **Contribution throughput may be unbounded; acceptance throughput is evidence-bound.**
-
-**This is the largest difference between this project and the Linux kernel, and
-the most important rule here.**
-
-## The gate raises the floor; it does not screen people out
-
-"Make every submitted patch review-worthy" is the purpose; "Contribution throughput
-may be unbounded; acceptance throughput is evidence-bound" is the reason. That order matters.
-
-**The gate does not exist to keep anyone out. It exists to raise every submission
-to the line where it is worth spending human time on.** The mechanical parts —
-whether tests exist, whether declarations match what was measured, whether docs
-and implementation are in sync — are done by scripts, which frees human attention
-for the part only humans can judge: **is this test testing the right thing?**
-
-Why this is necessary: wherever submissions come from, that
-side only grows, while human review bandwidth has not changed. **The only thing
-that scales with it is evidence.**
-
-Put the other way round: a submission that arrives without evidence spends someone
-else's time asking "did you verify this, and how?" — the gate moves that round trip
-forward onto the submitter's own machine. **That saves work on both sides; it is
-not an obstacle course.**
 
 ## The criterion is the test
 
-**Whether a patch lands is decided by automated verification.** Every patch should
-be rigorously tested; **every carefully tested, responsible submission is welcome.**
-
-Pass is pass and fail is fail — and that protects the submitter: whether your patch
-lands depends on how solidly it is verified, not on who you are.
+**Whether a patch lands is decided by automated verification.** Pass is pass and fail is fail.
 
 ## No patch without tests is accepted
 
-**Change `crates/*/src/` and you must bring tests.** No exceptions, no "this one is
-too simple", no "I will add them in the next patch". Documentation and script
-changes are exempt.
+**Change `crates/*/src/` and you must bring tests.** No exceptions; "this one is too simple" and
+"I will add them in the next patch" do not count. Documentation and script changes are exempt.
 
-Enforced by `scripts/show-me-test.sh` (`gate.sh` runs it as one stage), not by
-good intentions.
+Enforced by `scripts/show-me-test.sh` (`gate.sh` runs it as one stage).
 
 ## A new test must first be shown to go red
 
-**Every "verification" must be able to fail.** After writing one, ask yourself: if
-this code really were broken, would my check raise the alarm?
+**Every "verification" must be able to fail.** The right procedure: **break the code under test,
+confirm the test goes red, then put it back.** A test that cannot be shown to go red is the same as no test.
 
-The right procedure: **break the code under test, confirm the test goes red, then
-put it back.** A test that cannot be shown to go red is the same as no test.
-
-Scripts cannot verify this step (they only see whether a test exists), so **state
-in the commit message how you confirmed it goes red** — which line you broke, which
-assertion you saw fail. If you cannot write that down, you did not do it.
+Scripts only see whether a test exists and cannot verify this step: **state in the commit message
+how you confirmed it goes red** — which line you broke, which assertion you saw fail. If you cannot
+write that down, you did not do it.
 
 Where a mutation harness exists, go one step further: turn "break this → that assertion
 goes red" into a **checked-in mutation list** that the replay gate keeps re-running. The
 commit-message account is the fallback for repos without a harness, not the first
-choice — an account is read once, whereas a checked-in list re-proves itself on every
-replay.
+choice.
 
-**This also governs design argument**: for every hole an adversarial round finds, first
-build a world in the model that **must report non-zero**, then change the rule. Otherwise
-nothing can check whether the fix is right — it stays green afterwards, because that
-error was never under test in the first place.
+**Design argument follows the same procedure**: for every hole an adversarial round finds, first
+build a world in the model that **must report non-zero**, then change the rule.
 
 ## Turn traps you have hit into checks that fail, not into reminder sentences
 
-"Careful not to do Y while X" stops nobody who is typing commands by hand. **A check
-that refuses to run at that moment does.** When a new trap is found, the first
-reaction is "how does this become a red line in the gate", not "which document does
-this go in".
+When a new trap is found, the first reaction is "how does this become a red line in the gate",
+not "which document does this go in": make it a check that refuses to run on the spot, not a
+reminder sentence like "careful not to do Y while X".
 
 ### But first ask which layer the trap is on: inside one apparatus, or in the measurement basis
 
-**A check standing inside one apparatus does not govern the next one.** Assertions and
-mutation testing only take effect inside the apparatus they live in; stand up a second
-apparatus, model the same thing again from scratch, and that check will not say a word.
-
-
-⇒ **The criterion is not "was this trap turned into a check that goes red", it is "which
+**The criterion is not "was this trap turned into a check that goes red", it is "which
 layer is this trap on"**:
 
 | Where the trap is | Where the check goes |
@@ -92,27 +49,23 @@ layer is this trap on"**:
 | **in the measurement basis of the model** (how the same quantity is to be computed, whether the boundary counts, what the unit is) | **between apparatuses**: when two of them compute the same quantity, a check must force them onto the same number, and go red when they disagree |
 
 **Quick criterion**: stand up a second apparatus, do the same thing from scratch — would
-you step into it again? Yes ⇒ the trap is in the measurement basis, and only a
-cross-apparatus check helps.
-⚠️ This is where whoever fixes the trap stops most easily: they really did turn it into a
-check that goes red, **the evidence is complete and the gate is green**, so they never ask
-again how far that check reaches.
+you step into it again? If yes, the trap is in the measurement basis, and the check has to
+stand across apparatuses.
 
-⚠️ **A cross-apparatus check may pin only the value, not the quantity.**
-⇒ **A cross-apparatus check must pin "which quantity this name refers to"**: two quantities get two registered names,
-each pinned to its own value; a check that only asks "is the value right" stays silent when one name is used for two
-quantities (the other side of "one semantic concept, one name across the repo" in `code-discipline.md`).
+**A cross-apparatus check must pin "which quantity this name refers to"**: two quantities get two
+registered names, each pinned to its own value ("one semantic concept, one name across the repo" in
+`code-discipline.md`).
 
 ## The final criterion is set by the project
 
-Unit tests and model-based differential testing are fast feedback. **They are not
+Checks such as unit tests are fast feedback. **They are not
 the acceptance criterion.** The acceptance criterion is bound to the thing under test: which
 environment to bring up, which workload to run, which faults to inject — the project decides,
 tests and verifies all of it itself, and the apparatus and its gate stages live in the project;
 the shared gate carries none. The unimplemented list always carries `最终判据` (final criterion). Before
 writing that key, write the acceptance criterion into the project's own kb: which environment, which workload,
 which faults. Only a stage that does all of it declares `# gate-covers: 最终判据` in its header; a stage that
-does part of it does not, because the gate cannot tell whether it is complete and the summary would claim too much.
+does part of it does not.
 A stage covering any other item on the list declares `# gate-covers: <that item>` the same way (keys are copied
 literally from `gate.sh`). Only when that stage ran and passed this round does
 `gate.sh` move the item from the unimplemented list to "covered by which stage".
@@ -120,12 +73,11 @@ literally from `gate.sh`). Only when that stage ran and passed this round does
 ## The gate must not pretend to pass
 
 Unimplemented gate stages must be **reported explicitly as unimplemented**, never
-silently skipped. A green gate that quietly did not run the crash tests is far more
-dangerous than a red one.
+silently skipped.
 
 **A project-local stage with nothing to judge this round exits 77**: `gate.sh` records it as "not run
-this time" — not a pass, and not coverage. A skip that exits 0 looks exactly like "judged and passed"
-in the summary, and the gate cannot tell the two apart; that half rests on whoever writes the stage.
+this time" — not a pass, and not coverage. A skip that exits 0 cannot be told apart from "judged and passed"
+in the summary; that half rests on whoever writes the stage.
 Shared stages follow the same rule: with nothing to judge they exit 77 (`Show me test` and the naming lint exit 3), and `gate.sh` starts them in a way that understands 77.
 
 **When a stage runs only part of its work, the skipped part is reported into the summary item by item**: cases skipped for a missing tool, samples not implemented for this language, local stages with no fixtures
@@ -133,35 +85,24 @@ are reported with `report_not_run` from `lib.sh` (a stage that does not source `
 and `gate.sh` gathers them into the summary's "not run this time"; a warning printed only in the stage's own output does not count as reporting. A run that reported such a part is not recorded as "the last success" (`rules/preflight-discipline.md`),
 and a local stage that reported one does not count as covering its `# gate-covers:` item either.
 
-Likewise: **batch scripts must not swallow per-round failures** (`|| true` and
-friends), and output paths must not be reused across rounds. Put those two together
-and a failed round quietly passes off the previous round's output as its own —
-everything looks fine, only the numbers do not move. The criterion is "can this
+**Batch scripts must not swallow per-round failures** (`|| true` and
+friends), and output paths must not be reused across rounds. The criterion is "can this
 output prove it came from this round": delete old output before the run, and check
 for a completion marker that could only have been produced by this run.
 
-**Scanning zero items is not passing either.** Write the search scope of a criterion a
-little too narrowly and every object gets skipped at the first step — neither passing nor
-failing, and the tail still reports green with nobody able to tell.
-⇒ A check that scans a set of objects must report **how many items it checked** in its
+**Scanning zero items is not passing either.**
+A check that scans a set of objects must report **how many items it checked** in its
 success line; `gate-lint.sh` enforces this: it judges the last success line in the script,
 which must carry a quantity counted in the script (a variable that was accumulated, an array length, the result of `wc -l` / `grep -c`); a script that genuinely scans no objects writes its own comment line
 `# gate-lint:nocount <reason>`, with a reason of at least 8 characters.
 
 **Reporting "how many were checked" is not enough: "which were not checked" must be listed one by one too, and that list must be computed on the spot.**
-A stage can honestly report how many items it checked while missing a whole other half of its objects: both statements are true,
-and the reader cannot see that the second one exists.
-`gate-lint` was all green, and none of the 9 timing rows in that table had run; 6 of them neither ran nor appeared on any line.
-What it hid were two real problems: one experiment's retained artifact had long stopped matching its source, and another panicked outright in a release build.
-The root cause was a hand-copied skip list — hard-coded as 4 numbers, while what really did not run was every timing row in the table plus those 4.
-**So the skip list must come from the same data as the scanned set, computed on the spot**; the success line reports both "ran N; did not run M: named one by one".
+**The skip list must come from the same data as the scanned set, computed on the spot**; the success line reports both "ran N; did not run M: named one by one".
 This is not a check yet: `gate-lint` does not look at whether a script that reports a count also lists what it skipped, so it rests on whoever writes the stage.
 
 # When a change is not rolled out across the whole repo at once, every excluded file gets registered
 
-The rule that a skip list must come from the same data as the scanned set is about the
-skip list of **one check**. The same thing holds for **one
-change**, and there it is even easier to slip past: when a spec, an operation or a change
+When a spec, an operation or a change
 covers only part of the files, **whatever it did not cover gets registered in an exclusion
 table**, one entry per line with the reason after `#`. **No exclusion table means the whole
 repo has to change.**
@@ -171,84 +112,54 @@ or would make some gate stop working": another project's terminology and verbati
 a check's own input, a tool's own pattern table, the sentence that states this very change —
 those change into errors, so register them; everything else changes.
 
-Treat the exclusion table the way a check is treated: **an entry pointing at a path that does
-not exist is a failure** — an exclusion that does nothing leaves people believing that batch
-of files was already steered around. The table has to be readable by one command; do not let
-"what was excluded" live only in the memory of whoever did the work.
+**An entry in the exclusion table pointing at a path that does not exist is a failure.** The table has to be readable by one command.
 
-**The number in the success line needs something pinning it too.** It is a success line, so it never goes red; it reports a count,
-so it satisfies "a check that scans a batch reports how many it checked"; it is not a rejection, so none of the other three `gate-lint` rules reaches it.
-Put together, a miscounted statistic can stay green in the gate indefinitely, and it is exactly the conclusion people read.
+**The number in the success line needs something pinning it too.** `gate-lint` does not cover this; it rests on whoever writes the stage.
 
-**Project-local stages follow the same rules as shared ones.** They reject submitters
-just like shared stages, so they are subject to `gate-lint` and `shell-lint` too —
+**Project-local stages follow the same rules as shared ones**, and are subject to `gate-lint` and `shell-lint` too:
 `gate.sh` hands `.claude/gate.d/` to both lints.
 
-⚠️ **The reach stops at `.claude/gate.d/`.** Scripts elsewhere in the project (research scripts, hooks) reject people just the same, yet sit outside the reach of these two lints.
-⇒ If a project has such directories, hook up a local stage in `.claude/gate.d/` that hands them to both lints, setting `GATE_LINT_DIR` and `SHELL_LINT_DIR` respectively to the target directory when calling them —
-without them the shared scripts still scan the SOP's own package by default, and judging a fixture directory red or green then mixes in the real repository's scripts.
-Hooking up gate-lint alone does only half the job
+**The reach stops at `.claude/gate.d/`.** Scripts elsewhere in the project (research scripts, hooks) sit outside the reach of these two lints.
+If a project has such directories, hook up a local stage in `.claude/gate.d/` that hands them to both lints — both, not one:
+set `GATE_LINT_DIR` and `SHELL_LINT_DIR` respectively to the target directory when calling them.
 
 # What the gate can and cannot prove
 
 > **Gate proves evidence requirements, not semantic correctness.**
 
-**This is the necessary counterweight to the epigraph "Make every submitted patch review-worthy".** Without it, "the gate
-is all green" gets read as "the code is correct" — which is precisely the kind of
-silent error this project most wants to avoid.
-
 ## Passes every gate stage and is still wrong
 
-| Case | Why the gate cannot see it |
+| Case | What the gate cannot reach |
 |---|---|
 | the test tests the implementation, not the contract | it counts whether a test exists, it does not judge whether the test is right |
 | the declaration is itself wrong | declaration and measurement agree → "matches", though the declaration is wrong. **Without a control case** that proves nothing |
-| the invariant itself is wrong | the checker will faithfully check a wrong rule, all green |
+| the invariant itself is wrong | the checks will faithfully judge a wrong rule, all green |
 | the covered path is not the one that breaks | coverage is not correctness |
-| the number in the prose disagrees with its own artifact | the replay's **range** assertion pins only which band the conclusion lands in, not the number in the prose: the wider the range, the further the prose can drift (measured: the prose said 1.475×, the kept artifact says 1.625×, the range is [1.15, 2.10] — all green) |
+| the number in the prose disagrees with its own artifact | the replay's **range** assertion pins only which band the conclusion lands in, not the number in the prose: the wider the range, the further the prose can drift |
 | two apparatuses compute different numbers for the same quantity | assertions and mutations take effect **inside one apparatus**; across apparatuses nothing is comparing anything |
 | the design is wrong | the gate cannot reach this layer at all |
 
 ## Corollaries
 
-1. **A green gate does not mean the code need not be read.**
-   Its value is freeing people from "is there a test at all" so they can look at
-   **"is the test testing the right thing"** — the part only humans can do.
+1. **A green gate does not mean the code need not be read.** People look at
+   **"is the test testing the right thing"**.
 
 2. **Semantic correctness lives in `kb/decisions.md` and `kb/invariants.md`, not in
    the gate.** The gate only guarantees those two are **written down, implemented,
    and in sync with the code**; whether they are *right* is on humans.
 
-3. **The gate is a floor, not a ceiling** (`rules/sop-first.md`). It guarantees
-   nobody falls below a line; it does **not** guarantee that anyone reaches
-   correctness.
+3. **The gate is a floor, not a ceiling** (`rules/sop-first.md`).
 
-4. **Unimplemented stages stay explicitly listed.** A missing verification method
-   means a whole class of errors that has never been looked at. `gate.sh` prints
-   that list every time precisely so "it passed" is not mistaken for "it was
-   verified". When a project stage declares coverage of an item (`# gate-covers:`),
+4. **Unimplemented stages stay explicitly listed.** `gate.sh` prints that list every time.
+   When a project stage declares coverage of an item (`# gate-covers:`),
    the item leaves the list only if that stage ran and passed this round.
 
 5. **A handed-back list that a machine confirms is complete is not thereby judged right.**
-   For work a subagent judges item by item (sweeps, re-reviews), what can be made into a check is "every item has a verdict, every verdict is one of the recognised kinds, and the reason quotes that item's own words" —
+   For work a subagent judges item by item (sweeps, re-reviews), what can be made into a check is "every item has a verdict, every verdict is one of the recognised kinds, and the reason quotes that item's own words";
    that stops "the sample was enough" and "wave the whole group through", but not wrong verdicts. So after the completeness check, still spot-check and re-judge across **every kind of verdict**; redo the stretch where a spot check hits a wrong verdict, then sample again.
 
-## Putting the criterion on evidence is exactly how we avoid treating sources differently
+## No categories by source; evidence only
 
-**Screening by source is the discriminatory option, and it does not even work.**
-
-The moment review intensity is decided by who submitted, identity has replaced
-evidence — **and a patch does not become better or worse because of who wrote it.**
-Identity is a poor predictor: it wrongs the careful newcomer and waves through the
-familiar name's careless submission alike.
-
-Evidence is different. It is the same measure for everyone, and **the submitter can
-apply it in advance** — run the gate before sending and you know where you stand.
-An identity-based criterion can never offer that.
-
-So this project **defines no categories by source** and writes no special rules for
+This project **defines no categories by source** and writes no special rules for
 any of them. There is one division only: **submissions that carry evidence, and
 those that do not.**
-
-**So the quality of the gate is how high this project's floor sits.** `scripts/`
-matters more than any crate.

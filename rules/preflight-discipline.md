@@ -1,4 +1,4 @@
-<!-- generated-from: rules/preflight-discipline.md sha256:ef097787d167f9e1f37000875d47a2a6c789df8d8e42cdceebbb1fa0129d9963 -->
+<!-- generated-from: rules/preflight-discipline.md sha256:9afbd8348c3a6efc22e73692c778c7e016bbd858eb59949bce5b2942715290ba -->
 <!-- doc-lint:rule-definition -->
 # Admission and run conditions: decide whether it may run, then run it
 
@@ -39,7 +39,7 @@ In the comment block at the head of the file (after `#!`, before the first line 
 The reasons of `always` and `none` and the remedy of `check` are at least 8 characters.
 `none` is only for a script that truly has no requirement on the environment; one that needs a tool, a device or a permission writes `command` or `check`, rather than leaving the script to judge it itself.
 A `check` command runs under `bash -c` at the repository root (in the script's directory outside a git repository), with `PREFLIGHT_SCRIPT` and `PREFLIGHT_SCRIPT_DIRECTORY` in its environment, and cannot read the caller's standard input.
-Outside a git repository, whether the inputs changed cannot be judged: the script runs, and no fingerprint is recorded.
+Outside a git repository, whether the inputs changed is not judged: the script runs, and no fingerprint is recorded.
 Parsing and evaluating the declarations live in one place only, `scripts/preflight.py`; its behaviour is authoritative for the forms.
 
 ## Check first, at the head
@@ -51,7 +51,7 @@ Parsing and evaluating the declarations live in one place only, `scripts/preflig
 | Rust and other languages | The first statement of `main` calls a function named `preflight`: it starts `python3 <spec copy>/scripts/preflight.py check <absolute path of the source file> [--force] -- <arguments…>` directly (not through `sh -c`) and exits with the same code if that is not 0; when the line on stdout starts with `met`, it keeps the fingerprint in its last field, and when it starts with `forced`, it treats the summary in its last field as `PREFLIGHT_FORCED` |
 
 A script that declares `inputs-changed` calls `preflight_record_success` after a successful run, before it exits (Rust runs `preflight.py record <source file> --fingerprint <fingerprint at start> -- <arguments…>`).
-What is recorded is the fingerprint judged at the start; nothing is recorded if the inputs changed by the end (someone edited them during the run), if the run was forced, if it failed, or if part of it was not run this time (reported through `report_not_run` in `lib.sh`).
+What is recorded is the fingerprint judged at the start; nothing is recorded if the inputs changed by the end, if the run was forced, if it failed, or if part of it was not run this time (reported through `report_not_run` in `lib.sh`).
 
 ## When a condition is not met
 

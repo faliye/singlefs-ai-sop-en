@@ -2,7 +2,7 @@
 name: gate
 description: Run this project's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:0ab33569c38c91e6dc3b9e6a850b2286d22e71b8387358ac6ab7405fc0592864 -->
+<!-- generated-from: skills/gate/SKILL.md sha256:ce424a643308ff80d7993c086fce12ad3aa2008feaf0042a020d79478b36b969 -->
 
 # The acceptance gate
 
@@ -48,19 +48,18 @@ by the zh repository's cross-language sync stage.
 ## Unimplemented stages
 
 Every run, `gate.sh` lists the verification methods the shared gate **does not implement**:
-model-based differential testing, crash-point replay, the final criterion, and naming discipline for
-shell scripts. Only the project can wire the first three in, under `.claude/gate.d/`: model-based differential
-testing needs an ideal model of the thing under test, crash-point replay needs its own write stream and checker,
-and the final criterion is set by the project.
+the final criterion, naming discipline for shell scripts, and whatever the project registered in
+`.claude/gate-not-implemented.tsv` at its root (one per line: key, what is missing, the reminder that still applies once covered).
+Only the project can wire the final criterion and its own registered items in, under `.claude/gate.d/`.
 A stage that does declares `# gate-covers: <item>` in its header (keys copied literally from
 `gate.sh`); only when it ran and passed this round does the item move under "covered by
 project-local stages".
 
 **This is not noise; it is a precondition for reading the result**: an all-green gate says only
 "documents comply + tests exist + unit tests pass", plus whatever the stages listed under
-"covered by project-local stages" each verified. While no stage covers crash-point replay, any
-claim that "the write path is verified" is false; when a stage does cover it, the claim reaches
-only as far as the write paths that stage enumerated.
+"covered by project-local stages" each verified. While no stage covers a registered item, any
+claim that "that one is verified" is false; when a stage does cover it, the claim reaches
+only as far as that stage itself verified (the reminder in the registry's third column, which `gate.sh` prints at the end).
 
 ## Common false failures
 

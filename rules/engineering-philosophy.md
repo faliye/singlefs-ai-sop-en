@@ -1,15 +1,10 @@
-<!-- generated-from: rules/engineering-philosophy.md sha256:8007f513f3688a9d75bed1c16cfe443aa40a7fa1ca44a4b82fc27b6c7486591d -->
+<!-- generated-from: rules/engineering-philosophy.md sha256:8317634233439a8267e28bd8ff87a194bed30eca09763ac065ef6a1be18a5a7d -->
 <!-- doc-lint:rule-definition -->
 # Engineering Philosophy
 
 > **AI-friendly to implement, human-friendly to review.**
 
-This is not a compromise between two goals. **They are two axes that always
-should have been separate.**
-
-They used to be conflated — because the people writing the code and the people
-reading it were the same people, so "easy to write" and "easy to read" had to be
-the same thing. **They no longer are.**
+They are two separate axes, each optimised on its own, with no compromise struck between them.
 
 ## What each axis optimises for
 
@@ -23,59 +18,46 @@ the same thing. **They no longer are.**
 
 **The direction that is friendly to a model is "more explicit", not "more obscure".**
 
-A model reading code with no names, no types and seven levels of nesting is no
-better off than a person — it gets less information, makes more mistakes, and its
-mistakes are harder to catch. **Cutting readability does not make an
-implementation more AI-friendly; it makes both sides worse.**
-
 Exactly one thing is being relaxed: **compression done so it would fit in a human
 head** — requirements like "one mechanism for everything" and "the fewer concepts
 the better", i.e. uniformity at the design level.
 
-**Not relaxed** (these look like readability; they are verifiability or
-information content):
+**Naming, one responsibility per function, bounded path count and consistent conventions are not relaxed**;
+they are kept for verifiability and information content:
 
-| Item | Why it stays |
+| Item | How far it is kept |
 |---|---|
-| Naming | **A name is information, not decoration**: meaning left out of a name is meaning a model cannot recover, even by reading the implementation |
+| Naming | meaning goes into the name, none left out |
 | One responsibility per function | a function does one **independently verifiable** thing — that sets its length, not screen height |
-| **Bounded path count** | how many cases does exhaustive coverage of this code's control flow need? If you cannot state it, or it is unbounded, it cannot be verified. **It is path count, not nesting depth** — and it is a necessary condition for verifiability, not a sufficient one |
-| Consistent conventions | inconsistent conventions defeat mechanical checking — this is a different thing from "design uniformity"; do not conflate them |
+| **Bounded path count** | you can state how many cases exhaustive coverage of this code's control flow needs, and the number is finite. **It is path count, not nesting depth** — and it is a necessary condition for verifiability, not a sufficient one |
+| Consistent conventions | conventions stay consistent. This is a different thing from "design uniformity"; do not conflate them |
 
-**The criterion is still the one in `machine-first.md`**: does this rule make the code easier
-to verify mechanically, or only easier on the human eye? All four — naming, one responsibility per function, bounded path count,
-consistent conventions — make verification easier, so they stay — **with their reasons rewritten in terms of verification and
-information, no longer hung on "readability".**
+**The criterion is the one in `machine-first.md`**: a rule that makes the code easier to verify mechanically
+stays; one that only makes it easier on the human eye can go.
 **How this lands in code is spelled out in `code-discipline.md`**: no length cap on names,
 no abbreviations, no single letters; no cap on nesting depth, but a bounded path count;
 meaning that can go into a type does not go into a name, and meaning that can go into a name does not go into a comment.
 
 ## Corollary: where human attention should go
 
-**Human attention is the most expensive thing in this system, so it should not be
-spent reading code** — that job can go to a model.
-
-It should be spent on the four things a machine cannot judge:
+Human attention is not spent reading code; reading code goes to a model. Human attention
+is spent on the four things a machine cannot judge:
 
 1. **Is this test testing the right thing?**
 2. **Is this invariant itself correct?**
 3. **Does the basis for this decision hold?**
 4. **Do we accept this trade-off?**
 
-None of the four requires reading the implementation end to end, but all four
-require **the surface presented to humans to be human-friendly**.
-
-So: gate output, kb conclusions, decision records, failure messages — **these must
-be optimised for humans, and harder than before**, because they are now the only
-things a human will look at. Code that is hard to read is an acceptable price;
-those four being hard to judge is not.
+Gate output, kb conclusions, decision records and failure messages are optimised for humans,
+so that these four can be judged without reading the implementation end to end.
+Code that is hard to read is an acceptable price; those four being hard to judge is not.
 
 ## The line between the two axes
 
 > **Gate proves evidence requirements, not semantic correctness.**
 
-That sentence is the line: **machines prove evidence requirements; humans judge
-semantic correctness.** Below it is the implementation axis; above it, review.
+**Machines prove evidence requirements; humans judge semantic correctness.**
+Below the line is the implementation axis; above it, review.
 
 ## Where this lands in this SOP
 

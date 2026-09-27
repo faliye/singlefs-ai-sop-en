@@ -1,8 +1,8 @@
-<!-- generated-from: templates/kb/invariants.md sha256:09660ba6411d31a65954eaab1da5625b297a62e404096e6b47db3f23b04f198f -->
+<!-- generated-from: templates/kb/invariants.md sha256:eacbed73704d47859829fefd0fba9f09e8839e607e6fa7e6ce761ca696af9e0a -->
 # Invariant list
 
-**The checker is the executable form of `invariants.md`.** Every entry added here means
-a check added to the checker. A commit where the two disagree is not accepted.
+**The project's checks are the executable form of `invariants.md`.** Every entry added here means
+a check added. A commit where the two disagree is not accepted.
 
 Every invariant must be written in a **decidable** form — answerable "holds / does not
 hold" against a single image. Something that cannot be written that way is not yet
@@ -16,7 +16,7 @@ Enforced by `doc-lint.sh` (`../singlefs-ai-sop/rules/kb-discipline.md`, item 5).
 
 <!-- doc-lint:registry name-col=2 -->
 
-| ID | Short name | Invariant | Checker state |
+| ID | Short name | Invariant | Check state |
 |---|---|---|---|
 | I-1.1 | <the short name> | <decidable statement> | not implemented |
 

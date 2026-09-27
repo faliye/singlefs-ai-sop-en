@@ -1,4 +1,4 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:01eb1219ec61e91e52bff7e6336ed33972387ab0ea31266b24265c0ba5d6b041 -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:9b29fc936e6e41a9191379b1d3cb81731f12e0a24d7dc225fc5aa847230fafde -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
@@ -23,8 +23,7 @@ the main line. No longer.>
 @.claude/singlefs-ai-sop/rules/preflight-discipline.md
 @.claude/singlefs-ai-sop/rules/session-wrapup.md
 
-**Rules specific to filesystem design** (transactions, crash consistency, on-disk
-format, that family) go in `.claude/rules/` and are `@`-referenced here as well. They
+**Rules specific to the thing under test** (its own design discipline, its verification methods, that family) go in `.claude/rules/` and are `@`-referenced here as well. They
 are not upstreamed — the shared SOP holds collaboration rules only.
 
 (The `@.claude/singlefs-ai-sop/...` entries above are the shared rules distributed by
@@ -38,7 +37,7 @@ place inside a project.)
 |---|---|
 | `.claude/kb/decisions.md` | Design decisions: what is settled, why, what is not |
 | `.claude/kb/experiments.md` | Experiments: the question, criteria fixed in advance, controls and mutations, the rerun command |
-| `.claude/kb/invariants.md` | The invariant list; the checker is its executable form |
+| `.claude/kb/invariants.md` | The invariant list; the project's checks are its executable form |
 | `.claude/kb/prior-art.md` | Research into other implementations, with sources and measurement bases |
 | `.claude/kb/pitfalls.md` | The pitfall list; come back to it for every design decision |
 | `.claude/kb/checks-owed.md` | Checks owed: what we know to stop but cannot yet, with prerequisites |

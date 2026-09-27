@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:e9d66c2f1bb64b9550310db547e403da9117f1836f0f6ed75be579f48c11175b -->
+<!-- generated-from: rules/writing-discipline.md sha256:3d77034abe0130dfbca37037e11a7ed1b92635b8329ae403df04cea4ffe3cd4a -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -8,7 +8,7 @@ it is for, make the length match the weight of the change, and write plainly.
 
 ## First work out who this is for
 
-**Mixing them serves neither.** Three kinds of document, three ways of writing:
+Three kinds of document, three ways of writing:
 
 | Kind | Who uses it | Goal | Rule |
 |---|---|---|---|
@@ -17,21 +17,19 @@ it is for, make the length match the weight of the change, and write plainly.
 | **Rules** | execution | must be turnable into a check that fails | `rules-discipline.md` |
 
 Before writing, ask: will this be read start to finish by a person, or pulled out
-one item at a time by a model? Different answers, different writing.
+one item at a time by a model?
 
 **The one rule common to all three**: body text states only the current state;
-history goes to the end. But the *reason* differs for each kind, and is stated in
-each rule.
+history goes to the end.
 
 ## Length must match the weight of the change
 
 **The ruler: for a change of a few to a few dozen lines, the commit body caps at two
-paragraphs and new code comments cap at one line.** If it will not fit, first suspect
+paragraphs and new code comments cap at one line.** If it will not fit, first check whether
 you are writing something that should not be written.
 
 **Cutting it down to size is the job of whoever wrote the code, not of whoever
-reviews it.** However solid the argument, that is not a reason to write all of it out
-— the paragraph you feel is "load-bearing" is often exactly the one to cut.
+reviews it.** The paragraph you feel is "load-bearing" is often exactly the one to cut.
 
 ### As short as possible without losing content
 
@@ -39,11 +37,7 @@ reviews it.** However solid the argument, that is not a reason to write all of i
 name what was lost, cut it — "it reads more smoothly" and "it looks more thorough" are
 not content.
 
-The cost of padding is not the space it takes, it is that **the useful sentence gets buried**: readers and retrieving
-models alike have to pick the one useful sentence out of the filler, and the odds of
-missing it rise with length.
-
-The three most common are none of them "wrote something new": restating a point already
+Cut these three outright: restating a point already
 made in different words, prefacing an unchallenged conclusion with a run-up, and writing
 the same criterion once positively and once negatively.
 
@@ -53,23 +47,15 @@ the next step (`sop-first.md`'s `howto`) may none of them be dropped. What to ke
 
 ### "Shorter is better" is not "shorter is righter"
 
-The first phrase carries a precondition (nothing is lost), **and the precondition is the
-first thing to fall off in transmission** — what remains, "shorter is better", gets taken
-as an instruction executable on its own, and every deletion arrives with its defence
-pre-written.
+When in doubt, keep it.
 
-**The two directions of error are asymmetric, so when in doubt, keep it**: verbosity
-costs the reader a few more seconds, but they still find it; over-cutting
-makes content **disappear**, and the reader does not know what they are missing, so they
-cannot ask for it back.
-
-Three forms of going too far, each defensible as "well, it is shorter":
+These three are cut too far:
 
 | Cut down to | What was lost |
 |---|---|
-| "measured 3.26×" | **The basis**: what hardware, what workload, what block size. A number without its basis cannot be re-checked, which is the same as not having measured |
-| "rejected" | **The next step**: `sop-first.md` requires every rejection to carry a `howto`. Dropping it is shorter, and turns the gate back into a sieve |
-| "per that one decision" | **The grounds**: why it was settled that way. Three months on, nobody knows what that sentence rests on |
+| "measured 3.26×" | **The basis**: what hardware, what workload, what block size |
+| "rejected" | **The next step**: `sop-first.md` requires every rejection to carry a `howto` |
+| "per that one decision" | **The grounds**: why it was settled that way |
 
 **The reverse test pairs with the forward test; a sentence must pass both**:
 
@@ -78,8 +64,8 @@ Three forms of going too far, each defensible as "well, it is shorter":
 
 ### Hard data does not count against the ruler
 
-Core measurements provided for review do not count toward the length: a reviewer can
-take them and verify for themselves. They are evidence, not "please take my word".
+Core measurements provided for review do not count toward the length: this covers only what a
+reviewer can take and verify for themselves.
 
 | Does not count (include it) | Still counts (cut it) |
 |---|---|
@@ -91,19 +77,17 @@ take them and verify for themselves. They are evidence, not "please take my word
 
 ### Cut these categories
 
-1. **Subjective assessment.** Reporting your impression is not an argument; replace it
-   with a checkable fact.
+1. **Subjective assessment.** Replace it with a checkable fact.
 2. **Content duplicated between the body and the kb.** Conclusions in the body,
    verification method in the kb.
 3. **Circumstantial evidence.** Evidence requiring the reader to supply a reasoning
    step; replace it with the kind that is the conclusion directly.
-4. **The full derivation chain.** How you found it step by step is not something the
-   reader needs to walk again.
+4. **The full derivation chain.** How you found it step by step: leave it out.
 5. **Background exposition in code comments.** A comment says what this line is; it
    does not carry an argument.
 6. **Defending the history.** A commit says only **what changed**; the discussion is
    in the previous round's record.
-7. **Quoted source code.** The reader has the source tree. Same for logs and dumps:
+7. **Quoted source code.** Same for logs and dumps:
    state the conclusion. The exception is decisive evidence the reader could not
    verify without it.
 
@@ -122,14 +106,14 @@ take them and verify for themselves. They are evidence, not "please take my word
 
 ### Write conjunctions as conjunctions; unpack noun strings into sentences
 
-Symbols and strings of nouns are not sentences. Replacing conjunctions with `⇒`, `×`, `+` and compressing an action into a noun string like "verbatim verification of the four mandatory sites" saves characters, but the reader has to rebuild the sentence in their head first; and a noun string needs no subject and no causation, so the writer can dodge "who did what, and why does it hold" — stiff phrasing covers for gaps in the logic.
+Do not replace conjunctions with `⇒`, `×`, `+`, and do not compress an action into a noun string like "verbatim verification of the four mandatory sites".
 
 - Where "so / because / then / but" belongs, write the word, not `⇒`; inside a table cell, where space is tight, symbols may stay.
 - Unpack noun strings: "main agent additionally verbatim-verifies four mandatory sites" becomes "I also checked the four mandatory sites word for word."
-- Keep bold for verdicts and numbers; do not bold whole sentences or paragraphs — a page of bold has no emphasis left.
-- Label-style colons ("mechanism:", "basis:", "measurement:") carry structure in a kb and may stay, but a complete sentence must follow the colon.
+- Keep bold for verdicts and numbers; do not bold whole sentences or paragraphs.
+- Label-style colons ("mechanism:", "basis:", "measurement:") may stay in a kb, but a complete sentence must follow the colon.
 
-This does not conflict with "as short as possible": what gets cut is padding, not the skeleton of the sentence. Natural is not verbose.
+This does not conflict with "as short as possible": what gets cut is padding, not the skeleton of the sentence.
 
 The gate does not check this. The `⇒` already in `rules/` have not been swept yet; do not take them as examples.
 
@@ -147,25 +131,22 @@ Three concrete questions:
 ### Don't overcorrect
 
 **Plain does not mean vague.** Terms, measurement bases, numbers and commands stay
-exact — "block size 16 KiB" must not become "blocks aren't big" in the name of
-readability.
+exact: "block size 16 KiB" must not become "blocks aren't big".
 
 **Plain does not mean opinion-free either.** "This shouldn't be settled yet", "this
-approach is wrong" — write exactly that. Saying it straight includes **stating the
-conclusion outright**.
+approach is wrong" — write exactly that, without a run-up before turning into it.
 
 ### Which half the gate handles
 
-`scripts/doc-lint.sh` checks **the fixed phrasings in a word list** — the common
-padding and archaic constructions. A hit turns red and suggests the replacement. The rules
+`scripts/doc-lint.sh` checks **the fixed phrasings in a word list** (the common
+padding and archaic constructions). A hit turns red and suggests the replacement. The rules
 proper (`rules/*.md`, `CLAUDE.md`, skill bodies) are checked the same way: the
 `<!-- doc-lint:rule-definition -->` at the head of a file exempts only the examples quoted in
 backticks and 「」; the body is checked as usual.
 
 **What it cannot check**: whether a sentence flows, whether a concession is redundant,
-whether an explanation is bloated. Those need a person to read it aloud. So a green
-word list does not mean this rule is being kept; it only means the most obvious traps
-were avoided.
+whether an explanation is bloated; those need a person to read it aloud.
+A green word list only means the traps in the word list were avoided.
 
 The word list is Chinese and covers Chinese only. In the English and Japanese repositories this check
 reports **unimplemented** explicitly rather than passing silently (`show-me-test.md`: the gate must not pretend to pass).
