@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:8203608b14dd8c69654437b3a766eea4537250fd2e7cfd546e869158e17ce7b6 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:d0035ab79ae9bca060680503219ecd5026c3effd2b303801d32d9080db1e675a -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -186,14 +186,14 @@ Before reporting an extreme found by a sweep ("minimum viable value", "maximum s
 endpoint of the swept range. If it is, write "≤ endpoint (lower edge of the sweep; boundary not measured)"; otherwise
 widen the range and re-run until the extreme falls inside it.
 
-## When you write a new criterion, sweep it back over the entries already on the books
+## When you write a new criterion, record the entries to sweep and sweep them in a batch with the next stage sync
 
 Once the criterion is written, ask: **what does it say about the entries already
 registered?** No answer means you are not done writing it.
 
-### Withdrawing a number or a conclusion also means sweeping for who cites it
+### Withdrawing a number or a conclusion also goes into the sweep list
 
-With the object swapped for **a value or a clause that has been withdrawn or rewritten**, sweep on the spot the same way.
+With the object swapped for **a value or a clause that has been withdrawn or rewritten**, sweep the same way. The sweep itself is done in batches: each new criterion and each withdrawn number gets one line in the project's sweep list and is swept in a batch with the next stage sync, not dispatched one at a time.
 **Criterion**: after withdrawing, ask "**who else in this repository still uses this
 number**". You are done only when you can produce that list. The scope is the whole
 repository, not "the places I remember".

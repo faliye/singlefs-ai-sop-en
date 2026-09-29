@@ -1,12 +1,13 @@
-<!-- generated-from: rules/session-wrapup.md sha256:80f1a1af4b72eebd58ee189a969667888f9f418970def2d7ec1a7f8cd49d4bb7 -->
+<!-- generated-from: rules/session-wrapup.md sha256:0e8a7aad4055a470f9b143458ce98178bdd4ed5622a6237993e9b6cf2437bbf9 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
 ## 0. Report progress — first, and never skipped
 
 One line, three numbers: **which milestone we are at / whether the gate passes / what
-evidence is still missing.** Status is always checked now (run `gate.sh`), never
-copied from the previous round's notes.
+evidence is still missing.**
+For the gate, cite the verdict and date of the most recent pre-commit gate run (the summary of that `gate.sh --staged` run); do not rerun the whole gate just to report progress: the gate runs only at commit time.
+The milestone and evidence entries are checked now (read the records and artefacts), never copied from the previous round's notes.
 
 **State at the same time how much this round added to that number.** A null result, a
 decision overturned, or merely establishing that some piece of evidence is not yet
@@ -16,7 +17,7 @@ obtainable: **write 0**. Do not count other rounds' results into this one.
 
 The criterion is "**will it get copied a second time**", not "is it well written".
 
-**Turn traps you have hit into checks that refuse to run on the spot, not into reminder sentences.**
+**Turn traps you have hit into checks that refuse to run, not into reminder sentences.** When to add them follows the "Boundary" section of `sop-first.md`: record them as debt first and add them in batches.
 
 Look the other way too: is anything in there no longer used? Delete it.
 

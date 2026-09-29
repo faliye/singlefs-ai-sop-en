@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:c3bea54508176dd8f012fd1728b5628fa53d1afd2f953263d88dc9cbc87fe173 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:2a1eaf9f7e7be7dcf914d6b238533af4344fbb9ed9c3a62fcad7953b292387f9 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -12,7 +12,7 @@ without my knowing:
 
 | What you are about to say | The command to run now |
 |---|---|
-| whether the gate passes right now | run `scripts/gate.sh`; do not infer it from the last run |
+| whether the gate passes right now | cite the summary of the most recent `gate.sh --staged` run (with its date and the hash of that tree); if anything changed after it, do not say "passes" — say "green last time; these later changes have not been run". The gate runs only at commit time; do not rerun it just to say this |
 | whether some invariant is implemented | read the status column in `kb/invariants.md`, then grep the source of the check that implements it to confirm it is really there |
 | whether some decision is settled | read `kb/decisions.md` and see which of settled / partly settled / open it is |
 | whether the toolchain and environment are complete | run `scripts/env.sh` |

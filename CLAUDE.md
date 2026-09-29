@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:47b40bbd6e6f076537132995fba50313796987d088507d749c337d1acd6d8170 -->
+<!-- generated-from: CLAUDE.md sha256:d3ce3af84b2dd2cb3a71d48721208b337d63316853cd79834446ddc08570b88a -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -8,7 +8,9 @@ designed. It has exactly one user, named in `I18N` under `consumers=`.
 Work inside this repository is bound by these rules too.
 
 Changing the spec proper **must bump `VERSION` in the same change**; otherwise
-the project's gate will report a version mismatch. **Which paths count as "the spec
+the project's gate will report a version mismatch.
+Releases are batched weekly: rule and script changes accumulate in the working tree and go out as one version a week; fixes for false positives and misjudgements accumulate into that version; the consumer project syncs its copy once per release.
+**Which paths count as "the spec
 proper" is defined by `GOVERNED` in `scripts/version-discipline.sh`** — that is the
 only list, and it is not copied here.
 A bump comes with a section for that version at the top of `CHANGELOG.md` — one section per

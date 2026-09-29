@@ -1,12 +1,12 @@
-<!-- generated-from: rules/preflight-discipline.md sha256:9afbd8348c3a6efc22e73692c778c7e016bbd858eb59949bce5b2942715290ba -->
+<!-- generated-from: rules/preflight-discipline.md sha256:9ba88c3dbbe5e843514acfdb6738d858d102a541e9ea30cc7253db85253fe282 -->
 <!-- doc-lint:rule-definition -->
 # Admission and run conditions: decide whether it may run, then run it
 
 **Every script states at its head when it should be called and when it must not be, and checks that before it does any work: if a condition is not met it refuses to run, and only `--force` makes it run anyway.**
 
-This covers every script: this package's `install.sh` and `scripts/` (including `scripts/claude-hooks/` and `scripts/githooks/`),
-the project's `.claude/gate.d/`, `.claude/scripts/` and `.claude/hooks/`, and the directories the project registers in `.claude/preflight-dirs` —
-register wherever the experiment scripts and the source files of experiment binaries live. Each directory counts only its own level; register a subdirectory on a line of its own.
+This covers these places: this package's `install.sh` and `scripts/` (including `scripts/claude-hooks/` and `scripts/githooks/`),
+the project's `.claude/gate.d/`, and the directories the project registers in `.claude/preflight-dirs` — what gets registered are the heavy places whose rerun is decided by their inputs:
+register wherever the experiment scripts and the source files of experiment binaries live. The project's `.claude/scripts/`, `.claude/hooks/` and other light scripts do not declare admission and run conditions. Each directory counts only its own level; register a subdirectory on a line of its own.
 `.claude/preflight-dirs` has one `<directory>  # what lives there` per line; a project without experiments still creates the file, with one comment line saying so.
 
 Three kinds are not judged: libraries that are sourced or imported, fixtures, and wrappers that only `exec` a shared script (the few lines install.sh lays down; a wrapper with any other logic in it is judged like any script).

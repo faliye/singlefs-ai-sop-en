@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:abbb457440c6d14cb6c52c5c74d5a71fa153b46b3719ab5103c6b2179ca83242 -->
+<!-- generated-from: rules/kb-discipline.md sha256:b8bfc5f04f65170e669bed11fac118079de7b72d86c9f3a53be3d3782b4c57e8 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -116,6 +116,8 @@ half —
 | The registry table is not broken | the marker sits directly above its table, every row reaches the name column, `name-col` ≥ 2 |
 | Citations carry the name | every citation reads `number（short name）` and matches the registration site (ignoring `**`/`` ` `` and how much whitespace) |
 | The converse | an id-shaped token recurring **≥3 times** with no registration site at all |
+
+For citations missing their short name, first run `scripts/doc-lint-fix-names.py <file>` to add "（short name）" from the registration sites, then run `doc-lint.sh`; it only adds and never judges — whether registration sites and short names are right is still judged by `doc-lint.sh`.
 
 **The half only a person can do**: the substitution criterion (does the sentence still
 read once every number is replaced by its defining phrase). Lowercase numbers (`o1`), citation

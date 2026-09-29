@@ -1,4 +1,4 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:9b29fc936e6e41a9191379b1d3cb81731f12e0a24d7dc225fc5aa847230fafde -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:f0b528aa29254c6b4815f6431d9ea38f54ffcebe95cf5deb0626bc5914604bf6 -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
@@ -6,22 +6,21 @@ the main line. No longer.>
 
 ## Rules (always in force)
 
-@.claude/singlefs-ai-sop/rules/engineering-philosophy.md
 @.claude/singlefs-ai-sop/rules/sop-first.md
 @.claude/singlefs-ai-sop/rules/show-me-test.md
-@.claude/singlefs-ai-sop/rules/machine-first.md
 @.claude/singlefs-ai-sop/rules/code-discipline.md
 @.claude/singlefs-ai-sop/rules/writing-discipline.md
-@.claude/singlefs-ai-sop/rules/design-doc-discipline.md
 @.claude/singlefs-ai-sop/rules/kb-discipline.md
 @.claude/singlefs-ai-sop/rules/rules-discipline.md
 @.claude/singlefs-ai-sop/rules/test-discipline.md
 @.claude/singlefs-ai-sop/rules/evidence-discipline.md
 @.claude/singlefs-ai-sop/rules/verify-before-claiming.md
-@.claude/singlefs-ai-sop/rules/pushback-discipline.md
 @.claude/singlefs-ai-sop/rules/command-safety.md
 @.claude/singlefs-ai-sop/rules/preflight-discipline.md
 @.claude/singlefs-ai-sop/rules/session-wrapup.md
+
+The four philosophy rules are not `@`-loaded permanently: read each in full once at the start of a session, then look it up by name: `.claude/singlefs-ai-sop/rules/engineering-philosophy.md`, `.claude/singlefs-ai-sop/rules/machine-first.md`, `.claude/singlefs-ai-sop/rules/design-doc-discipline.md`, `.claude/singlefs-ai-sop/rules/pushback-discipline.md`.
+<!-- doc-lint:read-once engineering-philosophy.md machine-first.md design-doc-discipline.md pushback-discipline.md -->
 
 **Rules specific to the thing under test** (its own design discipline, its verification methods, that family) go in `.claude/rules/` and are `@`-referenced here as well. They
 are not upstreamed — the shared SOP holds collaboration rules only.

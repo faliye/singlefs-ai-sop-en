@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:34c0d560cd0640f43a6d90a77385659013881930451f11cdbd3d7fda28bf59b5 -->
+<!-- generated-from: rules/show-me-test.md sha256:649a28bd3481acbe4b11d62f6ff62e60440c169b8a7c85802a11e5f00dea750f -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -33,6 +33,8 @@ choice.
 build a world in the model that **must report non-zero**, then change the rule.
 
 ## Turn traps you have hit into checks that fail, not into reminder sentences
+
+When to add one follows the "Boundary" section of `sop-first.md`: record it as debt first and add it in a batch; one that keeps recurring right now is added on the spot.
 
 When a new trap is found, the first reaction is "how does this become a red line in the gate",
 not "which document does this go in": make it a check that refuses to run on the spot, not a

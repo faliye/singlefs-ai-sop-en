@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:3d77034abe0130dfbca37037e11a7ed1b92635b8329ae403df04cea4ffe3cd4a -->
+<!-- generated-from: rules/writing-discipline.md sha256:7dc3c6c818ef7df14ec265b4b6a35f22c8b73c972d00fc0650236ae229c3373d -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -91,7 +91,7 @@ reviewer can take and verify for themselves.
    state the conclusion. The exception is decisive evidence the reader could not
    verify without it.
 
-## Write plainly
+## Keep the style simple and natural
 
 **Write in plain modern English. Say it straight; don't circle around it.**
 

@@ -4,6 +4,36 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.62 — 2026-09-29
+
+**A newly found trap still becomes a check that goes red, but when to add it is now decided in batches; progress reports no longer rerun the whole gate; sweeps are done in batches; the stop hook gate-reuse-check may be left unregistered; the project's light scripts no longer declare admission and run conditions; four philosophy rules are no longer `@`-loaded permanently in the project; new `doc-lint-fix-names.py` adds missing short names; `history-ordinal` recognises nested history sections; releases are batched weekly.**
+
+Rules:
+- `sop-first.md` "Boundary": what can become a check keeps its form (a check that goes red, not a reminder), but is added in batches: a trap is first recorded in the project's debt table and the batch is assessed weekly, merging checks that judge the same thing on the same objects; a trap recurring right now, or one that destroys data, is added on the spot. Every gate and hook states a retirement criterion. "Add the gate check first" and "newly found trap" in the same file, the section in `show-me-test.md` and item 1 of `session-wrapup.md` point to it.
+- Item 0 of `session-wrapup.md` and "whether the gate passes right now" in `verify-before-claiming.md`: cite the summary of the most recent `gate.sh --staged` run (date and tree hash); with changes since, say "green last time; these later changes have not been run". Do not rerun the whole gate to report progress.
+- `evidence-discipline.md`: sweeping for a new criterion or a withdrawn number is done in batches: each gets one line in the project's sweep list and is swept with the next stage sync; the two headings are renamed accordingly.
+- `preflight-discipline.md`: on the project side only `.claude/gate.d/` and the directories registered in `.claude/preflight-dirs` are covered; light scripts such as `.claude/scripts/` and `.claude/hooks/` do not declare admission and run conditions.
+- `sop-first.md` "Who checks": the stop hook `gate-reuse-check.sh` is optional; the overlap check rests on the "Gate overlap check" stage before commit.
+- Item 5 of `kb-discipline.md`: for citations missing their short name, run `doc-lint-fix-names.py` first, then `doc-lint.sh`.
+- `writing-discipline.md`: the section "Write plainly" is renamed "Keep the style simple and natural".
+- `CLAUDE.md` in all three languages: releases are batched weekly. The zh `README`: the copy does not carry this repository's own `CLAUDE.md`.
+- Template `CLAUDE.project.md`: engineering-philosophy, machine-first, design-doc-discipline and pushback-discipline are not `@`-loaded permanently; they are read in full once per session and registered in `<!-- doc-lint:read-once … -->`.
+
+Scripts:
+- `hooks-registered.sh` ("Tool-layer gates"): a hook of this package whose header has `# hook-registration: optional <reason>` may be left unregistered, and the success line lists each such hook; a reason under 8 characters is red; the line counts for nothing in the project's own hooks. `gate-reuse-check.sh` carries the line; `gate-overlap.py` treats it as a machine directive, not as the description.
+- `doc-lint.sh`: the rule-list check (K) accepts rules registered in `<!-- doc-lint:read-once … -->`; the time-reference check (D-3) looks for a date in every ancestor heading, so `#### ` entries under a `### date` are recognised; a kb file that is a history registry throughout carries `<!-- doc-lint:history-registry -->` and is not matched against the reference, history-statement and style word lists from its first `## ` on (kb only; elsewhere it is red); when a file had so many citations without a short name that the output overflowed the pipe buffer, the step listing the first 3 made the whole script exit 141 and skip every later check — it now reads all of its input.
+- New `doc-lint-fix-names.py`: from the two registration forms doc-lint recognises, adds "（short name）" to bare numbers, leaving numbers inside another number's short-name parenthetical alone; it only adds and never judges. It has `--selftest`, which goes red with the breakage switch `DOC_LINT_FIX_NAMES_BREAK=touch-registry`.
+- `history-ordinal.sh`: scans every `.md` under `.claude/kb`; the position key is "`## ` section + `### date` + the named item", and only the same key with the same ordinal counts as a clash; the old `### date（其 N）` form is still recognised. Key extraction moved to the new `history-ordinal-keys.py` (its absolute path is taken before the `cd` to the repository root, so a relative invocation still finds it); the baseline pools keys over the whole kb tree.
+- `preflight-lint.py`: the project directories are only `.claude/gate.d/`; wrappers laid down by install.sh in registered directories are not judged separately either.
+
+**What to do on upgrade**:
+- If the project `CLAUDE.md` follows the template and drops the `@` for those four rules, write `<!-- doc-lint:read-once engineering-philosophy.md machine-first.md design-doc-discipline.md pushback-discipline.md -->` in the same file, or doc-lint reports them as unreferenced.
+- To drop the stop hook, remove `gate-reuse-check.sh` from `Stop` and `SubagentStop` in `.claude/settings.json`; if kept, it stays on both.
+- Delete the lines in `.claude/preflight-exclude` that point into `.claude/scripts/` or `.claude/hooks/`: those places are no longer judged, and a leftover line is reported as excluding no script.
+- Build the debt table and sweep list in whatever form the project uses.
+
+Self-test grew from 600 to 608 cases; the three decisions of optional registration each got one mutation (optional declaration ignored, project hooks let through, reason length dropped), all caught.
+
 ## 0.0.61 — 2026-09-27
 
 **The upstream no longer binds the consumer project's verification methods: the project registers its own methods for the unimplemented list, and shared rules, templates and skills no longer name them; every rule now states only criteria, steps, scope, defaults and pointers, with all explanation and argument removed.**
