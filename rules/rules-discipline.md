@@ -1,4 +1,4 @@
-<!-- generated-from: rules/rules-discipline.md sha256:f95c1cdb98da2cfb6cbd17ace317062af3deb53f4821fbfce54ea79fef1c89fe -->
+<!-- generated-from: rules/rules-discipline.md sha256:da9396081f8c1be1fb32197439ec6e63e9ed3d1096113f89cdf143b27b11493f -->
 <!-- doc-lint:rule-definition -->
 # Rule-file discipline
 
@@ -84,25 +84,23 @@ nor its file names, and may not use its decision or experiment numbers as exampl
 form that names no one: a wiring path like `.claude/gate.d/` is a shared convention and may be written;
 a specific `.claude/gate.d/55-xxx.sh` may not.
 
-The consumer list is registered in `I18N` under `consumers=`, in one place and copied nowhere else.
-`scripts/rules-lint.sh` judges the names; numbers and file names used as examples are beyond a machine
-and are left to review.
+The gate does not judge this clause; it is left to review.
 
 ## What the gate covers
 
 `scripts/rules-lint.sh` judges the part of clauses 1, 3, 4 and 5 that can be reduced to literal patterns:
-record sections, dated lines, explanatory paragraphs and half-sentences, lexical explanations, and history
+record sections, argument sections, dated lines, explanatory paragraphs and half-sentences, lexical explanations, and history
 links with no deterrent. It scans this package's `rules/`, and also the project's `.claude/rules/` (or `.claude/agents/`
 when that directory does not exist): the latter is started by the `gate.sh` stage "Rule discipline (project-local)"
 (`规则纪律（项目本地）`), so the project wires up nothing of its own. Files not yet swept are registered
 one per line in the project root's `.claude/rules-lint-exclude`; delete a line once that file is done —
 the exclusion list only shrinks.
 
-Clause 7 is judged by `scripts/doc-lint.sh`, not by `rules-lint`; the names half of clause 8 is judged by `rules-lint`.
+Clause 7 is judged by `scripts/doc-lint.sh`, not by `rules-lint`; clause 8 is not judged by the gate.
 
 **What it cannot cover**: the line in clause 2 (which sentence is criterion and which is argument), and
 whether the link under the deterrent points at the right place. Those rest on a person reading them aloud, and on review.
 
-The criteria are chosen by this package's language. Chinese judges all seven; English and Japanese judge record sections, argument sections, dated lines, links without a deterrent, and consumer names,
+The criteria are chosen by this package's language. Chinese judges all seven; English and Japanese judge record sections, argument sections, dated lines, and links without a deterrent,
 and recognise explanatory paragraphs and half-sentences only in the "label word plus colon" form (`Observed:`, `実測：` and the like); those opening with a conjunction, and lexical explanations, are reported explicitly as **not implemented** in these two languages,
 rather than passing silently (`show-me-test.md`: the gate must not pretend to pass).

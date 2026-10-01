@@ -1,11 +1,11 @@
-<!-- generated-from: templates/kb/checks-owed.md sha256:74c80b383b7c5b7e570e54f7935e18e0adf9d744be214a0abe2774974c2da6be -->
-# Checks owed
+<!-- generated-from: templates/kb/checks-owed.md sha256:f9cb7139da3599605dabba3a49ff1d6e6bb8bbe4cb98943dee70dfff5b7a1ea4 -->
+# Debt table
 
 **`checks-owed.md` holds checks we already know we want but cannot yet enforce.**
 
 The line against `invariants.md`: an invariant is a property **decidable against one
-image**, and the project's checks are its executable form; `checks-owed.md` holds requirements on
-**code paths** — undecidable from an image, enforceable only by the gate at run time.
+state or artefact of the system under test**, and the project's checks are its executable form; `checks-owed.md` holds requirements on
+**code paths** — undecidable from a state or artefact, enforceable only by the gate at run time.
 
 **The bar for writing one down**: you can state what it stops, how it goes red, and what
 prerequisite is missing. Missing any of the three means it is not thought through yet;

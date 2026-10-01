@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:d0035ab79ae9bca060680503219ecd5026c3effd2b303801d32d9080db1e675a -->
+<!-- generated-from: rules/evidence-discipline.md sha256:331758182ab764bbae6a996aa6eecc2a56593d30eb9db9b634816c7148753e7d -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -191,9 +191,9 @@ widen the range and re-run until the extreme falls inside it.
 Once the criterion is written, ask: **what does it say about the entries already
 registered?** No answer means you are not done writing it.
 
-### Withdrawing a number or a conclusion also goes into the sweep list
+### Withdrawing a number or a conclusion also goes into the debt table
 
-With the object swapped for **a value or a clause that has been withdrawn or rewritten**, sweep the same way. The sweep itself is done in batches: each new criterion and each withdrawn number gets one line in the project's sweep list and is swept in a batch with the next stage sync, not dispatched one at a time.
+With the object swapped for **a value or a clause that has been withdrawn or rewritten**, sweep the same way. The sweep itself is done in batches: each new criterion and each withdrawn number gets one line in the project's debt table and is swept in a batch with the next stage sync, not dispatched one at a time.
 **Criterion**: after withdrawing, ask "**who else in this repository still uses this
 number**". You are done only when you can produce that list. The scope is the whole
 repository, not "the places I remember".

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:b8bfc5f04f65170e669bed11fac118079de7b72d86c9f3a53be3d3782b4c57e8 -->
+<!-- generated-from: rules/kb-discipline.md sha256:fbc02aee6ce61e677bf2b4538c3912bba341d07369454023c4ef5ca500b68b47 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -11,7 +11,7 @@ The kb is written for **being pulled out one item at a time**, not for being rea
 
 A fact must still hold when retrieved alone, without the other paragraphs in its section.
 
-**No dangling references** — "as stated above", "same as above", "see above",
+**No positional references** — "as stated above", "same as above", "see above",
 "mentioned earlier", "the aforementioned", "as described below";
 positional references such as "see below", "see the section below", "see the table above", "that
 table above"; the bare forms without "see": "the above-mentioned", "the text below", "the table below",
@@ -35,7 +35,7 @@ only in the two forms that carry 见 ("see above", "see below"); the bare words
 Write the anchor: a date plus "that round", or the number of the experiment in question. A sentence that genuinely means any round should be rewritten without the reference
 ("the round that ran it" becomes "the run that produced this artefact").
 
-The gate's criterion is **whether this line, or the nearest heading above it, carries a date**; if so it
+The gate's criterion is **whether this line, or a heading at any level above it, carries a date**; if so it
 passes. Three things are not checked: "the next round"; "this time" / "last time"; entries in a history section.
 Compounds whose character to the left is 样, such as 样本轮 ("sample round"), are not judged.
 
@@ -137,13 +137,14 @@ No setup, no transitions, no conclusions to round things off.
 
 ## 8. Body text states only the current state; history goes to a "Revision history" at the end
 
-Every kb document must close with a "## Revision history" section; keep the section
-even with no history yet. `INDEX.md` is the exception.
+Which kb files carry history is registered in `.claude/history-carriers` at the project root: one directory or file per line (relative to the project root), with the reason after `#`.
+A registered file must close with a "## Revision history" section, kept even with no history yet; an unregistered file must not have that section — change its body directly, and the history lives in git.
+Without that registry, every file under kb must close with the section. `INDEX.md` is never judged.
 Enforced by `scripts/doc-lint.sh`.
 
 ### A dated snapshot of the current state is history too, and stays stuck on that day
 
-A current-state sentence carries no date: when the state changes, change the current value, and write what it looked like on that day into "## Revision history".
+A current-state sentence carries no date: when the state changes, change the current value, and write what it looked like on that day into "## Revision history" (not in a file that is not registered as carrying history; there the history lives in git).
 For an existing dated current-state sentence ("Status on <date>: …" and the like), delete the date and keep the fact; check the fact itself once first (`verify-before-claiming.md`), and if it is stale, change it to the current value.
 To tell whether a dated sentence is a current-state sentence, delete the date and read it again — if it reads as saying how things are today (whether something exists, how many, what is still owed), it is a current-state sentence;
 only if it reads as saying what was done that day (changed to, settled, ran once) is it an event sentence.

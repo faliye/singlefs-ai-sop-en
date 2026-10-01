@@ -2,7 +2,7 @@
 name: decide
 description: Record or change this project's design decision. Use it when settling a decision, overturning an old one, or finding that a choice cascades into others — covers the record format, the state machine, and how it must stay in step with the invariant list and the checks that implement it.
 ---
-<!-- generated-from: skills/decide/SKILL.md sha256:d90eff19163d4d2682a253015bcaf65013326d76169c6484d7c0fe3c4ecb95da -->
+<!-- generated-from: skills/decide/SKILL.md sha256:7473d96b9e9b1acb16d7af10fef38faddef60c0d1b9ed5908b778e1836f069ec -->
 
 # Recording a design decision
 
@@ -32,8 +32,10 @@ are marked as not verified in this project.>
 
 ## Hard requirements
 
-1. **A changed decision must state what overturned it**, and the old conclusion moves
-   into the closing "Revision history" — no old conclusions in the body.
+1. **A changed decision must state what overturned it**, and no old conclusion stays in the body.
+   If the file is registered in `.claude/history-carriers` at the project root (without that registry, every file under kb counts),
+   the old conclusion moves into the closing "## Revision history"; if it is not registered, edit the body directly and the history lives in git
+   (`rules/kb-discipline.md` item 8).
 2. **Changing the format means updating `kb/invariants.md` and the check that implements it in the same
    change.** A commit where the three disagree is not accepted.
 3. **Before settling a decision, go through `kb/pitfalls.md`** and confirm you are not
@@ -42,7 +44,7 @@ are marked as not verified in this project.>
 5. **Finding that the reason that actually carries a settled decision has changed is
    itself a decision change.** Experiments routinely replace "the reason given when we
    settled it" with a different, decisive one; swap the basis in the body for the
-   measured one and record the change — even when the state does not move.
+   measured one; if the file is registered in `.claude/history-carriers`, also record the change in "## Revision history" — even when the state does not move.
    Leave only the original sentence and, three months on, nobody knows what is
    actually holding it up.
 6. **Touch a clause a person settled, and you owe an open entry in `kb/checks-owed.md`.**

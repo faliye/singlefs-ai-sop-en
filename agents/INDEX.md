@@ -1,9 +1,9 @@
-<!-- generated-from: agents/INDEX.md sha256:469140a3d88e0740cdc316de689d0ddb321b208edc4b50342d6e7cff1013a3dd -->
+<!-- generated-from: agents/INDEX.md sha256:e3686fade301940ad38df3ea8347b6a4ee3cb1bd9b521a6e3b5a724703e3bb01 -->
 # Shared subagent definitions
 
 **This layer is governed; it is currently empty.** Empty is a state, not an oversight —
 writing it down explicitly: "there is none" and "we forgot" look identical in a
-directory listing (`rules/kb-discipline.md`: a blank is more dangerous than an error).
+directory listing (`rules/kb-discipline.md` section 3, "Record "we do not know" explicitly").
 
 ## What belongs here
 
@@ -14,7 +14,7 @@ The line against `skills/`:
 |---|---|---|
 | A procedure a person or the main model follows | `skills/` | It is **read**; it needs no separate context |
 | Work that needs its own context and returns only a conclusion | `agents/` | It is **delegated**; the main line should not drown in its intermediate output |
-| A delegation that only makes sense in one project | the project's `.claude/agents/` | Not upstreamed (the division criterion in `CLAUDE.md`) |
+| A delegation that only makes sense in one project | the project's `.claude/agents/` | Not upstreamed: whatever governs how the system under test is designed stays project-local, and so does anything you are unsure about |
 
 **When in doubt, keep it project-local.** A subagent that should not have been
 upstreamed has to be worked around in every round that follows.
@@ -35,7 +35,7 @@ description: <when to delegate it. This sentence is the main model's only basis 
 ```
 
 **`description` decides whether it gets used correctly.** "Reviews code" tells nobody
-when to reach for it; "after a mutation run, decides which blind spots are equivalent
+when to reach for it; "after a mutation run, decides which uncaught mutants are equivalent
 mutants" does.
 
 ## Three disciplines

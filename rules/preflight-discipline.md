@@ -1,4 +1,4 @@
-<!-- generated-from: rules/preflight-discipline.md sha256:9ba88c3dbbe5e843514acfdb6738d858d102a541e9ea30cc7253db85253fe282 -->
+<!-- generated-from: rules/preflight-discipline.md sha256:34b5c81a1806d2f73fba315b12e0dba8bbbf7a6793f5ac782243e42440e1f2db -->
 <!-- doc-lint:rule-definition -->
 # Admission and run conditions: decide whether it may run, then run it
 
@@ -48,7 +48,7 @@ Parsing and evaluating the declarations live in one place only, `scripts/preflig
 |---|---|
 | shell | After `source lib.sh` (hooks that do not source lib.sh source `preflight.sh`) and before the first thing that does work, copy this line verbatim: `preflight "${BASH_SOURCE[0]}" "$@"; set -- ${PREFLIGHT_ARGUMENTS[@]+"${PREFLIGHT_ARGUMENTS[@]}"}`. Before it only `set <options>`, `shopt`, `source`, lines that are nothing but assignments and do not read the arguments, and `unset` are allowed |
 | python | Set `sys.dont_write_bytecode = True` first, then import this package's `scripts/preflight.py`; the first statement under `if __name__ == '__main__':` calls `preflight(__file__)`; without that block, the call goes before the module's first statement that does work. Top-level statements before it may not read the arguments or standard input, start a subprocess, or open a file |
-| Rust and other languages | The first statement of `main` calls a function named `preflight`: it starts `python3 <spec copy>/scripts/preflight.py check <absolute path of the source file> [--force] -- <arguments…>` directly (not through `sh -c`) and exits with the same code if that is not 0; when the line on stdout starts with `met`, it keeps the fingerprint in its last field, and when it starts with `forced`, it treats the summary in its last field as `PREFLIGHT_FORCED` |
+| Rust and other languages | The first statement of `main` calls a function named `preflight`: it starts `python3 <spec copy>/scripts/preflight.py check <absolute path of the source file> [--force] -- <arguments…>` directly (not through `sh -c`); if that exits 78 it exits 78, and on any other non-zero code it exits 1; when the line on stdout starts with `met`, it keeps the fingerprint in its last field, and when it starts with `forced`, it treats the summary in its last field as `PREFLIGHT_FORCED` |
 
 A script that declares `inputs-changed` calls `preflight_record_success` after a successful run, before it exits (Rust runs `preflight.py record <source file> --fingerprint <fingerprint at start> -- <arguments…>`).
 What is recorded is the fingerprint judged at the start; nothing is recorded if the inputs changed by the end, if the run was forced, if it failed, or if part of it was not run this time (reported through `report_not_run` in `lib.sh`).

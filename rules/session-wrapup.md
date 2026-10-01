@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:0e8a7aad4055a470f9b143458ce98178bdd4ed5622a6237993e9b6cf2437bbf9 -->
+<!-- generated-from: rules/session-wrapup.md sha256:8ea0c232f8f3fca8183e5b526339299dc0504132d7d8bf89dd994e3f5b165bb3 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -74,9 +74,10 @@ When several sessions work concurrently, go through these one by one before wrap
 - **"Commit only these paths" is not `git commit -- <path>`.** A commit given paths commits what those paths hold in the **working tree**, not in the index.
   Before staging, confirm `git diff --cached --name-only` is empty; after staging and before committing, check the list and each file's cached diff once more, then `git commit` with no paths.
 
-If you collide on a number and it can be made into a check that goes red, make it one
-(`rules/show-me-test.md`, "turn traps you have hit into checks that fail"); on the
-project side, just follow the numbering shape the history files already use.
+Collisions between history entries are judged by the gate stage "History entry numbers" (`历史条目编号`, `scripts/history-ordinal.sh`):
+it recognises only the Chinese shape, entries under a `### <date>` heading numbered "（其 N）", and goes red when one added this time collides.
+Only when the project uses a numbering shape it does not recognise does the project add a check of its own that goes red
+(`rules/show-me-test.md`, "turn traps you have hit into checks that fail").
 
 ## 5. Before a subagent hands back, it deletes the build directories and repository copies it created
 

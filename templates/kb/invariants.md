@@ -1,11 +1,11 @@
-<!-- generated-from: templates/kb/invariants.md sha256:eacbed73704d47859829fefd0fba9f09e8839e607e6fa7e6ce761ca696af9e0a -->
+<!-- generated-from: templates/kb/invariants.md sha256:46504eaa947a9f4d77daed9664c2b8d73c40ffbdda25e16d1ce645cc36378123 -->
 # Invariant list
 
 **The project's checks are the executable form of `invariants.md`.** Every entry added here means
 a check added. A commit where the two disagree is not accepted.
 
 Every invariant must be written in a **decidable** form — answerable "holds / does not
-hold" against a single image. Something that cannot be written that way is not yet
+hold" against a single state or artefact of the system under test. Something that cannot be written that way is not yet
 understood, and does not belong here.
 
 ## I-1 <category name>

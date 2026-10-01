@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:649a28bd3481acbe4b11d62f6ff62e60440c169b8a7c85802a11e5f00dea750f -->
+<!-- generated-from: rules/show-me-test.md sha256:56b9b4cb5e3e298247d51ae68a6714fd64e501e869cf21748d9ccac1e5b19f5d -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -10,7 +10,7 @@
 
 ## No patch without tests is accepted
 
-**Change `crates/*/src/` and you must bring tests.** No exceptions; "this one is too simple" and
+**Change `crates/*/src/` or `crates/*/build.rs` and you must bring tests.** No exceptions; "this one is too simple" and
 "I will add them in the next patch" do not count. Documentation and script changes are exempt.
 
 Enforced by `scripts/show-me-test.sh` (`gate.sh` runs it as one stage).

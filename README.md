@@ -10,7 +10,7 @@ system is being built.
 **It does not govern how the filesystem should be designed.** Disciplines like
 "start from the transaction" belong to the project, in its own `.claude/rules/`.
 
-**This SOP was made for the one user named in `I18N` under `consumers=`, and nothing here
+**This SOP was made for its one user, and nothing here
 presumes it generalises to other projects.** So the criterion is not "would another
 project need it too" — there is no other project to look at, so anyone can answer
 "yes". The criterion is whether the item governs collaboration, or governs how the

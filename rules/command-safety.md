@@ -1,11 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:965cd6acb9f17eddcba8ca972663ccbe3e867e56e4233b30d34e69a7b5a7a548 -->
+<!-- generated-from: rules/command-safety.md sha256:395ed99b83ed5ebcf18f954cbf516d60b9beb1f598d96b2e7cd6357996941b45 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
-Six of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
+Seven of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
 by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
 subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
-an unguarded variable path**, and **a `wait` with no arguments**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). The rest are still prose, because the criterion for
+an unguarded variable path**, **a `wait` with no arguments**, and **a pipeline ending in `grep -q` in a script that sets `pipefail`**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
 can and cannot prove").
 
@@ -77,7 +77,7 @@ that `wait` does not return once the timeout logic is broken) is not saved by pa
 - they share one writable state (the same temp directory, the same target directory, the same device). To go parallel, give each item its own;
 - each item is fast by itself, running only a few milliseconds.
 
-Take the degree of parallelism from `nproc`, do not hard-code it; heavy work such as VMs and builds gets
+Take the degree of parallelism (processes, and threads within a process) from an argument or an environment variable, falling back to `nproc`; do not hard-code it; heavy work such as VMs and builds gets
 its own ceiling from memory and devices.
 The cargo commands the shared scripts start (`scripts/check.sh`) run through the prefix registered in `.claude/cargo-command-prefix` at the project root:
 one line `<command and arguments>  # reason`, split on whitespace with no quoting, relative paths taken from the project root, each cargo command going through it once.
@@ -161,6 +161,9 @@ have to ask whether it is still there at the next level, and whether it should b
 or skip the pipe altogether — capture the output into a variable or file first, then
 check the exit code before doing anything with it.
 
+S7 in `scripts/shell-lint.sh` judges one form of this: in a script that sets `pipefail`, a pipeline ending in `grep -q` (`… | grep -q pattern`) turns red; a match gets read as no match.
+The fix: capture the earlier stage's output into a variable first, then `grep -q pattern <<<"$variable"`; that form, with no earlier stage, is not judged.
+
 ## Test images always go in a temporary directory
 
 Never inside the repository. Image paths come from an environment variable, defaulting
@@ -169,7 +172,7 @@ to `${TMPDIR:-/tmp}`.
 **The harness that creates an image deletes it itself when the test ends**: on success, on failure and on panic alike. Rust uses a Drop guard; shell uses `trap … EXIT`.
 Keeping it to look at the scene is switched on by an explicit switch (an environment variable), and the path is printed when it is kept; without the switch it is deleted.
 A gate stage that goes red may leave its scene in `$TMPDIR` and name the path in its remedy.
-A cache meant to be reused across runs (build output and the like) is not an image: put it under `${GATE_CROSS_RUN_TMPDIR:-${TMPDIR:-/tmp}}`, not in `$TMPDIR`.
+A cache meant to be reused across runs (build output, a verdict store and the like) is not an image: put it under `${GATE_CROSS_RUN_TMPDIR:-${TMPDIR:-/tmp}}` or a place the project sets, not in `$TMPDIR`.
 
 `gate.sh` checks this: each run gives the stages a `TMPDIR` of that run's own, and at the end looks at what is left in it (the stage "No temporary files left behind", `跑完没留下临时文件`):
 if every other stage is green, whatever is left goes red, listed by name and size, and is deleted on exit; if some stage went red, this item is recorded as not judged this run, and the run's temporary directory is kept whole with its path printed — delete it yourself once you have looked.

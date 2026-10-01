@@ -218,7 +218,7 @@ invariant (written as an assertion), and every early exit.
   A `never used` from the compiler is treated as an error (`command-safety.md`: a
   warning is a free signal).
 - **A `TODO` says what is missing and why it is not done now.** A check that is owed goes into the
-  project kb's list of owed checks, and the code points there.
+  project kb's debt table, and the code points there.
 
 ## Popular practices, examined one by one
 

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:7e574295e450f88414319567a05235947240d07e1b125c3ca4f3ec641b58195a -->
+<!-- generated-from: rules/test-discipline.md sha256:ed6319c55a61cd8cd3e9088bb6364ecfbe4baa96960686b59303b58c3da91430 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -124,8 +124,9 @@ red? If you cannot answer, it is not finished.
 
 ## Which half the gate handles
 
-**Exactly one item of the testing discipline is a check**: change `crates/*/src/` and you must bring
-tests, judged by `scripts/show-me-test.sh`. One more sits on the unimplemented list that
+**Two items of the testing discipline are checks**: change `crates/*/src/` or `crates/*/build.rs` and you must bring
+tests, judged by `scripts/show-me-test.sh`; and a loop in the project's `.rs` and `.py` files that reads a child process's output (which directories are scanned follows `scripts/relay-timing-lint.py`) must not
+both timestamp lines and relay them, judged by the stage "Relay timing" (`转发计时`, `scripts/relay-timing-lint.py`). One more sits on the unimplemented list that
 `gate.sh` prints every time: the final criterion. It is set by the project (`show-me-test.md`), so only the project can wire it up in `.claude/gate.d/` and
 declare `# gate-covers:`.
 The project's own verification methods are registered in `.claude/gate-not-implemented.tsv` at the project root (one per line: key, what is missing, the reminder that still applies once covered); `gate.sh` merges them into the same list, and the project wires them up and declares them the same way.
@@ -136,7 +137,7 @@ criteria were pinned before the run, whether both controls ran, whether a failur
 ever fire, whether an assertion pinning an absolute value sits beside the cross-arm one,
 whether a quantity a clause feeds into a predicate was reported as a trajectory, whether a
 mutant is equivalent, whether a check has discriminating power, whether a negative
-result proves the path really executed, whether phases were timed inside the process under test,
+result proves the path really executed, whether phases outside a relay loop were timed inside the process under test,
 whether the side under test can read a positive control's answer, whether each registered quantity
 maps to a decision it is meant to settle.
 

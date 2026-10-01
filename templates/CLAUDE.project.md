@@ -1,4 +1,4 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:f0b528aa29254c6b4815f6431d9ea38f54ffcebe95cf5deb0626bc5914604bf6 -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:b6a339375b62754a6b736b0802348250e8468767e48ed62d53ebe227e7ea6371 -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
@@ -13,6 +13,7 @@ the main line. No longer.>
 @.claude/singlefs-ai-sop/rules/kb-discipline.md
 @.claude/singlefs-ai-sop/rules/rules-discipline.md
 @.claude/singlefs-ai-sop/rules/test-discipline.md
+@.claude/singlefs-ai-sop/rules/test-script-discipline.md
 @.claude/singlefs-ai-sop/rules/evidence-discipline.md
 @.claude/singlefs-ai-sop/rules/verify-before-claiming.md
 @.claude/singlefs-ai-sop/rules/command-safety.md
@@ -39,7 +40,7 @@ place inside a project.)
 | `.claude/kb/invariants.md` | The invariant list; the project's checks are its executable form |
 | `.claude/kb/prior-art.md` | Research into other implementations, with sources and measurement bases |
 | `.claude/kb/pitfalls.md` | The pitfall list; come back to it for every design decision |
-| `.claude/kb/checks-owed.md` | Checks owed: what we know to stop but cannot yet, with prerequisites |
+| `.claude/kb/checks-owed.md` | Debt table: checks we know we want but cannot enforce yet, with prerequisites |
 | `records/` | How it was built |
 
 ## The gate
@@ -53,7 +54,7 @@ bash .claude/scripts/gate.sh          # the acceptance gate; mandatory before su
 
 bash .claude/scripts/check.sh         # fast feedback (format/lint/build/unit tests)
 bash .claude/scripts/gate-lint.sh     # the gate itself: does every rejection give a next step
-bash .claude/scripts/shell-lint.sh    # shell discipline: pkill -f / pgrep -f, values carried out of subshells, git undo commands, unguarded rm -rf
+bash .claude/scripts/shell-lint.sh    # shell discipline: pkill -f / pgrep -f, values carried out of subshells, git undo commands, unguarded rm -rf, wait with no arguments, pipelines ending in grep -q under pipefail
 bash .claude/scripts/naming-lint.sh   # naming discipline: single-letter names and common abbreviations in .rs
 bash .claude/scripts/env.sh           # environment check
 ```

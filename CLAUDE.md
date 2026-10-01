@@ -1,10 +1,10 @@
-<!-- generated-from: CLAUDE.md sha256:d3ce3af84b2dd2cb3a71d48721208b337d63316853cd79834446ddc08570b88a -->
+<!-- generated-from: CLAUDE.md sha256:6c89edb4d060fa2d876f46ef3059f175ad6944eefda05c2ebadf034b4a84551b -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
 **Contributor governance rules and gate tooling (Contributor Governance).**
 It governs **how a project collaborates with AI**, not how a filesystem should be
-designed. It has exactly one user, named in `I18N` under `consumers=`.
+designed. It has exactly one user.
 Work inside this repository is bound by these rules too.
 
 Changing the spec proper **must bump `VERSION` in the same change**; otherwise
@@ -56,6 +56,7 @@ coverage check.
 @rules/kb-discipline.md
 @rules/rules-discipline.md
 @rules/test-discipline.md
+@rules/test-script-discipline.md
 @rules/evidence-discipline.md
 @rules/verify-before-claiming.md
 @rules/pushback-discipline.md
@@ -65,7 +66,7 @@ coverage check.
 
 ## Where a thing belongs
 
-**This SOP was made for the one user named in `I18N` under `consumers=`, and nothing here
+**This SOP was made for its one user, and nothing here
 presumes it generalises to other projects.** So the criterion is not "would another
 project need it too" — there is no other project to look at, so anyone can answer
 "yes", and everything ends up upstream.

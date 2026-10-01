@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:3ee7120030743799640ae1bbb582cddd480409c8baf00d84c74a2d799b717d21 -->
+<!-- generated-from: rules/machine-first.md sha256:9846842cb51310df94a4bace5dbf7e57c573f8022ff23498fe99f5ebefe9541c -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -101,8 +101,8 @@ explicit.** See "AI-friendly ≠ unreadable" in `engineering-philosophy.md`.
 
 ## Kept (independent of who reads the code)
 
-- crash consistency, invariants
-- on-disk format compatibility
+- invariants
+- compatibility of external formats and protocols
 - reproducible tests
 - fault domain isolation
 - bisectable, revertible

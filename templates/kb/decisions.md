@@ -1,10 +1,11 @@
-<!-- generated-from: templates/kb/decisions.md sha256:c4c4e686926487e6c1623c3757b890ea955bccf89f21df97fdffcbcbdd23b3b7 -->
+<!-- generated-from: templates/kb/decisions.md sha256:4c39fa5207446b386f96ad8a5e86f81aab51a707abfb6f565d1bae5a9bae7fe7 -->
 # Design decision record
 
 Each decision has exactly three states: **settled** / **half-settled** (direction fixed,
 details open) / **undecided**.
 The format and the hard requirements are in the `decide` skill. When overturning a
-decision, edit the body directly and put the basis into the closing "Revision history".
+decision, edit the body directly; if this file is registered in `.claude/history-carriers` at the project root (without that registry, every file counts),
+put the basis into the closing "## Revision history", and if it is not registered, the history lives in git.
 
 ---
 

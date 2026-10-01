@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:2a1eaf9f7e7be7dcf914d6b238533af4344fbb9ed9c3a62fcad7953b292387f9 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:d608d7d06438fed349270152484cacaf54f0acaa031e23cf99529c090c8edc03 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -17,7 +17,7 @@ without my knowing:
 | whether some decision is settled | read `kb/decisions.md` and see which of settled / partly settled / open it is |
 | whether the toolchain and environment are complete | run `scripts/env.sh` |
 | how another implementation does something | check its documentation or source now, and note in the kb both the source and "not verified in this project" |
-| the current state of a test image | run the project's checks now; do not rely on "it was fine last time" |
+| the current state of the system under test or its artefacts | run the project's checks now; do not rely on "it was fine last time" |
 
 **What does not need checking now**: files read earlier in this same conversation,
 pure code-logic derivation, arithmetic.
