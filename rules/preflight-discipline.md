@@ -1,13 +1,18 @@
-<!-- generated-from: rules/preflight-discipline.md sha256:34b5c81a1806d2f73fba315b12e0dba8bbbf7a6793f5ac782243e42440e1f2db -->
+<!-- generated-from: rules/preflight-discipline.md sha256:38e3dce9186c0d70ab8a78f96f4876ef9de5fc069635c047a5e0106d4e7ad3cb -->
 <!-- doc-lint:rule-definition -->
 # Admission and run conditions: decide whether it may run, then run it
 
 **Every script states at its head when it should be called and when it must not be, and checks that before it does any work: if a condition is not met it refuses to run, and only `--force` makes it run anyway.**
 
 This covers these places: this package's `install.sh` and `scripts/` (including `scripts/claude-hooks/` and `scripts/githooks/`),
-the project's `.claude/gate.d/`, and the directories the project registers in `.claude/preflight-dirs` — what gets registered are the heavy places whose rerun is decided by their inputs:
-register wherever the experiment scripts and the source files of experiment binaries live. The project's `.claude/scripts/`, `.claude/hooks/` and other light scripts do not declare admission and run conditions. Each directory counts only its own level; register a subdirectory on a line of its own.
+the project's registered gate-stage directory (default `.claude/gate.d/`), and the directories the project registers in `.claude/preflight-dirs` — what gets registered are the heavy places whose rerun is decided by their inputs:
+register wherever the experiment scripts and the source files of experiment binaries live. The project's registered hooks directory (default `.claude/hooks/`), `.claude/scripts/` and other light scripts do not declare admission and run conditions. Each directory counts only its own level; register a subdirectory on a line of its own.
 `.claude/preflight-dirs` has one `<directory>  # what lives there` per line; a project without experiments still creates the file, with one comment line saying so.
+
+A project moving its gate stages or hooks out of `.claude/` registers a file for each: the gate-stage directory in `.claude/gate-directory` at the project root,
+the hooks directory in `.claude/hooks-directory`; each file holds one line, a path relative to the project root with no trailing `/`, optionally followed by `# reason`;
+absent, it is the default. `lib.sh`'s `project_gate_dir` / `project_hooks_dir` and `preflight.py`'s
+`project_gate_directory` / `project_hooks_directory` read the same registration.
 
 Three kinds are not judged: libraries that are sourced or imported, fixtures, and wrappers that only `exec` a shared script (the few lines install.sh lays down; a wrapper with any other logic in it is judged like any script).
 List libraries and fixtures one by one in an exclusion table: this package's in `PACKAGE_EXCLUDED` in `scripts/preflight-lint.py`, the project's in `.claude/preflight-exclude`,

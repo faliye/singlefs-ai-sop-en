@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:331758182ab764bbae6a996aa6eecc2a56593d30eb9db9b634816c7148753e7d -->
+<!-- generated-from: rules/evidence-discipline.md sha256:d58bddd1f22fd22b4a4af44e27dd47bd27a1351e81259086868272b9a6dfd548 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -42,6 +42,7 @@ control history.** Within a round, not one character of its evidence — prompts
 reports, raw output, stored artifacts — may change. Once that round is committed, the next
 commit deletes **the batch the previous one left behind**; this round's own evidence stays.
 To look up what was deleted, go read it in the version control history.
+Before deleting, check the paths named in the registries the checks read (gate registries, pin tables, mutation lists and the like): one that is named is not deleted, or those registry rows change in the same commit.
 
 ⇒ **Old evidence is a reference, not a basis.** When an earlier conclusion is in doubt,
 re-verify it rather than digging up the old evidence (`kb-discipline.md` item 2, "All historical
@@ -61,6 +62,9 @@ directory that does not exist, or one that excludes no file at all, goes red.
 
 For every rate, capacity or ratio that enters a conclusion, first ask "was this measured or guessed?" — if guessed, go measure it.
 What cannot be measured here (say, the fsync rate of an enterprise drive) is written as a conditional: "at 10⁵/s it is 89 years; that tier cannot be measured on this machine, so it stays an assumption" — never as an upper bound.
+
+**Every number passed on to another session or another agent is marked "measured" or "inferred", and says which quantity it is** (which file, which product, the source file or the built binary).
+The receiving side treats it as a lead: it goes into a record only after being checked, and an unmarked one counts as inferred.
 
 ## How another project does it is a lead, not evidence
 

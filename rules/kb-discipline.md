@@ -1,8 +1,11 @@
-<!-- generated-from: rules/kb-discipline.md sha256:fbc02aee6ce61e677bf2b4538c3912bba341d07369454023c4ef5ca500b68b47 -->
+<!-- generated-from: rules/kb-discipline.md sha256:5fc6374409399118bac70f7056c651282ed1e7e0cbd969d25d94a8f385a97d41 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
-**Applies to**: `kb/*.md` — **things models retrieve from.**
+**Applies to**: `kb/*.md` — **things models retrieve from.** When a project moves kb text out of `.claude/kb/`
+(say, next to some crate), it registers the project root's `.claude/kb-directories` (one per line, relative to
+the project root, with a `#` reason; multiple lines are fine); absent, it stays `.claude/kb/`. `doc-lint.sh`,
+`history-ordinal.sh` and `number-name-sync.sh` all read this same registration.
 
 The kb is written for **being pulled out one item at a time**, not for being read through.
 **Its one goal is to keep the model from making things up.** Being pleasant to read is not the objective.

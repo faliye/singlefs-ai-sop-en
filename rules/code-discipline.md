@@ -1,4 +1,4 @@
-<!-- generated-from: rules/code-discipline.md sha256:86d7e7a6f7da94dd1f0b5c1e3abdd32cc4f7d045c839370b4d932302574efe84 -->
+<!-- generated-from: rules/code-discipline.md sha256:593c26efa75445b19b2b45eabd3942734bb682517d0f1adc0408a9c541444660 -->
 <!-- doc-lint:rule-definition -->
 # Code discipline: how machine-first lands in code
 
@@ -206,6 +206,7 @@ invariant (written as an assertion), and every early exit.
 
 - **Comments say "why it is this way"**, not "what this does".
   Constraints go into types, names or assertions, not comments.
+- **A comment that points at a place in another file names a function, a heading or a unique anchor string, not a line number.**
 - **Doc comments state the contract a type cannot**: which errors it returns, when it panics, what an
   `unsafe` function requires of its caller. Doc comments that restate the name are deleted.
 - **Every `unsafe` block has a `// SAFETY:` comment above it** saying why it is safe.
@@ -380,7 +381,7 @@ public API — gets its own criterion; you cannot get there by saying "explicit 
 | `unsafe` blocks need `// SAFETY:` | clippy `undocumented_unsafe_blocks` |
 | Shadowing with an unrelated meaning | clippy `shadow_unrelated` |
 | Warnings are errors | clippy `-D warnings` |
-| Whether a name says enough, whether one concept has one name, whether a function does one thing, whether a comment says why, whether error variants follow the caller's decisions, whether loop state is written out, `..Default::default()` | review |
+| Whether a name says enough, whether one concept has one name, whether a function does one thing, whether a comment says why, whether a comment cites a line number in another file, whether error variants follow the caller's decisions, whether loop state is written out, `..Default::default()` | review |
 | Names in shell scripts | **not yet a check**; `gate.sh` lists it among the unimplemented stages. ⚠️ This discipline applies to shell just the same, but the existing scripts in `scripts/` have never been swept; do not take them as models |
 
 The clippy ones run inside `scripts/check.sh`, i.e. the gate's "Build and unit tests" stage; that stage does not run when the project root has no `Cargo.toml`.

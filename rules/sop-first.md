@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:d37746865ca2f761465ac43a69684129cd83ea5acbcdbcb619755aee1d355014 -->
+<!-- generated-from: rules/sop-first.md sha256:4284674fdf65011fc7f2518723e8ca23de5f235ab4a953d27b80c5dfb6205c89 -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -76,3 +76,15 @@ Before adding a gate or a hook, check whether an existing one already covers the
   A hook of this package whose header has `# hook-registration: optional <reason>` may be left unregistered by the project, and the success line lists each one left unregistered; once registered, it is judged as usual. The line counts for nothing in the project's own hooks.
 
 Whether the named file really is the closest match, and whether the reason for not merging holds, the gate cannot judge; that is left to review.
+
+## Before setting up a verification rig or a test entry point, look for an existing one too
+
+Scope: verification rigs (the code that enumerates, runs differentials, or drives a real device or an external tool), test entry points (the entry scripts of `test-script-discipline.md`), and the gate stages and quick/slow tiers that run them.
+
+1. First list what each existing rig and entry point judges: which matter, which batch of objects (which streams, which enumeration domain), with which judging method, in which stage.
+2. Where one judges the same matter on the same batch of objects, merge the new one into the existing set: another algorithm, a move to acceleration hardware, one more stream, one more domain are all written as its acceleration path or new items, under its name, its entry point, its stage and its quick/slow tiers; no new name, no new stage, no second set of quick tier and full run. The acceleration path keeps a reference path and the two are run as a differential, per `test-script-discipline.md` "Use the hardware acceleration at hand".
+3. Where only part overlaps (some streams, a stretch of the domain), merge the overlapping part, and add the rest as new items of the same set.
+4. Where the repository already has two sets judging the same matter, merge them into one first, then run its pruned run or full run; before the merge, do not run the full run of either set.
+5. If it must stand alone, write in the head of the new entry point `# gate-similar: <existing rig or entry point> <why it is not merged into that one>`; if nothing is alike at all, write `# gate-similar: 无 <what was checked>`.
+
+The gate does not yet judge "Before setting up a verification rig or a test entry point, look for an existing one too": whether the head of a new entry point has `gate-similar`, and whether two rigs judge the same matter, are left to review.

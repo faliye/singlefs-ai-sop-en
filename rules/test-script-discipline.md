@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-script-discipline.md sha256:6cabd734cb37924585a6dba8a1062dcbbd0b885bd0d43e9fbd9737da7c9ae1f8 -->
+<!-- generated-from: rules/test-script-discipline.md sha256:3f1da56cc030eaebcb1fcef1e57613e429e38db616bd03f05e742e8f79c65375 -->
 <!-- doc-lint:rule-definition -->
 # How to write test cases and test scripts
 
@@ -15,20 +15,23 @@ They are equally bound by `show-me-test.md` (a new test is first shown to go red
 - A case name states the scenario and the expected outcome (the "Names" section of `code-discipline.md`), with no history such as milestone, step number or batch; history goes in the commit message or the project kb.
 - On red, rerun only the red ones: the entry script can take the red cases out of the previous run's output and give the command that runs just those. If the number taken out does not match the failure count in that run's summary, it is red, gives no command, and the next step reads "rerun the whole set once" (`command-safety.md` "Result collection needs a completeness gate").
 
-## Entry script: no arguments means the full run
+## Entry script: no arguments means a pruned run of every item
 
 | Argument | What it does |
 |---|---|
-| none | full run: every item of the quick tier and the slow tier |
+| none | pruned run: every item of the quick tier and the slow tier, pruning under "Reusable verdicts: stored by input, pruned by prefix" only what has a matching key and was already judged, and what is equivalent |
+| `--full` | full run: every item of the quick tier and the slow tier, reading no verdict store, judging everything now |
 | `--quick` | only the quick tier |
 | `--list-items` | lists the nameable items and their tier, one per line; builds nothing, runs nothing |
-| `--item <item>` | runs only the named items; given several times, takes the union |
+| `--item <item>` | runs only the named items; given several times, takes the union; together with `--full`, these items read no verdict store |
 | an item name that is wrong, or `--item` without a name | lists the nameable items, exits 2 |
 
-- A gate stage is not an entry script: `gate.sh` starts stages with no arguments; a stage that starts the test framework directly or calls an entry script names the tier explicitly either way (`--quick`, `--item`, or the test framework's own filter arguments).
+- A pruned run and a full run judge the same domain and differ only in whether verdicts are reused: a red in a pruned run is handled as a red from the full run. Running only some of the items, states or seeds (sampling) is neither a pruned run nor a full run.
+- Which one to run when: after every change, the quick tier; day to day, when the slow tier or the whole set is run, a pruned run, never sampling in its place; at every commit, one of a pruned run and a full run, and the run's product records which one; all three can name items one by one with `--item`. Differentials (the acceleration path against the reference path, multi-threaded against single-threaded, before against after an optimisation, two judging methods) are run the same way.
+- A gate stage is not an entry script: `gate.sh` starts stages with no arguments; a stage that starts the test framework directly or calls an entry script names the tier explicitly either way (`--quick`, `--full`, `--item`, or the test framework's own filter arguments).
 - When tiers are marked with the test framework's own markers (`#[ignore]` and the like), a run with no arguments runs the marked ones too (`--include-ignored`).
-- If a scale variable (number of seeds, expansion depth and the like) was set, that run's product writes out its value; the full run's completion marker does not accept a run whose scale was reduced.
-- Tools, devices and hardware the whole script cannot do without are written as a `run-condition` (`preflight-discipline.md`) and exit 78 when not met; where only some items need them, those items are reported one by one as "not run this time" under `show-me-test.md` "The gate must not pretend to pass", and that run does not say "full run passed".
+- If a scale variable (number of seeds, expansion depth and the like) was set, that run's product writes out its value; the completion marker of a pruned run or a full run does not accept a run whose scale was reduced.
+- Tools, devices and hardware the whole script cannot do without are written as a `run-condition` (`preflight-discipline.md`) and exit 78 when not met; where only some items need them, those items are reported one by one as "not run this time" under `show-me-test.md` "The gate must not pretend to pass", and that run does not say "all passed".
 - Each item prints one line when it ends: item name, exit code, how many judged, how many red, how many reused (an item with no verdict-reuse layer writes "no reuse"; one that has the layer but could not read the number this run writes "unavailable", is left out of the total, and is named in the success line; neither writes 0), seconds taken; the last line is the total. The number of items collected is checked under `command-safety.md` "Parallelism must not swallow the failures".
 - Exit codes 0 everything that ran is green (still 0 when some items reported "not run this time"), 1 some red, 2 usage error, 77 no item ran at all, 78 admission or run condition not met (`preflight-discipline.md`); these five have fixed meanings. Other forms of refusal may use other exit codes, listed one by one in the head of the file.
 
@@ -37,7 +40,7 @@ They are equally bound by `show-me-test.md` (a new test is first shown to go red
 **Criterion: the test script and the judging it uses both have a self-test; break them and the self-test goes red** (as in `test-discipline.md` "The check itself can also be wrong", applied to the project's test scripts).
 
 - Write them in a testable shape: the judging is a pure function; the item driver, devices, clock and random source can all be swapped for fakes through arguments or environment variables; no hard-coded paths or external services. Any part that cannot be swapped is named in the head of the file.
-- The self-test is `--selftest`, tests in the same package, or a directory of red and green fixtures (each fixture carrying a file that states the expected exit code and output; an empty directory a fixture needs gets a `.keep`, since git cannot store an empty directory, judged by the gate stage "Script executable bits" (`脚本执行位`)): every kind of verdict (green, red, not run this time, usage error) is fed at least one input with a known answer and judges the same as the answer; the entry script's listing, naming, refusing an unknown item name, failure counting and item-count check are each walked once.
+- The self-test is `--selftest`, tests in the same package, or a red/green case (each case carrying a statement of the expected exit code and output; written as a sample directory, an empty directory it needs gets a `.keep`, since git cannot store an empty directory, judged by the gate stage "Script executable bits" (`脚本执行位`); written as a single file, the expected values go in the file's head): every kind of verdict (green, red, not run this time, usage error) is fed at least one input with a known answer and judges the same as the answer; the entry script's listing, naming, refusing an unknown item name, failure counting and item-count check are each walked once.
 - Every branch that can judge red gets a break switch or a mutation: once broken, the self-test goes red, on the named item. Break switches are listed one by one in the head of the script: switch name, what it breaks, which item should go red when it is on; mutations go into the checked-in mutation list (`show-me-test.md` "A new test must first be shown to go red"). Whoever replays them (the self-test itself, or the gate's self-test) switches each one on and watches it go red on the named item. The switches are honoured only by the self-test, never in an ordinary run.
 - The self-test is wired into the gate or the quick tier, so that changing the test script or the judging runs it. The self-test uses fake drivers and starts no build or heavy work, so whoever changes the script can run it at any time; the project's guard against heavy tests does not block the self-test.
 - The self-test also keeps to "Atomic cases: every case can run on its own".
@@ -47,16 +50,18 @@ They are equally bound by `show-me-test.md` (a new test is first shown to go red
 | Tier | What it holds | When it runs |
 |---|---|---|
 | quick tier | cases the project's quick/slow criterion classes as quick, plus the kinds that always go into the quick tier | after every change |
-| slow tier | cases the quick/slow criterion classes as slow: exhaustive, long random, real device, external tools and the like | with the full run: before commit or on the user's request; any other timing is set by the project |
+| slow tier | cases the quick/slow criterion classes as slow: exhaustive, long random, real device, external tools and the like | with a pruned run or a full run, which one as set in "Entry script: no arguments means a pruned run of every item"; any other timing is set by the project |
 
 - The quick/slow criterion and each tier's command are written in the project-local rules. The criterion may be a per-item time threshold (judged by what was measured in ordinary runs), or a split by whether a case enumerates exhaustively or needs a real device or external tool; when unsure, it goes to the slow tier.
 - The tier is marked on the case or in a registry table, not in a second list copied into the script.
+- Every test target of the code under test (a library, an integration test, the inline tests in an executable and the like) belongs to a tier and runs when that tier runs. A test target in no tier is named when the entry script lists its items.
 - These kinds always go into the quick tier, whatever the quick/slow criterion says: a small-input case for every kind of judging in the slow tier (same judging, small input), the pruning self-test, the multi-threaded versus single-threaded differential, the before-and-after-optimisation differential, the accelerated versus reference path differential, and reds pinned back from the full run. Those that need particular hardware report "not run this time" on machines without it.
 - Where tiers are split by a compile switch (a feature, `cfg` and the like), at least one run in the quick tier compiles it in; a kind that compiles in with 0 cases is reported as "not run this time" and does not count as run.
 
 ## Reusable verdicts: stored by input, pruned by prefix
 
 - Every verdict is stored under a key computed from all the inputs it depends on: the code under test, the judging code, the parameters, the toolchain. A matching key is reused, not recomputed.
+- Reuse looks only at the key and has no time limit: a verdict whose inputs did not change is reused however long ago it was made, and is not rerun because time passed.
 - The verdict store is not this run's output: the output is written fresh every run under `show-me-test.md` "The gate must not pretend to pass", and reused verdicts are reported in it separately from those judged now; where the store lives follows the sentence on cross-run caches in `command-safety.md` "Test images always go in a temporary directory".
 - The state space is organised by shared prefix: a prefix shared by several streams or items is judged once, and what follows is judged on top of it.
 - Only two kinds of thing may be pruned: those with a matching key that have already been judged; and those equivalent to an already judged state. The equivalence is pinned by a case.
@@ -64,12 +69,14 @@ They are equally bound by `show-me-test.md` (a new test is first shown to go red
 - Pruning has a self-test: on a small input, run once with pruning and reuse off; the verdicts match the run with them on, item by item. The pruning self-test goes into the quick tier.
 - A block is written to disk only once it is fully judged, and the write is atomic; after an interruption, rerunning the same command resumes, filling in only what was not judged.
 - The success line reports "judged now N, reused M".
+- A full run (`--full`) reads no verdict store, and still writes the verdicts it judges back into the store by key.
 - When the whole script's inputs have not changed, it does not rerun: write `admission: inputs-changed` (`preflight-discipline.md`); reuse at the verdict level is done inside the script. Both layers are required.
 
 ## Fast to build, fast to run
 
 - Heavy cases run on an optimised build, with overflow checks and assertions still on (Rust: `opt-level = 3` plus `overflow-checks = true`, and every `assert!` kept). Whether assertions that only take effect in debug builds (`debug_assert!` and the like) are on is decided by the project after measuring the cost; if they are off, the measured cost is written beside the build configuration.
 - One build per run: several items share one build; build output is reused across runs (where it lives follows the sentence on cross-run caches in `command-safety.md` "Test images always go in a temporary directory") and is not cleaned before running.
+- Several copies of the repository do not share one build directory; each gets its own. Source files copied into a copy do not keep their modification times (no `rsync -a`, `cp -a`, `cp -p` and the like), or the files whose content changed get their modification time set to now after the copy. A script that builds from a copy (post-merge verification, bisection, proving red and the like) checks in this run's build output that every changed package was rebuilt (Rust: that package has a `Compiling` line), and goes red if not.
 - The hot path does nothing unrelated to judging: formatting, per-item logging, repeated allocation.
 - Independent units within a process are sliced by range and run in parallel, with the degree of parallelism under `command-safety.md` "Within one script, run the checks in parallel when they can be". Merging is deterministic: counts are summed in slice order, "the first one" is the one with the smallest ordinal; the multi-threaded versus single-threaded differential is identical word for word and goes into the quick tier. Where something cannot run in parallel (shared state, or the order itself is what is under test), say why in a comment on that case.
 - An item that runs longer than the progress interval the project sets prints at least one progress line per interval: each slice reports its range and how many it has judged.
@@ -84,14 +91,14 @@ They are equally bound by `show-me-test.md` (a new test is first shown to go red
 
 ## A red from the full run is pinned back into the quick tier
 
-- Every red from the full run has the input that triggered it turned into a quick-tier case or a row of a registry table, and is re-judged in the quick tier; after the fix it stays as a regression and is not deleted.
+- Every red from a full run or a pruned run has the input that triggered it turned into a quick-tier case or a row of a registry table, and is re-judged in the quick tier; after the fix it stays as a regression and is not deleted.
 - Before pinning, shrink the input to the smallest one that is still red where it can be shrunk; where it cannot, say why and pin it as it is. After pinning, check once: on the code that went red, the pinned case is red too, on the same assertion.
 - The project keeps a pin table with one row per pinned case: the line that went red, copied whole with the product's file name, and which change (a mutation or that commit) turns it red when put back.
-- A red is closed only when every red in the full run's products has its row in the pin table.
+- A red is closed only when every red in the products of full and pruned runs has its row in the pin table.
 
 ## Which half the gate handles
 
-**None of it is a shared check yet.** The parts that can be judged literally can be judged by a local stage the project wires into `.claude/gate.d/`:
-the entry script's argument conventions (`--list-items` exits 0 and starts no build or heavy work; a wrong item name exits 2), whether a self-test (in one of the three forms) exists and runs green, whether each break switch listed in the head of the file, once switched on, turns the self-test red on the named item, whether every red in the full run's products is in the pin table, whether loops over parameters have been split into cases, whether the differentials that always go into the quick tier are in it.
+**None of it is a shared check yet.** The parts that can be judged literally can be judged by a local stage the project wires into its registered gate-stage directory (default `.claude/gate.d/`):
+whether a script that builds from a copy checks that changed packages were rebuilt, the entry script's argument conventions (it accepts `--full`; `--list-items` exits 0 and starts no build or heavy work; a wrong item name exits 2), whether the product records whether the run was pruned or full, whether a self-test (in one of the three forms) exists and runs green, whether each break switch listed in the head of the file, once switched on, turns the self-test red on the named item, whether every red in the products of full and pruned runs is in the pin table, whether loops over parameters have been split into cases, whether the differentials that always go into the quick tier are in it.
 
-Left to review: whether the self-test covers every kind of verdict, whether the cases really are independent of each other, whether the reuse key covers all inputs, whether the pruning equivalence is right, whether the quick/slow criterion is reasonable, whether the hot path does anything unrelated to judging, whether every computation that should go to acceleration hardware is registered, whether a pinned case and the red from the full run are the same defect.
+Left to review: whether the self-test covers every kind of verdict, whether the cases really are independent of each other, whether the reuse key covers all inputs, whether the pruning equivalence is right, whether the quick/slow criterion is reasonable, whether the hot path does anything unrelated to judging, whether every computation that should go to acceleration hardware is registered, whether every test target belongs to a tier, whether a pinned case and the red from the full run are the same defect, whether sampling is passed off as a pruned run, whether the run at commit was a pruned run or a full run.

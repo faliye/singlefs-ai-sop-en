@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:ed6319c55a61cd8cd3e9088bb6364ecfbe4baa96960686b59303b58c3da91430 -->
+<!-- generated-from: rules/test-discipline.md sha256:a264be78f045288ab66f3024503d810869fa0ca0bbea8562ee388a91c5de6698 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -70,6 +70,10 @@ the clause is vacuous; either way it counts as having no clause.
 The control loop must iterate over the full set of arms, not "just run it against the first one".
 When adding an arm, change the control loop along with it.
 
+- **Controls are pinned per unit, not judged together.** Where the formal runs are cut into cells (tiers, families, domains and the like), each cell's own formal runs carry control readings for every criterion that cell judges; the unit test writes each cell's expected set out cell by cell, and does not judge the union of several cells' readings.
+- **The registration writes, cell by cell, which run carries each control.** When the pre-run registration writes its set of criteria, it lists per cell which formal run carries the control of each criterion; where no formal run in a cell can carry it, add a run, or that cell does not judge that criterion.
+- **Formal runs match one for one across the registration, the unit test and the rerun.** Every formal run in the registration can be found in the unit test's unit table and in the rerun registry; one missing is a cell with nobody controlling it.
+
 ## Comparing the arms only against each other cannot detect "every arm is wrong together"
 
 **Next to every cross-arm assertion there must be an assertion that pins down an
@@ -127,7 +131,7 @@ red? If you cannot answer, it is not finished.
 **Two items of the testing discipline are checks**: change `crates/*/src/` or `crates/*/build.rs` and you must bring
 tests, judged by `scripts/show-me-test.sh`; and a loop in the project's `.rs` and `.py` files that reads a child process's output (which directories are scanned follows `scripts/relay-timing-lint.py`) must not
 both timestamp lines and relay them, judged by the stage "Relay timing" (`转发计时`, `scripts/relay-timing-lint.py`). One more sits on the unimplemented list that
-`gate.sh` prints every time: the final criterion. It is set by the project (`show-me-test.md`), so only the project can wire it up in `.claude/gate.d/` and
+`gate.sh` prints every time: the final criterion. It is set by the project (`show-me-test.md`), so only the project can wire it up in its registered gate-stage directory (default `.claude/gate.d/`) and
 declare `# gate-covers:`.
 The project's own verification methods are registered in `.claude/gate-not-implemented.tsv` at the project root (one per line: key, what is missing, the reminder that still applies once covered); `gate.sh` merges them into the same list, and the project wires them up and declares them the same way.
 
@@ -138,7 +142,7 @@ ever fire, whether an assertion pinning an absolute value sits beside the cross-
 whether a quantity a clause feeds into a predicate was reported as a trajectory, whether a
 mutant is equivalent, whether a check has discriminating power, whether a negative
 result proves the path really executed, whether phases outside a relay loop were timed inside the process under test,
-whether the side under test can read a positive control's answer, whether each registered quantity
+whether the side under test can read a positive control's answer, whether controls are pinned per unit, whether the formal runs match across the registration, the unit test and the rerun, whether each registered quantity
 maps to a decision it is meant to settle.
 
 ## A negative result must be separable from "the code never ran"

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:56b9b4cb5e3e298247d51ae68a6714fd64e501e869cf21748d9ccac1e5b19f5d -->
+<!-- generated-from: rules/show-me-test.md sha256:cb6751e10fb690fac04e7174f0519cb3700a7471b51734fc6500b0b27972a9fa -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -119,10 +119,10 @@ those change into errors, so register them; everything else changes.
 **The number in the success line needs something pinning it too.** `gate-lint` does not cover this; it rests on whoever writes the stage.
 
 **Project-local stages follow the same rules as shared ones**, and are subject to `gate-lint` and `shell-lint` too:
-`gate.sh` hands `.claude/gate.d/` to both lints.
+`gate.sh` hands the project's registered gate-stage directory (default `.claude/gate.d/`) to both lints.
 
-**The reach stops at `.claude/gate.d/`.** Scripts elsewhere in the project (research scripts, hooks) sit outside the reach of these two lints.
-If a project has such directories, hook up a local stage in `.claude/gate.d/` that hands them to both lints — both, not one:
+**The reach stops at the project's registered gate-stage directory.** Scripts elsewhere in the project (research scripts, hooks) sit outside the reach of these two lints.
+If a project has such directories, hook up a local stage in the registered gate-stage directory that hands them to both lints — both, not one:
 set `GATE_LINT_DIR` and `SHELL_LINT_DIR` respectively to the target directory when calling them.
 
 # What the gate can and cannot prove
