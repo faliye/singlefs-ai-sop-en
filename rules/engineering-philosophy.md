@@ -20,7 +20,7 @@ They are two separate axes, each optimised on its own, with no compromise struck
 
 Exactly one thing is being relaxed: **compression done so it would fit in a human
 head** — requirements like "one mechanism for everything" and "the fewer concepts
-the better", i.e. uniformity at the design level.
+the better", that is, uniformity at the design level.
 
 **Naming, one responsibility per function, bounded path count and consistent conventions are not relaxed**;
 they are kept for verifiability and information content:

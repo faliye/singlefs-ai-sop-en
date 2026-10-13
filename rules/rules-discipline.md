@@ -1,4 +1,4 @@
-<!-- generated-from: rules/rules-discipline.md sha256:da9396081f8c1be1fb32197439ec6e63e9ed3d1096113f89cdf143b27b11493f -->
+<!-- generated-from: rules/rules-discipline.md sha256:84ce1a0220ce4d90c2f7b27db38181f831f3d3cd6bc2430e1fb10341751298d9 -->
 <!-- doc-lint:rule-definition -->
 # Rule-file discipline
 
@@ -35,7 +35,7 @@ Do not leave a summary behind.
 always did — `CHANGELOG.md`, one section per version; that is the only destination.
 If a deleted argument is needed again, argue it again.
 
-**Once moved, leave nothing behind**: no "(was X)", no "this used to be…" in the body.
+**Once moved, leave nothing behind**: no "(was <old value>)", no "this used to be…" in the body.
 
 ## 4. A link to history must carry a deterrent
 
@@ -65,7 +65,7 @@ a fact elsewhere becomes a link to the file it lives in.
 
 The scope is `rules/*.md`, `CLAUDE.md`, `agents/*.md` and `skills/*/SKILL.md`. For positional
 references the criterion is the same one `kb/*.md` is held to, with the per-word scope in
-`kb-discipline.md` clause 1.
+`kb-discipline.md` clause 1 "Every fact stands on its own".
 
 Self-reference is judged only for the words that name a document structure: "this section", "this
 chapter", "this table", "this document", "this clause". Domain objects — "this experiment", "this
@@ -82,13 +82,13 @@ Enforced by `scripts/doc-lint.sh`.
 The body may not name a project that uses these rules, nor its paths,
 nor its file names, and may not use its decision or experiment numbers as examples. Write examples in a
 form that names no one: a wiring path like `.claude/gate.d/` is a shared convention and may be written;
-a specific `.claude/gate.d/55-xxx.sh` may not.
+a specific `.claude/gate.d/55-<stage name>.sh` may not.
 
 The gate does not judge this clause; it is left to review.
 
 ## What the gate covers
 
-`scripts/rules-lint.sh` judges the part of clauses 1, 3, 4 and 5 that can be reduced to literal patterns:
+`scripts/rules-lint.sh` judges the part of clause 1 "The body carries four things only", clause 3 "What moves out is deleted", clause 4 "A link to history must carry a deterrent" and clause 5 "Rule files keep no history section" that can be reduced to literal patterns:
 record sections, argument sections, dated lines, explanatory paragraphs and half-sentences, lexical explanations, and history
 links with no deterrent. It scans this package's `rules/`, and also the project's `.claude/rules/` (or `.claude/agents/`
 when that directory does not exist): the latter is started by the `gate.sh` stage "Rule discipline (project-local)"
@@ -96,9 +96,9 @@ when that directory does not exist): the latter is started by the `gate.sh` stag
 one per line in the project root's `.claude/rules-lint-exclude`; delete a line once that file is done —
 the exclusion list only shrinks.
 
-Clause 7 is judged by `scripts/doc-lint.sh`, not by `rules-lint`; clause 8 is not judged by the gate.
+Clause 7 "No positional references in the body, and no self-reference" is judged by `scripts/doc-lint.sh`, not by `rules-lint`; clause 8 "The body carries nothing specific to one consumer" is not judged by the gate.
 
-**What it cannot cover**: the line in clause 2 (which sentence is criterion and which is argument), and
+**What it cannot cover**: the line in clause 2 "Keep the criterion, move the argument out" (which sentence is criterion and which is argument), and
 whether the link under the deterrent points at the right place. Those rest on a person reading them aloud, and on review.
 
 The criteria are chosen by this package's language. Chinese judges all seven; English and Japanese judge record sections, argument sections, dated lines, and links without a deterrent,

@@ -1,4 +1,4 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:b6a339375b62754a6b736b0802348250e8468767e48ed62d53ebe227e7ea6371 -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:4ab784d790e883bd5bc4471b3c87a01bb9b7fca0d849a69a16da83b7b5f34e58 -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
@@ -27,9 +27,8 @@ The four philosophy rules are not `@`-loaded permanently: read each in full once
 are not upstreamed — the shared SOP holds collaboration rules only.
 
 (The `@.claude/singlefs-ai-sop/...` entries above are the shared rules distributed by
-[singlefs-ai-sop](.claude/singlefs-ai-sop/README.md). **Changing one changes the floor
-under every contributor** — change it upstream and bump `VERSION`; never edit it in
-place inside a project.)
+[singlefs-ai-sop](.claude/singlefs-ai-sop/README.md). Change them upstream and bump
+`VERSION`; never edit them in place inside a project.)
 
 ## Project-local facts
 
@@ -45,8 +44,7 @@ place inside a project.)
 
 ## The gate
 
-The gate exists to **raise every submission to the line where it is worth a person's
-time to review**, not to keep anyone out. It does not sort submissions by where they
+The gate does not sort submissions by where they
 came from; it sorts them into those carrying evidence and those not.
 
 ```bash

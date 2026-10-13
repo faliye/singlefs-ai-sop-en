@@ -8,7 +8,7 @@ conclusions. Changing a criterion after the run makes it a new experiment — re
 
 ---
 
-## E1 <experiment name, display width ≤ 48, CJK = 2> —— not yet run
+## E1 <experiment name, width ≤ 48, wide character 2> —— not yet run
 
 <!-- This heading is the registration site for the number: the segment between the
      number and the "——" is its short name. Every citation elsewhere is written
@@ -18,7 +18,7 @@ conclusions. Changing a criterion after the run makes it a new experiment — re
 overturn.>
 
 **Prerequisites**: <which **concrete input** is missing — which number, which field
-table, which settled decision. Not "module X is owed": the criterion is often pure
+table, which settled decision. Not "some module is owed": the criterion is often pure
 arithmetic and needs no such module, and writing it coarsely shelves an experiment that
 could have run today.>
 

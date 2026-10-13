@@ -1,15 +1,15 @@
-<!-- generated-from: rules/sop-first.md sha256:4284674fdf65011fc7f2518723e8ca23de5f235ab4a953d27b80c5dfb6205c89 -->
+<!-- generated-from: rules/sop-first.md sha256:07bc4925c3b0e2cfe943da5e29c7f3091e0565cad26aeecc4858e9ba23bfdc3b -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
-**The spec and the gate outrank any line of implementation code.**
+**The specification and the gate outrank any line of implementation code.**
 In any round of work, if "add one gate check" conflicts with "write one feature",
 add the gate check first (this means a gate already decided on; when to add one for a newly found trap follows the "Boundary" section: in batches).
 
 ## Corollaries
 
-- **A script existing before the thing it tests is normal**: a harness can be written and
-  self-checked with no workload; plug the implementation in when it arrives.
+- **A script may exist before the thing it tests**: write and self-check the harness with
+  no workload; plug the implementation in when it arrives.
 - **The first reaction to a newly found trap is "how does this become a red line
   in the gate"**, not "which document does this go in"; once its form is clear, record it in the project's debt table first, and add it when the "Boundary" section says, in batches.
 - **Gate scripts need tests too**: change `scripts/` and you must construct an
@@ -18,8 +18,7 @@ add the gate check first (this means a gate already decided on; when to add one 
 
 # The gate is a teaching instrument, not a sieve
 
-**Assume by default that a submitter wants their patch to pass.** The gate must **state
-what "done" means clearly enough that nobody has to guess.**
+The gate must **state what "done" means clearly enough that nobody has to guess.**
 
 ## Every rejection must carry a next step
 

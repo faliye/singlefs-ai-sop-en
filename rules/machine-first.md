@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:9846842cb51310df94a4bace5dbf7e57c573f8022ff23498fe99f5ebefe9541c -->
+<!-- generated-from: rules/machine-first.md sha256:92e21312c2e49e355359517e77a626981eaba132a9e78a5de0b865786dd0f7a4 -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -17,8 +17,7 @@ premises, not at the "relaxed" and "kept" tables.**
 
 ### Premise 1: context windows are now in the 2×10⁵ – 10⁶ token range
 
-Three tiers: 200K / 500K / 1M. The 1M tier holds one crate together with its
-tests, its kb, and its decision record in a single window. Other vendors' numbers are not
+Three tiers: 200K / 500K / 1M. Other vendors' numbers are not
 written down here.
 
 **Calibration**: this is the **advertised window ceiling**, not "the same accuracy

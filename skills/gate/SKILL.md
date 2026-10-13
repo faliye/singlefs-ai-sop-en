@@ -2,7 +2,7 @@
 name: gate
 description: Run this project's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:1e62a5b4d8034a1c8fe4c999bfe30fee0c91b019f6ff5dcf58f8f8f90f358fde -->
+<!-- generated-from: skills/gate/SKILL.md sha256:36b9d1acec054c99296981cf09cc87f7d9241101cbfb5b4c70242d3f0b86b238 -->
 
 # The acceptance gate
 
@@ -31,12 +31,12 @@ bash .claude/scripts/gate.sh --staged # only HEAD + the index: for several sessi
 | Shell discipline | A script has `pkill -f` / `killall` / `pgrep -f`, carries a value out of a subshell through a variable, uses git's undo commands, runs `rm -rf` on an unguarded variable path, has a `wait` with no arguments, or, in a script that sets `pipefail`, has a pipeline ending in `grep -q`. See `rules/command-safety.md` |
 | Script executable bits (`脚本执行位`) | A `.sh` in the index is not `100755`, or a mode in the index disagrees with the executable bit in the working tree (a hand-staged `100644`). Fix the index mode with `git update-index --chmod=+x <path>` (or `-x`). An empty directory in scope is red as well: git cannot store one, so put a `.keep` in any you need to keep and `git add` it |
 | Local stage discriminating power (`本地阶段判别力`) | A fixture under `.claude/gate.d/fixtures/<stage>/` was judged wrong: the exit code is off, or the `want=` line is missing from the output. Decide whether the stage or the fixture is wrong, then fix that side; a stage with no fixtures is recorded as not run this time |
-| Link targets (`链接指向`) | A relative link in a document points at a path that does not exist, or a "section N" reference is past the target document's count of `##` sections, or the target cannot be read. Relative paths resolve from the linking file's directory; point at a section title instead of "section N". Directories of evidence kept verbatim go into `.claude/doc-lint-exclude` |
-| History entry numbers (`历史条目编号`) | A history entry added this time reuses an ordinal "(其 N)" under the same "`##` section + date + named item". Look up the highest number already used in that block and give your entry the next free one; do not renumber an entry someone else committed. See `rules/session-wrapup.md` item 4 |
+| Link targets (`链接指向`) | A relative link in a document points at a path that does not exist, or a "section <number>" reference is past the target document's count of `##` sections, or the target cannot be read. Relative paths resolve from the linking file's directory; point at a section title instead of "section <number>". Directories of evidence kept verbatim go into `.claude/doc-lint-exclude` |
+| History entry numbers (`历史条目编号`) | A history entry added this time reuses an ordinal "(其 <ordinal>)" under the same "`##` section + date + named item". Look up the highest number already used in that block and give your entry the next free one; do not renumber an entry someone else committed. See `rules/session-wrapup.md` item 4 "Is another session in flight in the same repository?" |
 | Tool-layer gates (`工具层的闸`) | A hook in `.claude/hooks/` or in the copy's `scripts/claude-hooks/` is not registered in `.claude/settings.json`, fails its `--selftest`, is not attached to every event in its `hook-events`, or, written with a tool name, sits on a matcher that does not recognise that tool. Register it as its file header says; see `rules/sop-first.md`, "Before adding a gate or hook, look for an existing one" |
 | Gate overlap check (`门禁查重`) | A gate or hook added or changed this time lacks `gate-similar` / `hook-events`, does not name every existing gate or hook it must, gives too short a reason, or adds lines identical to a whole block of an existing one. First run `python3 .claude/singlefs-ai-sop/scripts/gate-overlap.py --list` to find the one that handles the same thing, and merge where you can; see `rules/sop-first.md`, "Before adding a gate or hook, look for an existing one" |
 | Relay timing (`转发计时`) | Under `research/` or `crates/`, a loop reading a child process's output both timestamps lines and relays them. Time inside the process under test and write the number into its result line, or read all of the output before relaying it; see `rules/test-discipline.md`, "Time phases inside the process under test, not in the loop that relays its output". Where the timestamp genuinely feeds no timing conclusion, write `// relay-timing-lint:allow <reason>` on the loop head (`#` in Python) |
-| Numbers and short names (`编号与简称`) | A "number (short name)" cited in a source comment, script or record disagrees with the short name at the kb registration. Copy the short name from the registration (the first line of each entry, `## D<n> short name —— status`); see `rules/kb-discipline.md` item 5 |
+| Numbers and short names (`编号与简称`) | A "number (short name)" cited in a source comment, script or record disagrees with the short name at the kb registration. Copy the short name from the registration (the first line of each entry, `## D<ordinal> short name —— status`); see `rules/kb-discipline.md` item 5 "A number can serve as an index, never as a name" |
 | Document discipline | History statements in body text, a kb number cited without its short name, or a CLAUDE.md that does not `@` every rule. See `rules/writing-discipline.md` |
 | Document discipline's unimplemented list (`文档铁律的未实现清单`) | `doc-lint.sh --not-impl` failed, so the unimplemented list at the end of the summary is missing its entries. Run `bash .claude/singlefs-ai-sop/scripts/doc-lint.sh --not-impl` alone to see why (exit 78 means its admission and run conditions are unmet) |
 | Rule discipline (project-local) (`规则纪律（项目本地）`) | The project's `.claude/rules/` (or `.claude/agents/` when that directory does not exist), the project `CLAUDE.md`, an agent definition or a skill body has a records section, a rationale section, a dated line, an explanatory paragraph or half-sentence, a lexical explanation, or a history link with no deterrent. Fix it per `rules/rules-discipline.md`; register files not yet swept one by one in `.claude/rules-lint-exclude` |
@@ -56,12 +56,12 @@ bash .claude/scripts/gate.sh --staged # only HEAD + the index: for several sessi
 **Four stages run only in the SOP repository itself** (invisible to consuming projects):
 rule discipline, cross-language sync, version discipline, and CHANGELOG continuity.
 
-"Rule manifest" runs on both sides but asks different questions: inside the SOP repo it
+"Rule manifest" runs on both sides but asks different questions: inside the SOP repository it
 asks whether the manifest is in step with the rules; inside a project it compares
 **the copy you installed** — a modified or partial copy turns this red.
-When the installed copy is the en / ja edition, this stage exits 77 and the summary records it as not run this time (`本次未跑`): the manifest is
-maintained only in the reference repository (zh), and whether a translated edition has kept up is judged
-by the zh repository's cross-language sync stage.
+When the installed copy is the English or Japanese edition, this stage exits 77 and the summary records it as not run this time (`本次未跑`): the manifest is
+maintained only in the reference repository (the Chinese one), and whether a translated edition has kept up is judged
+by the Chinese repository's cross-language sync stage.
 
 ## Unimplemented stages
 
@@ -73,11 +73,11 @@ A stage that does declares `# gate-covers: <item>` in its header (keys copied li
 `gate.sh`); only when it ran and passed this round does the item move under "covered by
 project-local stages".
 
-**This is not noise; it is a precondition for reading the result**: an all-green gate says only
+**Read the result together with this list**: an all-green gate says only
 "documents comply + tests exist + unit tests pass", plus whatever the stages listed under
-"covered by project-local stages" each verified. While no stage covers a registered item, any
-claim that "that one is verified" is false; when a stage does cover it, the claim reaches
-only as far as that stage itself verified (the reminder in the registry's third column, which `gate.sh` prints at the end).
+"covered by project-local stages" each verified. While no stage covers a registered item, do not
+claim "that one is verified"; when a stage does cover it, the claim reaches
+only as far as that stage itself verified (the registry's "reminder that still applies once covered" column, which `gate.sh` prints at the end).
 
 ## Common false failures
 
@@ -97,22 +97,19 @@ confirm it really goes red**:
 
 ```bash
 # Build a sample that should be rejected, feed it to doc-lint, confirm it goes red: a kb document missing its closing history section (a structural check, judged in a repository of any language)
-d=$(mktemp -d); mkdir -p "$d/kb"
-printf '# Decisions\n\nNode size is 16K.\n' > "$d/kb/decisions.md"
-bash .claude/singlefs-ai-sop/scripts/doc-lint.sh "$d"; echo "exit code $? — expected 1"
-rm -rf "$d"
+sample_directory=$(mktemp -d); mkdir -p "$sample_directory/kb"
+printf '# Decisions\n\nNode size is 16K.\n' > "$sample_directory/kb/decisions.md"
+bash .claude/singlefs-ai-sop/scripts/doc-lint.sh "$sample_directory"; echo "exit code $? — expected 1"
+rm -rf "$sample_directory"
 ```
 
 ⚠️ **Build the sample in a separate directory; do not `>>` onto a real kb file.**
-Appended text lands after the "Revision history" heading, where the body scan has
-already stopped — the exit code is 0, which looks like "the check does nothing" when in
-fact the sample was built in the wrong place.
 
 After changing a check, also run
 `bash .claude/singlefs-ai-sop/scripts/selftest.sh`: it uses the fixtures under
 `scripts/fixtures/` to prove every check can still go red.
 **A new check comes with a new fixture**, and its `want=` must name that check's own
-message — a fragment shared by several checks watches nothing
+message, not a fragment shared by several checks
 (`rules/show-me-test.md`).
 
 Per `rules/show-me-test.md`, a check that cannot be shown to go red is not written.

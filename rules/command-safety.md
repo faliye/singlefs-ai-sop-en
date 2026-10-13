@@ -1,4 +1,4 @@
-<!-- generated-from: rules/command-safety.md sha256:395ed99b83ed5ebcf18f954cbf516d60b9beb1f598d96b2e7cd6357996941b45 -->
+<!-- generated-from: rules/command-safety.md sha256:53dde31c2b28208cdfeb4fee4dc2dfa924aabe4767ee8a2305da5f7ae0b119b4 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
@@ -23,8 +23,8 @@ The criterion: **after this step, can you get back?**
 **Scripts must never contain git's undo commands.** To get to a clean state inside
 a script, `git stash` first, or copy the whole repository and work on the copy.
 
-**`rm -rf` on a variable path needs an empty-value guard**: write `rm -rf "${d:?}/x"`, not
-`rm -rf "$d/x"`. `rm -rf "$d"` with nothing after it needs no guard.
+**`rm -rf` on a variable path needs an empty-value guard**: write `rm -rf "${build_directory:?}/cache"`, not
+`rm -rf "$build_directory/cache"`. `rm -rf "$build_directory"` with nothing after it needs no guard.
 
 ## `pkill -f` / `killall` are forbidden outright
 
@@ -34,14 +34,14 @@ after `--grace` seconds (default 10), and refuses when the target is the process
 For counting, use structured criteria from `/proc` and exclude your
 own process tree.
 
-**Do not use `pgrep -f` in a wait loop either** (a wait like `until ! pgrep -f "X"; do sleep 5; done`).
+**Do not use `pgrep -f` in a wait loop either** (a wait like `until ! pgrep -f "<process name>"; do sleep 5; done`).
 To wait for a process to end, use its **literal pid**: `until ! kill -0 "$pid" 2>/dev/null; do sleep 5; done`;
 for a background job you started yourself, use `wait`; for one you did not start (a daemon another script launched, say), have whoever starts it write its pid to a file and wait on that.
 If the pid was not recorded, find it with `scripts/proc.py find <executable-name> [--argument <argument>]`: it compares the executable name exactly instead of matching a pattern against the whole command line, and it does not list the process tree that issues the command;
 with the pid in hand, `scripts/proc.py wait <pid> --timeout <seconds>` waits for it to exit, and if it has not exited when time is up, lists the ones still alive and exits with code 3.
 The S3 check in `scripts/shell-lint.sh` turns every `pgrep -f` in command position in a script red (after `if` /
 `while` / `until` / `!` also counts as command position), without looking at whether the same line also has a `kill`.
-Commands typed by hand are refused before they run by `scripts/claude-hooks/pattern-process-guard.sh`, which uses the same criteria as shell-lint's S2 and S3 (`PATTERN_KILL_RE` and `PATTERN_PGREP_RE` in `scripts/lib.sh`),
+Commands typed by hand are refused before they run by `scripts/claude-hooks/pattern-process-guard.sh`, which uses the same criteria as shell-lint's S2 (killing processes by pattern match) and S3 (`pgrep -f`) (`PATTERN_KILL_RE` and `PATTERN_PGREP_RE` in `scripts/lib.sh`),
 and when it refuses it gives the pid-based ways to do the same thing. It is a Claude Code PreToolUse hook; a project registers it once under `hooks.PreToolUse` in `.claude/settings.json`:
 
 ```json
@@ -50,22 +50,22 @@ and when it refuses it gives the pid-based ways to do the same thing. It is a Cl
 
 In a session where it is not registered, commands typed by hand still rely on this text alone.
 
-## Once you start a background task or a subagent, re-check it on a schedule, and do not force it to end
+## Once you start a background task or a subagent, re-check it on a schedule, and end it only when whoever dispatched it does not respond
 
 Long work may run long, but someone has to be watching it:
 
 - **Anything started gets re-checked.** For a task started in the background or a subagent sent off, whoever dispatched it checks on a schedule: how long since its last action,
   whether it is sitting in a wait loop, whether the same command keeps running with byte-identical output, whether the files it writes are still growing.
-- **Keep detection separate from handling.** Tools that detect stuck or spinning work (hooks, watchdog scripts) only record and report; they do not block commands, kill processes, or stop subagents.
-  Whether it ends and how it is handled is decided by whoever dispatched it, after looking.
-  A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4: refuse, before writing, to overwrite an untracked file).
+- **Keep detection separate from handling.** Tools that detect stuck or spinning work (hooks, watchdog scripts) only record and report and do not block commands; they do not kill processes or stop subagents, except when whoever dispatched the work does not respond.
+  Whether it ends and how it is handled is decided by whoever dispatched it, after looking; if whoever dispatched it does not respond after the report (the same thing reported several times in a row, neither handled nor acknowledged), whoever reported (a person, an agent, or the detecting tool) may end it: a process with `scripts/proc.py stop <process id>`, a subagent with the tool that stops it; an ending is reported.
+  A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4 "Is another session in flight in the same repository?": refuse, before writing, to overwrite an untracked file).
 - **Before waiting for a line in a log, make sure that line is really written to that file.**
 - In sessions such as Claude Code, put long work in the background and come back to re-check it periodically, instead of idling in the foreground.
 
 ## Within one script, run the checks in parallel when they can be
 
 **Criterion: this batch of checks do not depend on each other, and every one of them has to start a
-subprocess to do its work (a build, a test run, a VM, a python process). Then run them in parallel,
+subprocess to do its work (a build, a test run, a virtual machine, a python process). Then run them in parallel,
 instead of waiting for them one at a time.**
 
 Once it is fast, look again at where the remaining time goes: a case that idles on purpose (one that verifies, say,
@@ -77,7 +77,7 @@ that `wait` does not return once the timeout logic is broken) is not saved by pa
 - they share one writable state (the same temp directory, the same target directory, the same device). To go parallel, give each item its own;
 - each item is fast by itself, running only a few milliseconds.
 
-Take the degree of parallelism (processes, and threads within a process) from an argument or an environment variable, falling back to `nproc`; do not hard-code it; heavy work such as VMs and builds gets
+Take the degree of parallelism (processes, and threads within a process) from an argument or an environment variable, falling back to `nproc`; do not hard-code it; heavy work such as virtual machines and builds gets
 its own ceiling from memory and devices.
 The cargo commands the shared scripts start (`scripts/check.sh`) run through the prefix registered in `.claude/cargo-command-prefix` at the project root:
 one line `<command and arguments>  # reason`, split on whitespace with no quoting, relative paths taken from the project root, each cargo command going through it once.
@@ -89,7 +89,7 @@ words that look like paths (containing `/`, or ending in `.sh` or `.py`; options
 There are only two ways to collect: record `pids+=($!)` when starting and take the exit code with `wait "$pid"`
 one at a time; or have each parallel item write its own exit-code file, and judge them when collecting in the
 order of the table the work was dealt from.
-A `wait` with no arguments, and `|| bad=1` inside the background body with the parent reading `$bad`, collect no exit code.
+Do not use a `wait` with no arguments, and do not write `|| bad=1` inside the background body for the parent to read `$bad`.
 
 S6 in `scripts/shell-lint.sh` judges this one: a `wait` with no arguments in command position turns red.
 Where the exit code really is collected elsewhere, write `# shell-lint:exit-collected <how it is collected>`
@@ -106,16 +106,16 @@ input that must go red, and see whether the parallel version still goes red.
 
 ## Do not use echo to fake success
 
-Do not report success the way `cmd 2>/dev/null; echo "done"` does.
+Do not report success the way `<command> 2>/dev/null; echo "done"` does.
 Any command that changes state must be verified by **reading the state back**: after
-`systemctl stop X`, confirm with `is-active`; the exit code of `stop` is not enough.
+`systemctl stop <service name>`, confirm with `is-active`; the exit code of `stop` is not enough.
 
 ## Result collection needs a completeness gate
 
 **Do this**: have the program under test report, on its final line, how many results it
 emitted; the collector compares the count and discards the round on a mismatch.
 That gate must itself be proven to go red first — feed it a fake program that claims
-N results and emits N−1, and it must fail.
+one more result than it actually emits, and it must fail.
 
 ## A script with a gate hands over its output only after judging it
 
@@ -128,12 +128,12 @@ self-test must go red.
 
 ## Assignments inside a subshell do not travel back to the parent
 
-In `rc="$(run_one ...)"`, any variable `run_one` assigns is **empty in the parent**.
+In `exit_code="$(run_one ...)"`, any variable `run_one` assigns is **empty in the parent**.
 **Pass values through a file or an argument, not through a variable.** It is a check that goes red in `scripts/shell-lint.sh`.
 
 ## After a script edits a file, read it back — a compiler warning is a free signal
 
-When a script does a string replacement on code or docs, two things to do:
+When a script does a string replacement on code or documents, two things to do:
 
 1. **The replacement must assert it hit something**: zero replacements is an error to
    raise, not "ran the script, so it's done".
@@ -146,8 +146,8 @@ When a script does a string replacement on code or docs, two things to do:
 
 | Form | How to write it |
 |---|---|
-| `inner; rc=$?` under `set -e` | Take the exit code inside an `if`: `if inner; then rc=0; else rc=$?; fi` |
-| `export X="$(cmd)"` / `local x="$(cmd)"` | Assign first, `export` second — write it as two lines |
+| `inner; exit_code=$?` under `set -e` | Take the exit code inside an `if`: `if inner; then exit_code=0; else exit_code=$?; fi` |
+| `export <variable name>="$(<command>)"` / `local <variable name>="$(<command>)"` | Assign first, `export` second — write it as two lines |
 | An environment variable used for a handshake leaking into a child process | `unset` it as soon as it is read; clear it with `env -u` when starting a child process |
 
 **The criterion is "how many process levels does this value cross"**: cross one and you
@@ -155,13 +155,13 @@ have to ask whether it is still there at the next level, and whether it should b
 
 ## The exit code of a pipeline is not the one you want
 
-`$?` after `cmd | head`, and `cmd | grep x && do_something`, both judge the last stage of the pipeline, not `cmd`.
+`$?` after `<command> | head`, and `<command> | grep <pattern> && <next action>`, both judge the last stage of the pipeline, not `<command>`.
 
 **What to do**: to judge whether the earlier stage succeeded, use `${PIPESTATUS[0]}`,
 or skip the pipe altogether — capture the output into a variable or file first, then
 check the exit code before doing anything with it.
 
-S7 in `scripts/shell-lint.sh` judges one form of this: in a script that sets `pipefail`, a pipeline ending in `grep -q` (`… | grep -q pattern`) turns red; a match gets read as no match.
+S7 in `scripts/shell-lint.sh` judges one form of this: in a script that sets `pipefail`, a pipeline ending in `grep -q` (`… | grep -q pattern`) turns red.
 The fix: capture the earlier stage's output into a variable first, then `grep -q pattern <<<"$variable"`; that form, with no earlier stage, is not judged.
 
 ## Test images always go in a temporary directory

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:46bdb5e523e601088b06879c235a0dab05f0c8a6c6b10ed5567a047d10ac6a67 -->
+<!-- generated-from: rules/session-wrapup.md sha256:3fff699a80fe6cfb1aaa18103cbe042fff9c408f8b4e940ecc7fa737fe6f9e3d -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -76,7 +76,7 @@ When several sessions work concurrently, go through these one by one before wrap
   Before staging, confirm `git diff --cached --name-only` is empty; after staging and before committing, check the list and each file's cached diff once more, then `git commit` with no paths.
 
 Collisions between history entries are judged by the gate stage "History entry numbers" (`历史条目编号`, `scripts/history-ordinal.sh`):
-it recognises only the Chinese shape, entries under a `### <date>` heading numbered "（其 N）", and goes red when one added this time collides.
+it recognises only the Chinese shape, entries under a `### <date>` heading numbered "（其 <ordinal>）", and goes red when one added this time collides.
 Only when the project uses a numbering shape it does not recognise does the project add a check of its own that goes red
 (`rules/show-me-test.md`, "turn traps you have hit into checks that fail").
 

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/design-doc-discipline.md sha256:dbe3b89b77beab2c73bab53ab1bd12b8b6fb716c61adbbbfd8c568c3230f7eda -->
+<!-- generated-from: rules/design-doc-discipline.md sha256:67641f9e688681747ecf4715b186b2ab40af034f26580b9bb5eb4c2efc8ec129 -->
 <!-- doc-lint:rule-definition -->
 # Design document discipline
 
@@ -9,22 +9,22 @@ Knowledge documents for model retrieval follow `kb-discipline.md`.
 
 ## 1. Body text states only the current state; history goes to the end
 
-No historical statements in the body — no "it used to be X, now it is Y", no "it was
-once called A". History that must be kept goes into a "Revision history" section at
+No historical statements in the body — no "it used to be <old approach>, now it is <new approach>", no "it was
+once called <old name>". History that must be kept goes into a "Revision history" section at
 the end:
 
 ```markdown
 ## Revision history
 
 ### YYYY-MM-DD
-- Was X / now Y / basis for the change: Z
+- Was <old approach> / now <new approach> / basis for the change: <why it changed>
 ```
 
 **Corollaries**:
-- Changed a decision? **Edit the body directly.** Do not annotate "(was X)" beside it.
+- Changed a decision? **Edit the body directly.** Do not annotate "(was <old value>)" beside it.
 - A conclusion overturned? **Delete the old conclusion from the body** and put
-  "was X / now Y / what overturned it" at the end.
-- No `~~strikethrough~~`, `[deprecated]`, `(superseded by XX)` in the body.
+  "was <old conclusion> / now <new conclusion> / what overturned it" at the end.
+- No `~~strikethrough~~`, `[deprecated]`, `(superseded by <the later decision>)` in the body.
 - Same for code comments: write "why it is this way now", not "how it used to be".
   **Pitfall comments in checking code are the exception** ("this bypass measurably
   got through, hence this check"). The criterion is what it points at:

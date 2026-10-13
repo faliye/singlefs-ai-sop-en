@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:d608d7d06438fed349270152484cacaf54f0acaa031e23cf99529c090c8edc03 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:71f4c903cf26841da5c6c3962121f75968126b0377da5e4258a969412c86c131 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -26,8 +26,8 @@ pure code-logic derivation, arithmetic.
 
 know what it settled on**. Before using a decision in any derivation (building a model,
 writing a check, overturning some other conclusion), paste its defining sentence
-verbatim into your notes or experiment comments. If you cannot paste it, you were
-working from memory.
+verbatim into your notes or experiment comments. If you cannot paste it, do not
+derive from it.
 
 ## You checked the narrow claim and then stated the broad one
 
@@ -37,14 +37,14 @@ ones you just checked?**
 - You checked "this path is blocked" ⇒ you may say "this path is blocked", **not "it
   cannot be done"**.
 - You checked "this file does not say it" ⇒ you may say "this file does not say it",
-  **not "nothing in the repo says it"**.
+  **not "nothing in the repository says it"**.
 
 ⇒ **What to do**: take the broad sentence as a proposition to be proved and ask
 **"what cases would I have to rule out for this to be true"**, then rule them out one
 by one. If you cannot finish, shrink the sentence back to the range you actually
 finished.
 
-⚠️ Before judging "is this object covered by a clause", **grep its name across the whole repo**
+⚠️ Before judging "is this object covered by a clause", **grep its name across the whole repository**
 and see whether it has been placed in some existing class.
 
 ⚠️ **Truncated output is a narrow claim too**: `grep … | head -12` shows the first 12 lines, not every match.

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-script-discipline.md sha256:3f1da56cc030eaebcb1fcef1e57613e429e38db616bd03f05e742e8f79c65375 -->
+<!-- generated-from: rules/test-script-discipline.md sha256:8adb8e413fe10c9c379c07c3741b62897ac4be49603305d855a15383c0dfcb2a -->
 <!-- doc-lint:rule-definition -->
 # How to write test cases and test scripts
 
@@ -68,7 +68,7 @@ They are equally bound by `show-me-test.md` (a new test is first shown to go red
 - A class left unjudged wholesale by registration is not pruning: the registry has one row per class saying why it is not judged, the success line reports how many were skipped, and the classes not judged are listed under `show-me-test.md` "The gate must not pretend to pass".
 - Pruning has a self-test: on a small input, run once with pruning and reuse off; the verdicts match the run with them on, item by item. The pruning self-test goes into the quick tier.
 - A block is written to disk only once it is fully judged, and the write is atomic; after an interruption, rerunning the same command resumes, filling in only what was not judged.
-- The success line reports "judged now N, reused M".
+- The success line reports "judged now <count>, reused <count>".
 - A full run (`--full`) reads no verdict store, and still writes the verdicts it judges back into the store by key.
 - When the whole script's inputs have not changed, it does not rerun: write `admission: inputs-changed` (`preflight-discipline.md`); reuse at the verdict level is done inside the script. Both layers are required.
 

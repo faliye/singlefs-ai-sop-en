@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:cb6751e10fb690fac04e7174f0519cb3700a7471b51734fc6500b0b27972a9fa -->
+<!-- generated-from: rules/show-me-test.md sha256:6b8f6a34b5fc96a8bf6a8a0dee59c656ad5a66d7f6d597e46ec94c271daef424 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -11,7 +11,7 @@
 ## No patch without tests is accepted
 
 **Change `crates/*/src/` or `crates/*/build.rs` and you must bring tests.** No exceptions; "this one is too simple" and
-"I will add them in the next patch" do not count. Documentation and script changes are exempt.
+"I will add them in the next patch" do not count. Documentation and script changes are exempt, and so are changes that only touch comments in `.rs` files (only when the code, with comments and whitespace removed, is token for token the same as before; code blocks in doc comments that compile as doctests, and adding or removing doc comments or `// SAFETY:` comments, count as code; the judgement is `scripts/comment-only-change.py`).
 
 Enforced by `scripts/show-me-test.sh` (`gate.sh` runs it as one stage).
 
@@ -26,7 +26,7 @@ write that down, you did not do it.
 
 Where a mutation harness exists, go one step further: turn "break this → that assertion
 goes red" into a **checked-in mutation list** that the replay gate keeps re-running. The
-commit-message account is the fallback for repos without a harness, not the first
+commit-message account is the fallback for repositories without a harness, not the first
 choice.
 
 **Design argument follows the same procedure**: for every hole an adversarial round finds, first
@@ -38,7 +38,7 @@ When to add one follows the "Boundary" section of `sop-first.md`: record it as d
 
 When a new trap is found, the first reaction is "how does this become a red line in the gate",
 not "which document does this go in": make it a check that refuses to run on the spot, not a
-reminder sentence like "careful not to do Y while X".
+reminder sentence like "careful not to do <something> while <some situation>".
 
 ### But first ask which layer the trap is on: inside one apparatus, or in the measurement basis
 
@@ -55,7 +55,7 @@ you step into it again? If yes, the trap is in the measurement basis, and the ch
 stand across apparatuses.
 
 **A cross-apparatus check must pin "which quantity this name refers to"**: two quantities get two
-registered names, each pinned to its own value ("one semantic concept, one name across the repo" in
+registered names, each pinned to its own value ("one semantic concept, one name across the repository" in
 `code-discipline.md`).
 
 ## The final criterion is set by the project
@@ -99,15 +99,15 @@ which must carry a quantity counted in the script (a variable that was accumulat
 `# gate-lint:nocount <reason>`, with a reason of at least 8 characters.
 
 **Reporting "how many were checked" is not enough: "which were not checked" must be listed one by one too, and that list must be computed on the spot.**
-**The skip list must come from the same data as the scanned set, computed on the spot**; the success line reports both "ran N; did not run M: named one by one".
+**The skip list must come from the same data as the scanned set, computed on the spot**; the success line reports both "ran <count>; did not run <count>: named one by one".
 This is not a check yet: `gate-lint` does not look at whether a script that reports a count also lists what it skipped, so it rests on whoever writes the stage.
 
-# When a change is not rolled out across the whole repo at once, every excluded file gets registered
+# When a change is not rolled out across the whole repository at once, every excluded file gets registered
 
-When a spec, an operation or a change
+When a specification, an operation or a change
 covers only part of the files, **whatever it did not cover gets registered in an exclusion
 table**, one entry per line with the reason after `#`. **No exclusion table means the whole
-repo has to change.**
+repository has to change.**
 
 The test is not "it is a hassle to change", it is "changing it would make the sentence false,
 or would make some gate stop working": another project's terminology and verbatim citations,

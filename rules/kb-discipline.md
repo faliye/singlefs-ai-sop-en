@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:5fc6374409399118bac70f7056c651282ed1e7e0cbd969d25d94a8f385a97d41 -->
+<!-- generated-from: rules/kb-discipline.md sha256:dd25d23439184879f62c2e251bc5f2f57338ed1537256c706fa4d053187dce93 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -51,7 +51,7 @@ file", "this document".
 
 | Referring to | Write it as |
 |---|---|
-| A numbered entry | write it as "number (short name)" — the same shape as rule 5 |
+| A numbered entry | write it as "number (short name)" — the same shape as item 5 "A number can serve as an index, never as a name" |
 | A section | Its heading |
 | A document | Its filename |
 
@@ -65,7 +65,7 @@ with temporal references not implemented; English implements none of the three. 
 ## 2. Every entry carries its source and status
 
 Source, measured or inferred, on what measurement basis. Dates go only with events: a measurement or a conclusion read elsewhere says which day it was done;
-a sentence that states the current state carries no date (see "A dated snapshot of the current state is history too, and stays stuck on that day" under section 8).
+a sentence that states the current state carries no date (see "A dated snapshot of the current state is history too, and stays stuck on that day").
 
 - Numbers must carry their basis: blocks or bytes, metadata included or not, on what
   hardware under what workload.
@@ -99,13 +99,13 @@ does the sentence still read? If it does not, the citation has drifted.
 
 | Form | How it is written | Where the short name comes from |
 |---|---|---|
-| Registry table | a line of its own directly above the table it governs: `<!-- doc-lint:registry name-col=2 -->` | column N of each row (N ≥ 2) |
+| Registry table | a line of its own directly above the table it governs: `<!-- doc-lint:registry name-col=2 -->` | column `name-col` of each row (`name-col` ≥ 2) |
 | Registry heading | `## D1 Data mobility —— settled`, **the dash is not optional** | after the number, before the dash |
 
 A heading without the dash (`### D1 and its relation to parity`) is not a registration.
 
 A short name may not be empty, may not equal the number itself, may not be shared by two
-numbers, and its display width is capped at 48 (CJK counts 2, ASCII 1 — i.e. 24 CJK
+numbers, and its display width is capped at 48 (a Chinese, Japanese or Korean character counts 2, an ASCII character 1 — that is, 24 Chinese, Japanese or Korean
 characters). Domain terms (`RAID5`, `SHA256`) are shaped exactly like numbers; exempt them
 explicitly: `<!-- doc-lint:not-numbers RAID5 SHA256 -->`.
 

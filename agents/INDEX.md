@@ -1,23 +1,20 @@
-<!-- generated-from: agents/INDEX.md sha256:e3686fade301940ad38df3ea8347b6a4ee3cb1bd9b521a6e3b5a724703e3bb01 -->
+<!-- generated-from: agents/INDEX.md sha256:15ba3972baf020b2904c501b950dd8c2f9bfd34c0dc0503fd876298003588cf0 -->
 # Shared subagent definitions
 
-**This layer is governed; it is currently empty.** Empty is a state, not an oversight —
-writing it down explicitly: "there is none" and "we forgot" look identical in a
-directory listing (`rules/kb-discipline.md` section 3, "Record "we do not know" explicitly").
+**This layer is governed; it is currently empty** (`rules/kb-discipline.md` section 3, "Record "we do not know" explicitly").
 
 ## What belongs here
 
 **Subagents that get delegated repeatedly across rounds of work, with fixed criteria.**
 The line against `skills/`:
 
-| | Where | Why |
-|---|---|---|
-| A procedure a person or the main model follows | `skills/` | It is **read**; it needs no separate context |
-| Work that needs its own context and returns only a conclusion | `agents/` | It is **delegated**; the main line should not drown in its intermediate output |
-| A delegation that only makes sense in one project | the project's `.claude/agents/` | Not upstreamed: whatever governs how the system under test is designed stays project-local, and so does anything you are unsure about |
+| What work | Where |
+|---|---|
+| A procedure a person or the main model reads and follows, with no separate context | `skills/` |
+| Work that needs its own context and returns only a conclusion | `agents/` |
+| A delegation that only makes sense in one project, or one that governs how the system under test is designed | the project's `.claude/agents/` |
 
-**When in doubt, keep it project-local.** A subagent that should not have been
-upstreamed has to be worked around in every round that follows.
+**When in doubt, keep it project-local.**
 
 ## How to write one
 
@@ -27,26 +24,22 @@ line 1):
 ```markdown
 ---
 name: <lower-case-hyphenated, identical to the filename>
-description: <when to delegate it. This sentence is the main model's only basis for
-             picking it, so state the trigger>
+description: <when to delegate it: state the trigger>
 ---
 
 <Body: its remit, its criteria, and the **format of what it returns**.>
 ```
 
-**`description` decides whether it gets used correctly.** "Reviews code" tells nobody
-when to reach for it; "after a mutation run, decides which uncaught mutants are equivalent
-mutants" does.
+**`description` states the trigger**: write "after a mutation run, decides which uncaught
+mutants are equivalent mutants", not "reviews code".
 
 ## Three disciplines
 
-1. **Pin down the output format.** A subagent that comes back with a wall of prose has
-   pushed the sorting cost onto the main line. Say what it returns, in what order, and
-   which pieces of evidence each item carries.
-2. **Report only what was run, never what was inferred.** Nobody watches the middle of
-   delegated work, so its report must carry its own evidence (which command, which
-   file, what output) — the same rule as `rules/evidence-discipline.md`, applied to
-   delegation.
+1. **Pin down the output format.** Say what it returns, in what order, and which pieces
+   of evidence each item carries.
+2. **Report only what was run, never what was inferred.** The report carries its own
+   evidence (which command, which file, what output) — the same rule as
+   `rules/evidence-discipline.md`, applied to delegation.
 3. **It has to be able to say what it did not do.** What could not run, what was not
    verified, listed explicitly (`rules/show-me-test.md`: unimplemented stages stay
    listed).
@@ -61,8 +54,7 @@ place.
 | Shared definition | this directory, `agents/<name>.md` |
 | Project side | `.claude/agents/<name>.md` is a stub: frontmatter plus a pointer to the shared body |
 
-`install.sh` generates the stub. Nothing of the body goes in it — writing it there
-creates a second copy, and two copies eventually say different things.
+`install.sh` generates the stub. Nothing of the body goes in it.
 
 ## Gate
 

@@ -1,15 +1,15 @@
-<!-- generated-from: rules/test-discipline.md sha256:a264be78f045288ab66f3024503d810869fa0ca0bbea8562ee388a91c5de6698 -->
+<!-- generated-from: rules/test-discipline.md sha256:a234905c99d88f861de5b9c7194d013cfe9234a3d8ed94f184f0798db7ab50d3 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
 ## A single observation does not count
 
-N≥5 rounds. To call it "pass" every round must pass; to call it "fail" every round
+Run at least 5 rounds. To call it "pass" every round must pass; to call it "fail" every round
 must fail; if neither holds, report "unstable" honestly and draw no conclusion.
 
 The precondition is that the observation itself varies: real I/O, concurrency, timing,
 randomness — at least one must be present. With none of them the thing under test is a
-deterministic model, and the only phrasing allowed is "running N rounds proves there is no
+deterministic model, and the only phrasing allowed is "however many rounds ran, they prove only that there is no
 hidden state, not statistical stability"; its evidence strength comes from mutation testing
 and from assertions that pin down absolute values, not from the round count.
 
@@ -34,7 +34,7 @@ elsewhere, your own intuitive expectation: none of them.
 **What you must read is the definition, not the answer.** The basis, parameters and
 semantics of the thing under test have to be read verbatim (`verify-before-claiming.md`,
 "whether it is settled and what it actually says are two different questions");
-"last round measured X" and "project Y says this way is faster" are answers, and are not read.
+"last round measured some value" and "some project says this way is faster" are answers, and are not read.
 
 **What to do**: pin down criteria, thresholds and discard clauses before the run, then go
 look at the existing conclusions. Where the two disagree, record both as they stand —
@@ -78,7 +78,7 @@ When adding an arm, change the control loop along with it.
 
 **Next to every cross-arm assertion there must be an assertion that pins down an
 absolute value.** "The three arms have equal overhead" is not enough; you also need
-"the overhead is exactly N", with N derived by independent arithmetic.
+"the overhead is exactly some number", with that number derived by independent arithmetic.
 
 **What to do**: once you have written a cross-arm assertion, ask yourself "if all three
 arms were wrong **together**, who would notice". If you cannot answer, add one that
@@ -106,14 +106,14 @@ which value of it would flip that decision, and at what point that decision beco
 Mutation only proves "every piece of code with an assertion has been mutation-tested", **not**
 "every piece of code the conclusion rests on has been tested".
 
-Never write "zero blind spots"; write "all N mutations were caught" and nothing more.
+Never write "zero blind spots"; write "all <count> mutations were caught" and nothing more.
 And once the conclusion is written, go back and ask: **is the arithmetic this conclusion
 comes from covered by an assertion?**
 
 Two pitfalls silently disarm mutation testing:
 
-1. **Write constant assertions as addition, not subtraction**: write `assert_eq!(A, B + 240)`,
-   not `assert_eq!(A - B, 240)`.
+1. **Write constant assertions as addition, not subtraction**: write `assert_eq!(total_size_in_bytes, header_size_in_bytes + 240)`,
+   not `assert_eq!(total_size_in_bytes - header_size_in_bytes, 240)`.
 2. **An equivalent mutant is not a blind spot; account for it separately.** For a mutation
    that agrees with the original on every input and is judged equivalent, pin the equivalence
    down as a test for the record, then substitute a mutation that really changes behaviour.

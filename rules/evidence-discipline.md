@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:d58bddd1f22fd22b4a4af44e27dd47bd27a1351e81259086868272b9a6dfd548 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:ef4f79232c9942ce20c61bebac86d95e28a1269f603927191a9cb65a70595307 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -13,12 +13,8 @@ spelled out.** Missing any of them, write it as a hypothesis, not as a conclusio
 
 ## The cross-check path must itself be shown to go red
 
-Inject a known fault into the subject under test — one the second path *ought* to catch —
-and confirm that it does. If it does not, that cross-check is decoration, and every earlier
-record of "the two paths agree" is void with it.
-Example: when block-layer counters cross-check the I/O counts a program keeps for itself, the
-agreement counts as evidence only once dropping direct I/O is seen to send the block-layer count
-to zero while the program's own count does not move.
+Inject a known fault into the subject under test — one the cross-check route *ought* to catch —
+and confirm that it does. If it does not, every earlier record of "the two paths agree" is void.
 
 ⚠️ **An independent count that matches only the total does not confirm a breakdown.**
 Before using a count to confirm a breakdown, ask whether the counter can distinguish the kinds being split. If it cannot, write only "consistent with", say where the breakdown comes from, and check the other raw count as well.
@@ -27,7 +23,7 @@ Before using a count to confirm a breakdown, ask whether the counter can disting
 
 When cross-checking a conclusion across multiple independent sources, **every external fact in
 the "known facts" brief handed to each party is checked first by the person asking the question**.
-Before writing "implementation X works like this" into the brief, check it on the spot; what you
+Before writing "some implementation works like this" into the brief, check it on the spot; what you
 cannot check, mark "unverified".
 
 ## Evidence kept verbatim must not be edited afterwards
@@ -49,7 +45,7 @@ re-verify it rather than digging up the old evidence (`kb-discipline.md` item 2,
 data is reference only"). Overturning an earlier conclusion means running the project's own
 inference discipline again, not confronting it with an old file.
 
-⇒ **A check on artifact lines quoted in prose judges "this change", not the whole repo.**
+⇒ **A check on artifact lines quoted in prose judges "this change", not the whole repository.**
 Numbers written into prose today must match today's artifacts verbatim; lines copied down
 earlier are historical reference and are not judged again.
 
@@ -83,8 +79,8 @@ data, not that implementation.
 | **Counter-evidence**: a scheme that appears in **no** production implementation is a signal demanding an explanation | **Positive proof**: a scheme appearing in a production implementation does not make it fit for this project |
 | **Mechanism**: decompose what they did into a mechanism, then argue that mechanism holds under this project's premises | **Transplanting**: carrying the conclusion over together with the premises it never wrote down |
 
-⚠️ **"No production implementation takes path X" does not prove X is wrong, but the burden of
-proof is on X's side**: to walk a path nobody has walked, you must say why nobody did.
+⚠️ **"No production implementation takes a certain path" does not prove that path is wrong, but the burden of
+proof is on the side that wants to take it**: to walk a path nobody has walked, you must say why nobody did.
 
 ⚠️ **When citing another implementation, you must also write down one known difference
 between it and this project.** If you cannot name a difference, the citation is
@@ -93,7 +89,7 @@ between it and this project.** If you cannot name a difference, the citation is
 **Cite it with its source and "not verified in this project"**
 (`kb-discipline.md`, "Every entry carries its source and status").
 
-## A hypothesis must be refutable by observation, or it is not a hypothesis
+## A hypothesis must name the observation that would refute it
 
 After writing a hypothesis down, **first ask "what phenomenon would overturn it".**
 If you cannot answer, do not build an experiment on it.
@@ -157,8 +153,8 @@ the artifact**; keep the original criterion as written and judge the two arms ea
 |---|---|---|
 | **The hit does not tell the arms apart** | One cell knocks every arm out at once; the cause lies in a premise all arms share | Do not use it to judge the arms: open a separate item for that shared premise and fix it first; judge the arms only on the cells that tell them apart. When writing a clause like "all out ⇒ fall back to one arm", also write how to record a cell that knocks every arm out |
 | **The discriminator cannot be observed** | The criterion asks the system under judgement to tell two situations apart, but what that system can see at the moment it decides is identical, item for item, in both | Change the criterion — and a changed criterion is a new round |
-| **The hit is filed under the wrong criterion** | A leg reports "criterion X fires", while what happened belongs, by the wording, to another criterion with a different threshold | Check word by word which clause of which criterion the hit satisfies |
-| **The fix does not reach the cells that were hit** | A reverse-acceptance clause written before the run says "hit ⇒ choose between fix A and fix B", and one of the fixes is still hit on exactly the cells that were hit | When writing the clause, state for each fix which cell it repairs; after a hit, check each fix against the hit cells first, and when handing over one that is still hit, write "does not work on these cells" |
+| **The hit is filed under the wrong criterion** | A leg reports "some criterion fires", while what happened belongs, by the wording, to another criterion with a different threshold | Check word by word which clause of which criterion the hit satisfies |
+| **The fix does not reach the cells that were hit** | A reverse-acceptance clause written before the run says "hit ⇒ choose between two fixes", and one of the fixes is still hit on exactly the cells that were hit | When writing the clause, state for each fix which cell it repairs; after a hit, check each fix against the hit cells first, and when handing over one that is still hit, write "does not work on these cells" |
 
 ⇒ **When a criterion fires, ask four questions first**: does it tell the arms apart? Can the system under judgement
 actually see, at that moment, what it is asked to tell apart? Which clause of the criterion's wording does it satisfy?
@@ -175,13 +171,13 @@ computed yourself.
 Re-run an artifact and every number the prose quotes from it has to be checked back, one by
 one. **A green replay does not constitute "the numbers in the prose are right".**
 
-⇒ The same governs **claims a single command could count**: "N unit tests", "M mutations",
-"K lines of artifact". **A number a single command can count is counted by that command**,
+⇒ The same governs **claims a single command could count**: "<count> unit tests", "<count> mutations",
+"<line count> lines of artifact". **A number a single command can count is counted by that command**,
 not left to the writer to remember to come back and fix it.
 
 ⚠️ **Prose disagreeing with its artifact has another shape: the number is not wrong, the qualifier is gone.**
-⇒ **Criterion**: when a conclusion says "only A buys it / unique to A / only A can", go to the
-artifact and read **the non-A arms at every parameter setting**; if the table in the prose
+⇒ **Criterion**: when a conclusion says "only a certain arm buys it / unique to a certain arm / only a certain arm can", go to the
+artifact and read **every arm other than that one at every parameter setting**; if the table in the prose
 **has no column for that parameter**, the scope has been shed and the "only" does not hold.
 
 ### An extreme found by a sweep that lands on the sweep's endpoint is not a measured number
@@ -206,7 +202,7 @@ repository, not "the places I remember".
 **Test: swap the new value into the sentence — is it still true?** If yes, it states the present, so change it. If no, it reports that occasion, so leave it.
 
 ⚠️ **Sweep by the old wording, not only by the new names.**
-Before sweeping, write down "how the repository would describe this thing before it was done" (no X, X not yet, only Y, N items) and search the whole repository for those phrasings;
+Before sweeping, write down "how the repository would describe this thing before it was done" (no <this thing>, <this thing> not yet, only <some other approach>, <count> items) and search the whole repository for those phrasings;
 also take each current-state sentence this phase's diff deleted or rewrote and search, one by one, for whether it still lives elsewhere.
 
 ### A withdrawal's rationale collapsing does not bring the withdrawn conclusion back

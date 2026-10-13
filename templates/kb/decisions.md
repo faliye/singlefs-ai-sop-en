@@ -9,7 +9,7 @@ put the basis into the closing "## Revision history", and if it is not registere
 
 ---
 
-## D1 <decision name, display width ≤ 48, CJK = 2> —— undecided
+## D1 <decision name, width ≤ 48, wide character 2> —— undecided
 
 <!-- This heading is the registration site for the number: the segment between the
      number and the "——" is its short name. Every citation elsewhere is written

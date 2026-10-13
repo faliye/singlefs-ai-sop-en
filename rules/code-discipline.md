@@ -1,4 +1,4 @@
-<!-- generated-from: rules/code-discipline.md sha256:593c26efa75445b19b2b45eabd3942734bb682517d0f1adc0408a9c541444660 -->
+<!-- generated-from: rules/code-discipline.md sha256:ae3f205594d0f03863338e07a77c710ee46166c1042a7145092384916bf1c054 -->
 <!-- doc-lint:rule-definition -->
 # Code discipline: how machine-first lands in code
 
@@ -12,7 +12,9 @@ are in "Popular practices, examined one by one".
 For a principle not listed here, run the procedure in `machine-first.md` before using it — the
 default is doubt, not compliance.
 
-This covers all the code we write in this project: product code, tests, experiment code, scripts.
+This covers all the code and text we write in this project, in every language and every directory: product code, tests, experiment code, scripts, configuration and build files, and documents (README, design notes, kb, rules, skills, agent definitions, commit messages, gate failure messages).
+The examples are in Rust; other languages follow the same criterion, written the way that language does it.
+Documents follow two things: names they mention are formed by "Names"; their text follows the rule "Comments contain no abbreviations and refer to nothing by a code name".
 How far the gate checks is in "Which half the gate handles".
 
 ## Names: the name alone says what it is and what it does
@@ -37,6 +39,7 @@ Names fixed from outside are not ours to decide: implement `Display` and the met
 | **Test names state the scenario and the expected outcome** | `crash_between_data_write_and_commit_keeps_previous_generation`, not `test_commit` or `it_works` |
 | **One name per semantic concept across the repository** | The unit is the semantic concept, not the word: one concept may not be `generation` here and `epoch` there; two concepts, however close their underlying meaning (the generation recorded on disk, the generation in a transaction's lifecycle), may not share a name — each carries its role: `committed_generation`, `transaction_generation` |
 | **A name stands on its own, without the module path** | Write `block::BlockAddress`, not `block::Address`. Type names thereby form a hand-made namespace (`BlockAddress`, `JournalAddress`, `LogicalAddress`…); write them that way |
+| **No ordinals or positions as names** | Functions, variables, parameters, types, fields, constants, modules and files alike: names such as `layer0`, `stream_0`, `step2`, `phase_1`, `first_item`, which only say "which number", are not allowed; name what it does and what it handles: `stream_0` → `metadata_journal_stream`, `layer0` → `checksum_verification_layer`. Instances that truly differ only by position go into one collection, told apart by a typed index (`stream_index: StreamIndex`), not given numbered names one by one. A registered project number with its short name is used as is — see "The abbreviation registry" |
 | **A new meaning gets a new name** | Shadow a name only when the meaning stays the same; when raw data becomes verified data, or a byte count becomes a block count, pick a new name |
 
 ### No abbreviations; the criterion is whether there is one authoritative definition
@@ -68,7 +71,7 @@ e<数字>  # experiment numbers, registered in .claude/kb/experiments.md
 
 (`<数字>`, "digits", is literal syntax that the lint reads as written.)
 Once registered, the `e57` in `e57_field_authority` no longer counts as a single letter. A number in a
-name carries its short name here too (`kb-discipline.md`, item 5): write `e57_field_authority`, not a
+name carries its short name here too (`kb-discipline.md`, item 5 "A number can serve as an index, never as a name"): write `e57_field_authority`, not a
 bare `e57`.
 
 ### Where meaning lives: comment < name < type
@@ -166,7 +169,7 @@ fn walk(node: &VerifiedNode) { /* ... */ }   // skip verification and you cannot
 - **Recoverable failures** (I/O errors, corrupted on-disk data, running out of resources) **go through
   `Result`**. The variants of an error enum are **split by the decision the caller has to make**, not
   expanded one per underlying cause: for example, what the layer above branches on may be only "not
-  found", "corrupt", "no space" and "other I/O error", with the dozens of underlying OS errors carried
+  found", "corrupt", "no space" and "other I/O error", with the dozens of underlying operating system errors carried
   as the source inside "other I/O error".
 - **The criterion is whether the caller loses a decision it should be able to make.** A library's
   public boundary does not use a catch-all error type like `anyhow` or `Box<dyn Error>`; nor does it
@@ -207,10 +210,13 @@ invariant (written as an assertion), and every early exit.
 - **Comments say "why it is this way"**, not "what this does".
   Constraints go into types, names or assertions, not comments.
 - **A comment that points at a place in another file names a function, a heading or a unique anchor string, not a line number.**
+- **Comments contain no abbreviations and refer to nothing by a code name.** Spell abbreviations out; the only exception is a registered domain abbreviation (see "The abbreviation registry").
+  Do not use stand-ins that only give a letter, an ordinal or a position — `a`, `b`, `c`, `layer0`, `stream_0`, "layer 0", "the first item" — and do not shorten several things into a list like "a b c":
+  write out what each one is and what it does, for example "the first item" becomes "the checksum item".
 - **Doc comments state the contract a type cannot**: which errors it returns, when it panics, what an
   `unsafe` function requires of its caller. Doc comments that restate the name are deleted.
 - **Every `unsafe` block has a `// SAFETY:` comment above it** saying why it is safe.
-- **Invariants are written as assertions**, not only in docs.
+- **Invariants are written as assertions**, not only in documents.
 - **Magic numbers become named constants**: a number has exactly one definition, with its unit in the
   name or the type.
 - **Duplication is generated, never hand-copied.** Macros and `build.rs` are the proper way to generate;
@@ -381,10 +387,10 @@ public API — gets its own criterion; you cannot get there by saying "explicit 
 | `unsafe` blocks need `// SAFETY:` | clippy `undocumented_unsafe_blocks` |
 | Shadowing with an unrelated meaning | clippy `shadow_unrelated` |
 | Warnings are errors | clippy `-D warnings` |
-| Whether a name says enough, whether one concept has one name, whether a function does one thing, whether a comment says why, whether a comment cites a line number in another file, whether error variants follow the caller's decisions, whether loop state is written out, `..Default::default()` | review |
-| Names in shell scripts | **not yet a check**; `gate.sh` lists it among the unimplemented stages. ⚠️ This discipline applies to shell just the same, but the existing scripts in `scripts/` have never been swept; do not take them as models |
+| Whether a name says enough, whether one concept has one name, whether a function does one thing, whether a comment says why, whether a comment cites a line number in another file, whether a name or a comment uses an ordinal or a position as a stand-in, whether a comment contains an abbreviation, whether error variants follow the caller's decisions, whether loop state is written out, `..Default::default()` | review |
+| Names, abbreviations and stand-ins in code other than `.rs` (shell, python and the like) and in documents | **not yet a check**; `gate.sh` lists it among the unimplemented stages (key 「命名纪律（shell）」) |
 
-The clippy ones run inside `scripts/check.sh`, i.e. the gate's "Build and unit tests" stage; that stage does not run when the project root has no `Cargo.toml`.
+The clippy ones run inside `scripts/check.sh`, that is, the gate's "Build and unit tests" stage; that stage does not run when the project root has no `Cargo.toml`.
 
 The abbreviation list in `naming-lint.sh` holds only the most common ones — **an abbreviation missing
 from the list is still a violation**; the gate just cannot see it.

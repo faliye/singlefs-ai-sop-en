@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:7dc3c6c818ef7df14ec265b4b6a35f22c8b73c972d00fc0650236ae229c3373d -->
+<!-- generated-from: rules/writing-discipline.md sha256:4fa61ec4217b95152c75d306a40aa0dbca0a55a525ea2ed3ad4e9e2f7fb6c55c -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -12,7 +12,7 @@ Three kinds of document, three ways of writing:
 
 | Kind | Who uses it | Goal | Rule |
 |---|---|---|---|
-| **Design docs** | humans read them through | make people **agree** and **get started** | `design-doc-discipline.md` |
+| **Design documents** | humans read them through | make people **agree** and **get started** | `design-doc-discipline.md` |
 | **Engineering kb** | model retrieval | keep the model from **making things up** | `kb-discipline.md` |
 | **Rules** | execution | must be turnable into a check that fails | `rules-discipline.md` |
 
@@ -29,7 +29,7 @@ paragraphs and new code comments cap at one line.** If it will not fit, first ch
 you are writing something that should not be written.
 
 **Cutting it down to size is the job of whoever wrote the code, not of whoever
-reviews it.** The paragraph you feel is "load-bearing" is often exactly the one to cut.
+reviews it.**
 
 ### As short as possible without losing content
 
@@ -71,7 +71,7 @@ reviewer can take and verify for themselves.
 |---|---|
 | numbers: hit/miss counts, before-and-after, timings | why this number matters and what it shows |
 | the reproduction command and its verbatim output | how I came to think of running that command |
-| the basis needed to re-run: version, config, hardware | which dead ends were tried |
+| the basis needed to re-run: version, configuration, hardware | which dead ends were tried |
 
 **Include only the few decisive numbers**; the full record stays in `kb/` or `records/`.
 
@@ -101,8 +101,12 @@ reviewer can take and verify for themselves.
 |---|---|---|
 | **Bureaucratic padding** | "in the event that", "with respect to", "it is the case that", "perform an analysis of", "make use of" | "if", "about", drop it, "analyse", "use" |
 | **Archaic or literary register** | "hereinafter", "thus it follows", "whereupon", "one might posit" | Say what it is and what follows |
-| **Concessions that concede nothing** | "While X, however Y" where X and Y do not actually conflict | Keep only the half you mean |
+| **Concessions that concede nothing** | "While <one point>, however <another point>" where the two points do not actually conflict | Keep only the half you mean |
 | **Over-explaining** | "as is well known", "needless to say", "it goes without saying"; stating a conclusion and then restating its negation | Say it once |
+
+### No abbreviations, nothing referred to by a code name
+
+The criterion and the registry are those of `code-discipline.md`: the "Names" section and the rule "Comments contain no abbreviations and refer to nothing by a code name". The gate does not check this.
 
 ### Write conjunctions as conjunctions; unpack noun strings into sentences
 
@@ -112,8 +116,6 @@ Do not replace conjunctions with `⇒`, `×`, `+`, and do not compress an action
 - Unpack noun strings: "main agent additionally verbatim-verifies four mandatory sites" becomes "I also checked the four mandatory sites word for word."
 - Keep bold for verdicts and numbers; do not bold whole sentences or paragraphs.
 - Label-style colons ("mechanism:", "basis:", "measurement:") may stay in a kb, but a complete sentence must follow the colon.
-
-This does not conflict with "as short as possible": what gets cut is padding, not the skeleton of the sentence.
 
 The gate does not check this. The `⇒` already in `rules/` have not been swept yet; do not take them as examples.
 

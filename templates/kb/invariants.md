@@ -1,4 +1,4 @@
-<!-- generated-from: templates/kb/invariants.md sha256:46504eaa947a9f4d77daed9664c2b8d73c40ffbdda25e16d1ce645cc36378123 -->
+<!-- generated-from: templates/kb/invariants.md sha256:6ece5493d403cb1adabd445011af2256ee1118c77e3d71d112ce1ad5f31cbab9 -->
 # Invariant list
 
 **The project's checks are the executable form of `invariants.md`.** Every entry added here means
@@ -12,11 +12,11 @@ understood, and does not belong here.
 
 **A number is an index, not a name**: every invariant has a short name, and every
 citation elsewhere is written `<number> (<short name>)`.
-Enforced by `doc-lint.sh` (`../singlefs-ai-sop/rules/kb-discipline.md`, item 5).
+Enforced by `doc-lint.sh` (`../singlefs-ai-sop/rules/kb-discipline.md`, item 5 "A number can serve as an index, never as a name").
 
 <!-- doc-lint:registry name-col=2 -->
 
-| ID | Short name | Invariant | Check state |
+| Number | Short name | Invariant | Check state |
 |---|---|---|---|
 | I-1.1 | <the short name> | <decidable statement> | not implemented |
 

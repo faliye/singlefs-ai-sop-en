@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:6c89edb4d060fa2d876f46ef3059f175ad6944eefda05c2ebadf034b4a84551b -->
+<!-- generated-from: CLAUDE.md sha256:654782edff073acb6181e3efc217fa1bdba9609a05a5cd51d8387eb260fe3fb8 -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -7,10 +7,9 @@ It governs **how a project collaborates with AI**, not how a filesystem should b
 designed. It has exactly one user.
 Work inside this repository is bound by these rules too.
 
-Changing the spec proper **must bump `VERSION` in the same change**; otherwise
-the project's gate will report a version mismatch.
+Changing the specification proper **must bump `VERSION` in the same change**.
 Releases are batched weekly: rule and script changes accumulate in the working tree and go out as one version a week; fixes for false positives and misjudgements accumulate into that version; the consumer project syncs its copy once per release.
-**Which paths count as "the spec
+**Which paths count as "the specification
 proper" is defined by `GOVERNED` in `scripts/version-discipline.sh`** — that is the
 only list, and it is not copied here.
 A bump comes with a section for that version at the top of `CHANGELOG.md` — one section per
@@ -31,10 +30,10 @@ the person making the change is the one who guarantees they agree. The gate can 
 see that a hash does not match — not whether the editions say the same thing.
 
 **Master is pushed only through `bash scripts/push-all.sh`, which checks and pushes every edition together.**
-It first checks every language repo (on master, clean working tree, same VERSION, gate green), connects to
-the remotes only after that, and pushes the commit it checked in each one; if any repo's HEAD moved after
+It first checks every language repository (on master, clean working tree, same VERSION, gate green), connects to
+the remotes only after that, and pushes the commit it checked in each one; if any repository's HEAD moved after
 the check, it pushes none of them. Run `git config core.hooksPath scripts/githooks` once in each language
-repo: the hook refuses a direct `git push` of master on the spot and points to push-all.sh. Pushing any
+repository: the hook refuses a direct `git push` of master on the spot and points to push-all.sh. Pushing any
 other ref (a feature branch, a tag) goes through the hook untouched: only the ref you named gets pushed.
 
 **What gets translated and what gets copied verbatim** turns on one question: is there
@@ -44,7 +43,7 @@ coverage check.
 
 ## Rules (always in force)
 
-**Explanations and arguments are superfluous in `rules/`.** A rule states only criteria, steps, scope and exceptions, defaults, and pointers (`rules/rules-discipline.md`, items 1 and 2).
+**Explanations and arguments are superfluous in `rules/`.** A rule states only criteria, steps, scope and exceptions, defaults, and pointers (`rules/rules-discipline.md`, item 1 "The body carries four things only" and item 2 "Keep the criterion, move the argument out").
 
 @rules/engineering-philosophy.md
 @rules/sop-first.md
@@ -67,9 +66,8 @@ coverage check.
 ## Where a thing belongs
 
 **This SOP was made for its one user, and nothing here
-presumes it generalises to other projects.** So the criterion is not "would another
-project need it too" — there is no other project to look at, so anyone can answer
-"yes", and everything ends up upstream.
+presumes it generalises to other projects.** The criterion is not "would another
+project need it too".
 
 To decide where a piece of content goes, look at what it governs:
 
@@ -83,9 +81,7 @@ To decide where a piece of content goes, look at what it governs:
   `kb/invariants.md`, **project-specific rules into `.claude/rules/`**, and
   project-specific scripts into `.claude/scripts/`.
 
-**When in doubt, keep it in the project.** A rule that should not have gone upstream
-has to be worked around every round from then on; one misplaced in the project is a
-single file to fix.
+**When in doubt, keep it in the project.**
 
 ## How a project hooks in
 
@@ -94,12 +90,10 @@ own hook-up (**no symlinks**):
 
 | Layer | How it hooks in |
 |---|---|
-| rules | The project's `CLAUDE.md` references `@.claude/singlefs-ai-sop/rules/x.md`; no copy is kept in the project |
-| Project-local rules | Put them in `.claude/rules/x.md` and reference them as `@.claude/rules/x.md` in the project `CLAUDE.md`. They do not go upstream |
+| rules | The project's `CLAUDE.md` references `@.claude/singlefs-ai-sop/rules/<name>.md`; no copy is kept in the project |
+| Project-local rules | Put them in `.claude/rules/<name>.md` and reference them as `@.claude/rules/<name>.md` in the project `CLAUDE.md`. They do not go upstream |
 | skills | The project's `.claude/skills/<name>/SKILL.md` is a **stub**: frontmatter plus a pointer to the shared body |
 | agents | The project's `.claude/agents/<name>.md` is a **stub**: frontmatter plus a pointer to the shared body. Conventions in `agents/INDEX.md` |
-| scripts | The project's `.claude/scripts/x.sh` is a **wrapper**: set up the environment, then `exec` the shared script |
+| scripts | The project's `.claude/scripts/<name>.sh` is a **wrapper**: set up the environment, then `exec` the shared script |
 
-Never put substance or logic inside a stub or a wrapper — the substance should exist
-in exactly one place; put it there and a second copy exists, and two copies will
-disagree sooner or later.
+Never put substance or logic inside a stub or a wrapper.

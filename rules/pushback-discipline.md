@@ -1,4 +1,4 @@
-<!-- generated-from: rules/pushback-discipline.md sha256:d304568c3277890357eefd80eedd87cc3edc100b2d775770c10421b62df330a8 -->
+<!-- generated-from: rules/pushback-discipline.md sha256:a182572ce0e746601b74573d6435d4a9e1cd979e2308d1ed14386e54117f25b9 -->
 <!-- doc-lint:rule-definition -->
 # A proposal is not exempt because of who made it
 
@@ -28,7 +28,7 @@ someone else gets checked too).
 done, finishing and only then finding the premise does not hold, having started on an
 investigation that was too thin: say so, and withdraw the whole thing if that is what it takes.
 
-"We already built this much" is not a reason to continue. "Rolling this back costs X" is one
+"We already built this much" is not a reason to continue. "How much rolling this back costs" is one
 piece of information for them; it does not go into the technical rationale.
 
 ⚠️ This holds for **work already produced**. `git checkout`, `rm -rf` and the rest that silently
@@ -67,7 +67,7 @@ section per warning, all four items present:
 **Outcome**: <they restated it, done as asked / plan changed / withdrawn>
 ```
 
-**Everywhere else links here and copies nothing** (`kb-discipline.md` §4). The decision in
+**Everywhere else links here and copies nothing** (`kb-discipline.md` item 4 "A contradiction is worse than a gap"). The decision in
 `kb/decisions.md` needs one line — "there was a warning, see `.claude/warnings/2026-09-06.md`" —
 and no copy of the body.
 
