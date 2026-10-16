@@ -1,4 +1,4 @@
-<!-- generated-from: templates/CLAUDE.project.md sha256:4ab784d790e883bd5bc4471b3c87a01bb9b7fca0d849a69a16da83b7b5f34e58 -->
+<!-- generated-from: templates/CLAUDE.project.md sha256:31c6513d1a051b37c18473eb877346a3e0120ece7d642255b9d73f0c171d3fc8 -->
 # <project name>
 
 <Three to five lines: what this project is, which milestone it is at, how it relates to
@@ -51,6 +51,7 @@ came from; it sorts them into those carrying evidence and those not.
 bash .claude/scripts/gate.sh          # the acceptance gate; mandatory before submitting
 
 bash .claude/scripts/check.sh         # fast feedback (format/lint/build/unit tests)
+bash .claude/scripts/doc-lint.sh      # documentation discipline check
 bash .claude/scripts/gate-lint.sh     # the gate itself: does every rejection give a next step
 bash .claude/scripts/shell-lint.sh    # shell discipline: pkill -f / pgrep -f, values carried out of subshells, git undo commands, unguarded rm -rf, wait with no arguments, pipelines ending in grep -q under pipefail
 bash .claude/scripts/naming-lint.sh   # naming discipline: single-letter names and common abbreviations in .rs

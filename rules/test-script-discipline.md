@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-script-discipline.md sha256:8adb8e413fe10c9c379c07c3741b62897ac4be49603305d855a15383c0dfcb2a -->
+<!-- generated-from: rules/test-script-discipline.md sha256:570e2d51149a4db25b965957bc8bc7c9da667349227bdc12c8ed71d57e06e749 -->
 <!-- doc-lint:rule-definition -->
 # How to write test cases and test scripts
 
@@ -67,6 +67,7 @@ They are equally bound by `show-me-test.md` (a new test is first shown to go red
 - Only two kinds of thing may be pruned: those with a matching key that have already been judged; and those equivalent to an already judged state. The equivalence is pinned by a case.
 - A class left unjudged wholesale by registration is not pruning: the registry has one row per class saying why it is not judged, the success line reports how many were skipped, and the classes not judged are listed under `show-me-test.md` "The gate must not pretend to pass".
 - Pruning has a self-test: on a small input, run once with pruning and reuse off; the verdicts match the run with them on, item by item. The pruning self-test goes into the quick tier.
+- Reuse has a self-test too: every script that claims to store verdicts and reuse them has a cell for it, and all three questions must pass: run the same inputs twice, and the second run judges 0 and reuses exactly as many as the first run judged; change one input outside every verdict closure and run again, and it judges 0; change one unit inside a closure and run again, and it judges exactly the items whose closure contains that unit and reuses the rest. One item too few reused is red; one item too many judged is red too. Every real run also draws a few already-judged items with unchanged keys from the verdict library as sentinels; a run that re-judges a sentinel is red.
 - A block is written to disk only once it is fully judged, and the write is atomic; after an interruption, rerunning the same command resumes, filling in only what was not judged.
 - The success line reports "judged now <count>, reused <count>".
 - A full run (`--full`) reads no verdict store, and still writes the verdicts it judges back into the store by key.

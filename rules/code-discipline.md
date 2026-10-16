@@ -1,4 +1,4 @@
-<!-- generated-from: rules/code-discipline.md sha256:ae3f205594d0f03863338e07a77c710ee46166c1042a7145092384916bf1c054 -->
+<!-- generated-from: rules/code-discipline.md sha256:16bf2c3d8e428a17447f3356c9f8007748c5a90b1508278fbd6ebefb56362a29 -->
 <!-- doc-lint:rule-definition -->
 # Code discipline: how machine-first lands in code
 
@@ -227,6 +227,20 @@ invariant (written as an assertion), and every early exit.
 - **A `TODO` says what is missing and why it is not done now.** A check that is owed goes into the
   project kb's debt table, and the code points there.
 
+## After fixing a bug, search the whole repository hard for places with similar logic or code
+
+Scope: any defect fix, in code, scripts, gates or documents, across language versions.
+
+**Criterion: after the fix, you can name every other place in the repository that follows the same pattern, and for each one say whether it was fixed or checked and found free of the defect.**
+
+1. Split the defect into two forms: the **code form** (the same way of writing it, the same function or regular expression, the same copied block) and the **logic form** (the same assumption, the same boundary, the same measurement basis, even when written differently).
+2. Search the whole repository for both. For the code form, grep the way of writing it; for the logic form, look for "who else does the same job": other implementations of the same concept, other handling of the same kind of input, other checks that judge the same criterion, including tests, examples and the other language versions. Do not truncate the output; count first, then read (`verify-before-claiming.md`, "Truncated output is a narrow claim too").
+3. Judge every hit. Those with the same defect are fixed in the same change; for the rest, write down why they are unaffected.
+4. Each similar place fixed along the way gets its own test that is first shown to go red (`show-me-test.md`).
+5. The commit message states what was searched (keywords or commands), how many hits, how many fixed, and why each unfixed one was left. When no other similar place turns up, write "searched <what>, 0 hits", not "none".
+
+When the defect is on the measurement-basis layer (the same quantity computed differently by two apparatuses), the similar place is the other apparatus; set up a cross-apparatus check as in `show-me-test.md`, "But first ask which layer the trap is on".
+
 ## Popular practices, examined one by one
 
 Each one was put through the procedure in `machine-first.md`. There are only six **dispositions**:
@@ -388,6 +402,7 @@ public API — gets its own criterion; you cannot get there by saying "explicit 
 | Shadowing with an unrelated meaning | clippy `shadow_unrelated` |
 | Warnings are errors | clippy `-D warnings` |
 | Whether a name says enough, whether one concept has one name, whether a function does one thing, whether a comment says why, whether a comment cites a line number in another file, whether a name or a comment uses an ordinal or a position as a stand-in, whether a comment contains an abbreviation, whether error variants follow the caller's decisions, whether loop state is written out, `..Default::default()` | review |
+| Whether the search for similar places after a bug fix was complete, and whether each hit was judged correctly | review |
 | Names, abbreviations and stand-ins in code other than `.rs` (shell, python and the like) and in documents | **not yet a check**; `gate.sh` lists it among the unimplemented stages (key 「命名纪律（shell）」) |
 
 The clippy ones run inside `scripts/check.sh`, that is, the gate's "Build and unit tests" stage; that stage does not run when the project root has no `Cargo.toml`.

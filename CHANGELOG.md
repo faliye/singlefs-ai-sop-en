@@ -4,6 +4,25 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.66 — 2026-10-15
+
+**Fix baseline fallthrough bug in `diff_base` after gate pass, eliminate visual false alarm on `inputs-unchanged`; share and guard `.gitignore` across translations; clean up exit code and exclusion list verification in `naming-lint` when no `.rs` files exist; harden argument parsing in `bump.sh`; add built-in selftest to `pattern-process-guard`; eliminate Python bytecode and dead variables**
+
+Rules:
+- `code-discipline.md`: new section "After fixing a bug, search the whole repository hard for places with similar logic or code" — split the defect into a code form and a logic form, search the whole repository, judge every hit, fix similar places in the same change each with a red-first test, and state in the commit message what was searched and the hit and fix counts; "Which half the gate handles" lists it as review.
+
+Scripts and Gate:
+- `lib.sh`: fix `diff_base` vulnerability. Previously on the default branch when `refs/sop/gate-ok` equaled `HEAD`, failing the `!= HEAD` check caused fallback to `HEAD~1`, which hid unbumped modifications in the worktree behind previous version bumps. Now returns `gate-ok` directly whenever it exists and is an ancestor of `HEAD`.
+- `gate.sh`: capture stderr of `preflight.py check` in `stage_admitted`. When refused as `inputs-unchanged` (inputs unchanged since last success), eliminate the red `✗` visual false alarm and emit a yellow `warn` to skip; all other unmet conditions and malformed declarations print details and next steps as before.
+- `i18n-sync.sh`: add `.gitignore` to `SHARED`, synced verbatim across translations; guard against missing shared items so sample fixtures without them are not falsely reported as differences by `diff -rq`.
+- `naming-lint.sh`: emit `warn` instead of checkmark when no `.rs` files exist, eliminating the contradiction between a green checkmark and exit code 3; add existence and justification checks for `.claude/naming-sweep-exclude` entries to reject invalid or blank paths.
+- `bump.sh`: use a `while / case` loop to parse `--root` and reject unknown options; add coverage test cases in `selftest.sh`.
+- `claude-hooks/pattern-process-guard.sh`: add built-in `--selftest` driver covering 19 red/green test fixtures.
+- `package-family.py`, `session-transcript.py`: set `sys.dont_write_bytecode = True`; ignore bytecode files in `.gitignore`.
+- `relay-timing-lint.py`: remove unused dead variable `FROZEN_EVIDENCE_DIRECTORIES`.
+- `templates/CLAUDE.project.md`: add documentation for `doc-lint.sh`.
+- `selftest.sh`: add regression test case `version-discipline/门禁过闸后新改动不提版本要拦住` to lock down `diff_base` behavior when `gate-ok == HEAD`; selftest suite now covers 668 cases.
+
 ## 0.0.65 — 2026-10-13
 
 **The reach of the naming and comment discipline widens to all code and text (every language, every directory, documents included); two new rules, "No ordinals or positions as names" and "Comments contain no abbreviations and refer to nothing by a code name", and this repository's scripts and documents in all three languages swept to follow them; when whoever dispatched the work does not respond, whoever reported may end a stuck process or subagent; a change that only touches comments in `.rs` files does not count as a code change; more argument and history removed from the rules**
