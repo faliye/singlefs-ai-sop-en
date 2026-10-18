@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:a234905c99d88f861de5b9c7194d013cfe9234a3d8ed94f184f0798db7ab50d3 -->
+<!-- generated-from: rules/test-discipline.md sha256:955517710025ee4af39a6c67876c2f258a6b49f8e260cf60d65400b8adb04b91 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -70,10 +70,6 @@ the clause is vacuous; either way it counts as having no clause.
 The control loop must iterate over the full set of arms, not "just run it against the first one".
 When adding an arm, change the control loop along with it.
 
-- **Controls are pinned per unit, not judged together.** Where the formal runs are cut into cells (tiers, families, domains and the like), each cell's own formal runs carry control readings for every criterion that cell judges; the unit test writes each cell's expected set out cell by cell, and does not judge the union of several cells' readings.
-- **The registration writes, cell by cell, which run carries each control.** When the pre-run registration writes its set of criteria, it lists per cell which formal run carries the control of each criterion; where no formal run in a cell can carry it, add a run, or that cell does not judge that criterion.
-- **Formal runs match one for one across the registration, the unit test and the rerun.** Every formal run in the registration can be found in the unit test's unit table and in the rerun registry; one missing is a cell with nobody controlling it.
-
 ## Comparing the arms only against each other cannot detect "every arm is wrong together"
 
 **Next to every cross-arm assertion there must be an assertion that pins down an
@@ -142,7 +138,7 @@ ever fire, whether an assertion pinning an absolute value sits beside the cross-
 whether a quantity a clause feeds into a predicate was reported as a trajectory, whether a
 mutant is equivalent, whether a check has discriminating power, whether a negative
 result proves the path really executed, whether phases outside a relay loop were timed inside the process under test,
-whether the side under test can read a positive control's answer, whether controls are pinned per unit, whether the formal runs match across the registration, the unit test and the rerun, whether each registered quantity
+whether the side under test can read a positive control's answer, whether each registered quantity
 maps to a decision it is meant to settle.
 
 ## A negative result must be separable from "the code never ran"

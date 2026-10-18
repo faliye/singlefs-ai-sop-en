@@ -1,4 +1,4 @@
-<!-- generated-from: rules/evidence-discipline.md sha256:ef4f79232c9942ce20c61bebac86d95e28a1269f603927191a9cb65a70595307 -->
+<!-- generated-from: rules/evidence-discipline.md sha256:38aa87e0437132da48c78004c95c9e14a8862660a38781b73782caff2f1674f5 -->
 <!-- doc-lint:rule-definition -->
 # Every conclusion needs three derivations: forward, backward, cross-check
 
@@ -165,6 +165,9 @@ clauses written before the run.
 
 **Quote the artifact line whole, with its filename**; summarize only the one cell you
 computed yourself.
+
+**Once the artifact is archived out of the working tree, the line in the prose becomes a one-line pointer**: `artifact line: git show <commit>:<path> line N (name=<name>)`, one pointer per line, never several lines folded into one sentence; the line it points at must start with an artifact-line prefix the project registered (form `<prefix> name=<name>`), and a pointer to a line that does not start with one does not count as quoting the artifact. Prefixes are registered in `.claude/product-line-prefixes` at the project root, one prefix per line, with `#` followed by which kind of artifact line it is.
+How to judge: fetch the line with `git show` per the pointer and check that it exists and starts with one of the registered prefixes; the project hooks this check up in its registered gate-stage directory, and until it does, it goes into the project's debt table.
 
 ### After a re-run, check the prose back against it — a green replay does not mean the prose is right
 

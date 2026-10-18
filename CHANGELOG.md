@@ -4,6 +4,30 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.67 — 2026-10-18
+
+**Withdraw `test-script-discipline.md` (added in 0.0.63) and the three rules added in 0.0.64 and 0.0.66; `evidence-discipline.md` gains "once an artifact is archived out of the working tree, the prose carries a one-line pointer"; reading the frozen-evidence list becomes the shared library `evidence-exclude.py`; `history-ordinal.sh` reports not-implemented in non-Chinese repositories; `stage-selftest.sh` stage names drop `.sh` everywhere; `push-all.sh` pushes to the remote master tracks; selftest samples missing `expect` or `exit=` go red**
+
+Rules:
+- Delete `rules/test-script-discipline.md`; `CLAUDE.md` and `templates/CLAUDE.project.md` no longer reference it.
+- `code-discipline.md`: delete the section "After fixing a bug, search the whole repository hard for places with similar logic or code" and its row in "Which half the gate handles".
+- `sop-first.md`: delete the section on looking for an existing verification rig or test entry point before adding one.
+- `test-discipline.md`: delete the three items on pinning controls per cell, stating per cell which formal run carries the control, and matching formal runs across the pre-registration, the unit tests and the replay, plus their two entries in "Which half the gate handles".
+- `evidence-discipline.md` "Quote an artifact by copying the line whole": new item — once the artifact is archived out of the working tree, the line in the prose becomes a one-line pointer `artifact line: git show <commit>:<path> line N (name=<name>)`, and the line it points at must start with a prefix registered in `.claude/product-line-prefixes` at the project root; the project hooks this check up in its registered gate-stage directory and records it in the debt table until then.
+
+Scripts and the gate:
+- `evidence-exclude.py` (new): the only place that reads the frozen-evidence directories registered in `.claude/doc-lint-exclude`; `link-targets.py`, `number-name-sync.sh` and `relay-timing-lint.py` each kept a copy whose trailing-slash handling had diverged, and all three now call it. `preflight-lint.py` registers it as a library.
+- `history-ordinal.sh`: when the package language is not Chinese it reports not-implemented and exits 77 instead of reporting "no collisions"; `HISTORY_ORDINAL_LANG` exists only to pin the sample language in selftests. The skip sentence for this stage in `gate.sh` is rewritten to match.
+- `gate.sh`: refuse when `GATE_STAGED_TREE` is set without `--staged`; when checking whether another `--staged` run is alive, confirm that process's command line really contains `gate.sh`, and treat a reused process number as a leftover.
+- `stage-selftest.sh`: stage names drop `.sh` in both layouts (`--item` still accepts `.sh`, and several names separated by whitespace in one value count as separate stages); a name collision between the flat and nested layouts goes red; an `expect` without `exit=<number>` is an error instead of being read as exit 0.
+- `selftest.sh`, `claude-hooks/pattern-process-guard.sh`: a sample missing `expect`, or with a non-numeric `exit=`, goes red; `selftest.sh` adds `rules/`, `CLAUDE.md`, `GLOSSARY.md` and `.gitignore` to its admission inputs.
+- `push-all.sh`: push to the remote that master tracks (origin when no tracking is set); a missing remote goes red during verification, not at push time.
+- `i18n-sync.sh`: the shared set gains `.claude/abbreviations`, `.claude/settings.json` and `.claude/rules-lint-exclude`.
+- `number-name-sync.sh`: before comparing short names, normalize them the way `doc-lint.sh` does (drop `*`, `` ` `` and extra whitespace); `NUMBER_NAME_SYNC_VERBOSE=1` lists every mismatch.
+- `naming-lint.sh`: list each path registered in `.claude/naming-sweep-exclude` that has not been swept yet.
+- `doc-lint.sh`: the GLOSSARY description column splits on `<br>`, `<br/>` and `<br />` alike.
+- `rules-lint.sh`: also recognize a consequence that follows 「否则」 or 「不然」 after a comma.
+
 ## 0.0.66 — 2026-10-15
 
 **Fix baseline fallthrough bug in `diff_base` after gate pass, eliminate visual false alarm on `inputs-unchanged`; share and guard `.gitignore` across translations; clean up exit code and exclusion list verification in `naming-lint` when no `.rs` files exist; harden argument parsing in `bump.sh`; add built-in selftest to `pattern-process-guard`; eliminate Python bytecode and dead variables**
