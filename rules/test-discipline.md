@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:955517710025ee4af39a6c67876c2f258a6b49f8e260cf60d65400b8adb04b91 -->
+<!-- generated-from: rules/test-discipline.md sha256:42b81efce34776d66f82fa8d4e33fe63b61eba049789ff336cd0a0e3730389d4 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -121,6 +121,22 @@ Before asserting, confirm the check **has discriminating power**: when verifying
 
 After writing a check, ask: if the thing under test really were broken, would this go
 red? If you cannot answer, it is not finished.
+
+## Test under real conditions; do not invent conditions that cannot be reached
+
+- Resources, configuration and scale in a test take the values the thing under test will really meet: take them from the project's configuration or configuration template, and do not write into the test a number that never occurs in the real environment.
+- The behaviour a test case sets out to prove must be one that happens in the real environment; conditions the real environment cannot reach (resources that can never be gathered, combinations that never occur) are not turned into test cases.
+- When the condition to verify cannot be produced in a test, write down "this one cannot be tested"; do not substitute a condition that can be produced but never occurs for real.
+
+This is not yet a check: whether the values are the real environment's and whether the conditions can be reached is left to review.
+
+## Every breakage switch must go red
+
+A breakage switch is a switch, used only by the self-test, that deliberately breaks one place when turned on.
+
+- Turn every switch on one at a time and run the self-test: the self-test must exit non-zero, and go red in the cell the switch table names.
+- A switch that does not go red when turned on, or goes red somewhere other than the named cell, is fixed on the spot: change the self-test so it goes red in that cell, or change the switch so it really breaks the named place; if neither can be fixed, delete the switch. No switch that cannot go red is kept.
+- After adding a switch, changing the switch table, or changing the code a switch breaks, rerun the affected switches one by one.
 
 ## Which half the gate handles
 

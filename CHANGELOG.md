@@ -4,6 +4,25 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.68 — 2026-10-31
+
+**Five new rules: build tests under real conditions, every breakage switch must go red, one change changes every related piece of code and configuration, settle a stopped sub-agent's changes and who takes over, name background and script tasks clearly; `shell-lint.sh` adds S8 (judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size); `check.sh` runs clippy once per feature combination.**
+
+Rules:
+- `test-discipline.md`: new sections "Test under real conditions; do not invent conditions that cannot be reached" and "Every breakage switch must go red".
+- `code-discipline.md`: new section "One change changes every related piece of code and configuration" (local configuration and settings a program writes into the system at run time count too).
+- `command-safety.md`, the section on background tasks and sub-agents: two new items — after stopping a sub-agent, settle its changes and who takes over its unfinished work on the spot; name background and script tasks in the language used with the user, saying what each is and which job it waits for, with no two running tasks sharing a name.
+- `command-safety.md`: new sections "Put the sample processes a harness starts into their own process group" and "Judge whether a file under `/proc`, `/sys` or cgroupfs is empty by reading its content"; after `systemctl stop`, read back the output of `is-active` and the content of `cgroup.procs`; the word after `coproc` is also a command position.
+- `session-wrapup.md`: new item — before clearing the index, check whether it holds anything someone else staged, and clear only your own paths.
+
+Scripts and gate:
+- `shell-lint.sh`: new S8 — `[ -s ]`, `stat`'s `%s`, and `find`'s `-size` and `-empty` applied to a path starting with `/proc/` or `/sys/`, or named `cgroup.<name>`, go red; S3 recognises `pgrep -f` after `coproc`.
+- `check.sh`: clippy runs once per feature combination the project registers (`.claude/clippy-feature-combinations`; without the registry, two runs: no features and `--all-features`); breakage switch `CHECK_BREAK=single-clippy-pass`. `gate.sh --staged` checks the temporary tree has that registry.
+- `gate-lint.sh`: `✗` and `✓` count only at the start of the printed line; breakage switch `GATE_LINT_BREAK=anywhere-mark`.
+- `doc-lint.sh`: the K path recognises the project's registered read-once local rules; breakage switch `DOC_LINT_BREAK=read-once-copy-only`.
+- `claude-hooks/pattern-process-guard.sh`: when it cannot judge (input not JSON, extracting the command fails, the criterion fails) it exits 1, and when run conditions are unmet it exits 78; both let the command run and leave a line saying the command was not judged.
+- `selftest.sh`: wires in the new samples and breakage switches above.
+
 ## 0.0.67 — 2026-10-18
 
 **Withdraw `test-script-discipline.md` (added in 0.0.63) and the three rules added in 0.0.64 and 0.0.66; `evidence-discipline.md` gains "once an artifact is archived out of the working tree, the prose carries a one-line pointer"; reading the frozen-evidence list becomes the shared library `evidence-exclude.py`; `history-ordinal.sh` reports not-implemented in non-Chinese repositories; `stage-selftest.sh` stage names drop `.sh` everywhere; `push-all.sh` pushes to the remote master tracks; selftest samples missing `expect` or `exit=` go red**

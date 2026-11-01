@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:3fff699a80fe6cfb1aaa18103cbe042fff9c408f8b4e940ecc7fa737fe6f9e3d -->
+<!-- generated-from: rules/session-wrapup.md sha256:a4d80b9dc4f5ed250c558f6e3e8c8132467e2622250e882941cc97dee38f6b13 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -74,6 +74,7 @@ When several sessions work concurrently, go through these one by one before wrap
   where the tool layer can stop it (a pre-write hook that refuses to overwrite untracked files), stop it there.
 - **"Commit only these paths" is not `git commit -- <path>`.** A commit given paths commits what those paths hold in the **working tree**, not in the index.
   Before staging, confirm `git diff --cached --name-only` is empty; after staging and before committing, check the list and each file's cached diff once more, then `git commit` with no paths.
+- **"Everything in the index is mine" no longer holds.** Before clearing the index (`git reset`, `git restore --staged .`), run `git diff --cached --name-only` to see whether someone else staged anything; unstage only your own paths: `git restore --staged -- <path…>`.
 
 Collisions between history entries are judged by the gate stage "History entry numbers" (`历史条目编号`, `scripts/history-ordinal.sh`):
 it recognises only the Chinese shape, entries under a `### <date>` heading numbered "（其 <ordinal>）", and goes red when one added this time collides.

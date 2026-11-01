@@ -1,11 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:53dde31c2b28208cdfeb4fee4dc2dfa924aabe4767ee8a2305da5f7ae0b119b4 -->
+<!-- generated-from: rules/command-safety.md sha256:4a670b99778d77a47a11079f37bb2db9ed400c0baa088fdeb90f84d7f88017e7 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
-Seven of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
+Eight of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
 by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
 subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
-an unguarded variable path**, **a `wait` with no arguments**, and **a pipeline ending in `grep -q` in a script that sets `pipefail`**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). The rest are still prose, because the criterion for
+an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, and **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
 can and cannot prove").
 
@@ -40,7 +40,7 @@ for a background job you started yourself, use `wait`; for one you did not start
 If the pid was not recorded, find it with `scripts/proc.py find <executable-name> [--argument <argument>]`: it compares the executable name exactly instead of matching a pattern against the whole command line, and it does not list the process tree that issues the command;
 with the pid in hand, `scripts/proc.py wait <pid> --timeout <seconds>` waits for it to exit, and if it has not exited when time is up, lists the ones still alive and exits with code 3.
 The S3 check in `scripts/shell-lint.sh` turns every `pgrep -f` in command position in a script red (after `if` /
-`while` / `until` / `!` also counts as command position), without looking at whether the same line also has a `kill`.
+`while` / `until` / `!` / `coproc` also counts as command position), without looking at whether the same line also has a `kill`.
 Commands typed by hand are refused before they run by `scripts/claude-hooks/pattern-process-guard.sh`, which uses the same criteria as shell-lint's S2 (killing processes by pattern match) and S3 (`pgrep -f`) (`PATTERN_KILL_RE` and `PATTERN_PGREP_RE` in `scripts/lib.sh`),
 and when it refuses it gives the pid-based ways to do the same thing. It is a Claude Code PreToolUse hook; a project registers it once under `hooks.PreToolUse` in `.claude/settings.json`:
 
@@ -49,6 +49,17 @@ and when it refuses it gives the pid-based ways to do the same thing. It is a Cl
 ```
 
 In a session where it is not registered, commands typed by hand still rely on this text alone.
+
+## Sample processes a harness starts go in a process group of their own
+
+When a harness, a judging script or a replay script starts sample processes (a real shell, the program under test, a sample command), the criterion is: **when each sample finishes, not one of the processes it started is left.**
+
+- Put each sample in a process group of its own: in shell start it with `setsid`; in Python pass `start_new_session=True` to `subprocess`.
+- On timeout and at the end, signal the whole group, TERM first and KILL after a grace period: in Python `os.killpg(<process-group-id>, <signal>)`, in shell `kill -TERM -- -<process-group-id>`. Do not stop only the process you started directly.
+- After the run, check `/proc` by process group id that nothing is left in the group; stop what is left and write it into that sample's failure message.
+- Stopping only the direct child leaves the grandchildren behind: a `cat` started by a process substitution holds the write end of the pipe, and whoever reads that pipe never gets EOF.
+
+This is not a check yet: whether what a script starts is a sample, and whether it stopped the whole group on timeout and at the end, cannot be told reliably from the script; it rests on review.
 
 ## Once you start a background task or a subagent, re-check it on a schedule, and end it only when whoever dispatched it does not respond
 
@@ -59,6 +70,9 @@ Long work may run long, but someone has to be watching it:
 - **Keep detection separate from handling.** Tools that detect stuck or spinning work (hooks, watchdog scripts) only record and report and do not block commands; they do not kill processes or stop subagents, except when whoever dispatched the work does not respond.
   Whether it ends and how it is handled is decided by whoever dispatched it, after looking; if whoever dispatched it does not respond after the report (the same thing reported several times in a row, neither handled nor acknowledged), whoever reported (a person, an agent, or the detecting tool) may end it: a process with `scripts/proc.py stop <process id>`, a subagent with the tool that stops it; an ending is reported.
   A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4 "Is another session in flight in the same repository?": refuse, before writing, to overwrite an untracked file).
+- **After stopping a sub-agent, settle its changes and its unfinished work on the spot.** Decide file by file for whatever it left half-changed: keep it, revert it, or hand it to someone to continue; decide who takes over the work it did not finish.
+  Write the decision into the record and tell whoever takes over; leave no half-made change without an owner.
+- **Name background tasks and script tasks in the language used with the user, saying what each is and which job it is waiting for.** Tasks running at the same time may not share a name; one whose name alone does not say what it is doing is renamed before it is started.
 - **Before waiting for a line in a log, make sure that line is really written to that file.**
 - In sessions such as Claude Code, put long work in the background and come back to re-check it periodically, instead of idling in the foreground.
 
@@ -107,8 +121,19 @@ input that must go red, and see whether the parallel version still goes red.
 ## Do not use echo to fake success
 
 Do not report success the way `<command> 2>/dev/null; echo "done"` does.
-Any command that changes state must be verified by **reading the state back**: after
-`systemctl stop <service name>`, confirm with `is-active`; the exit code of `stop` is not enough.
+Any command that changes state must be verified by **reading the state back**:
+after `systemctl stop <service name>`, read back the **output** of `systemctl is-active <service name>`; only `inactive` or `failed` counts as stopped.
+Then read its `cgroup.procs` (the directory is `/sys/fs/cgroup` followed by `systemctl show -p ControlGroup --value <service name>`); only an empty read counts as its processes being gone.
+Neither the exit code of `stop` nor the exit code of `is-active` is enough: `is-active` returns 0 only for `active`, and also returns non-zero for `activating` and `deactivating`.
+To judge whether a service is up before stopping it, look at the output the same way: `active`, `activating`, `reloading` and `deactivating` all count as up, and so do processes in its cgroup.
+
+## Files under `/proc`, `/sys` and cgroupfs: read the contents to judge emptiness
+
+File sizes in these places do not reflect the contents: procfs and cgroupfs report 0, sysfs reports 4096.
+To judge whether such a file is empty, or whether there are processes, read the contents and judge those: `[[ -n "$(< "$cgroup_directory/cgroup.procs")" ]]`; do not use `[ -s <file> ]`, `stat`'s `%s`, or `find`'s `-size` and `-empty`.
+
+S8 in `scripts/shell-lint.sh` judges this: any of these three forms applied to a path that literally starts with `/proc/` or `/sys/`, or whose file name is `cgroup.<name>`, turns red.
+Paths held entirely in variables with an unrecognizable file name are not judged; languages other than shell (python's `os.path.getsize`, `st_size` and the like) are not judged and are left to review.
 
 ## Result collection needs a completeness gate
 

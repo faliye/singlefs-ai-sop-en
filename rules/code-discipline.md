@@ -1,4 +1,4 @@
-<!-- generated-from: rules/code-discipline.md sha256:ae3f205594d0f03863338e07a77c710ee46166c1042a7145092384916bf1c054 -->
+<!-- generated-from: rules/code-discipline.md sha256:340067c292c375df7887f5bd640eb27fce34789a31d94b41dabdced88f5a09f8 -->
 <!-- doc-lint:rule-definition -->
 # Code discipline: how machine-first lands in code
 
@@ -369,6 +369,14 @@ dropped, relaxed, rewritten, kept, left to tooling, demoted to advice.
 
 Design- and process-level principles (unify the design, keep PRs small, and the ones kept because they
 have nothing to do with who reads the code) are in `machine-first.md`.
+
+## One change changes every related piece of code and configuration
+
+- When changing a behaviour, removing a feature or replacing an approach, change the code, tests, documentation, registries and configuration that depend on it in the same change; local configuration (files kept out of version control, settings a program writes into the system at run time) counts too.
+- Before starting, search the whole repository for the old names, old paths and old values, then check local configuration and run-time state; when removing code that changed system state, clear the state it left behind in the same change and read it back.
+- After the change, search with the same list again: the old ones remain only where a line describes this change itself.
+
+This is not yet a check: local configuration and run-time state are not in version control, so whether they were all changed is left to the person changing them to check on the spot.
 
 ## When not to apply them
 

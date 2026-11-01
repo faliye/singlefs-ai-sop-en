@@ -2,7 +2,7 @@
 name: gate
 description: Run this project's acceptance gate. Use it before submitting code, or when judging whether a change can be accepted — covers what each stage means, how to read the result, and which "failures" are environment problems rather than code problems.
 ---
-<!-- generated-from: skills/gate/SKILL.md sha256:36b9d1acec054c99296981cf09cc87f7d9241101cbfb5b4c70242d3f0b86b238 -->
+<!-- generated-from: skills/gate/SKILL.md sha256:225eb00d8bd3808ed8ef90946c32753255c388a94430b345bc7ed9f1aaafb09d -->
 
 # The acceptance gate
 
@@ -28,7 +28,7 @@ bash .claude/scripts/gate.sh --staged # only HEAD + the index: for several sessi
 | Gate self-check | Some rejection gives no way out (a `bad` with no `howto`, a `die` carrying one argument, a printed `✗` with no `→` after it), or a check that scans a set of objects reported no count on success. Shapes in `rules/sop-first.md` |
 | Admission and run conditions (`准入与运行条件`) | A script lacks an `admission:` / `run-condition:` line at its head, uses an unrecognised form, declares it after the first line of code, registers an `inputs-changed` path that does not exist, does not call `preflight` first, or writes `inputs-changed` without calling `preflight_record_success`; or an exclusion or registration table points at a path that does not exist. Fill it in per `rules/preflight-discipline.md`; register libraries and fixtures in `.claude/preflight-exclude` |
 | Gate discriminating power | A fixture was judged against expectation — **the gate itself is broken**; fix that before anything else |
-| Shell discipline | A script has `pkill -f` / `killall` / `pgrep -f`, carries a value out of a subshell through a variable, uses git's undo commands, runs `rm -rf` on an unguarded variable path, has a `wait` with no arguments, or, in a script that sets `pipefail`, has a pipeline ending in `grep -q`. See `rules/command-safety.md` |
+| Shell discipline | A script has `pkill -f` / `killall` / `pgrep -f`, carries a value out of a subshell through a variable, uses git's undo commands, runs `rm -rf` on an unguarded variable path, has a `wait` with no arguments, has a pipeline ending in `grep -q` in a script that sets `pipefail`, or judges whether a file under `/proc`, `/sys` or cgroupfs is empty by its size. See `rules/command-safety.md` |
 | Script executable bits (`脚本执行位`) | A `.sh` in the index is not `100755`, or a mode in the index disagrees with the executable bit in the working tree (a hand-staged `100644`). Fix the index mode with `git update-index --chmod=+x <path>` (or `-x`). An empty directory in scope is red as well: git cannot store one, so put a `.keep` in any you need to keep and `git add` it |
 | Local stage discriminating power (`本地阶段判别力`) | A fixture under `.claude/gate.d/fixtures/<stage>/` was judged wrong: the exit code is off, or the `want=` line is missing from the output. Decide whether the stage or the fixture is wrong, then fix that side; a stage with no fixtures is recorded as not run this time |
 | Link targets (`链接指向`) | A relative link in a document points at a path that does not exist, or a "section <number>" reference is past the target document's count of `##` sections, or the target cannot be read. Relative paths resolve from the linking file's directory; point at a section title instead of "section <number>". Directories of evidence kept verbatim go into `.claude/doc-lint-exclude` |
