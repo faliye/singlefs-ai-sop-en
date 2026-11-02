@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:a4d80b9dc4f5ed250c558f6e3e8c8132467e2622250e882941cc97dee38f6b13 -->
+<!-- generated-from: rules/session-wrapup.md sha256:846c2b27cc61cb7b8beca486814db3bfeae5cb36109dcb19d01fd2ba7f087b74 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -64,7 +64,6 @@ When several sessions work concurrently, go through these one by one before wrap
   in a temporary worktree on HEAD plus the index only; whatever goes red there is what this commit brings in.
   When run without `--staged`, `gate.sh` fingerprints the working tree at the start and at the end and goes red when they differ.
   **Wait until the edits stop, or use `--staged`.**
-- **"Only I am building on this working tree" no longer holds.** Before applying a patch to, merging into, or starting a build or heavy work on a shared working tree, check the working-tree lock: if another session holds it, queue and report who holds it; hold the lock while merging and release it when done. The gate does not judge this item.
 - **Shared numbering is first-come, first-served.** For history entry ordinals,
   experiment numbers and the like, look up the highest existing number before taking
   one. Edit shared files by targeted replacement only, never by rewriting the whole

@@ -1,4 +1,4 @@
-<!-- generated-from: rules/machine-first.md sha256:92e21312c2e49e355359517e77a626981eaba132a9e78a5de0b865786dd0f7a4 -->
+<!-- generated-from: rules/machine-first.md sha256:18d50cd9b0241541c2df727a3a32aeeff6861cf0ebea22317726d09d3a5235d8 -->
 <!-- doc-lint:rule-definition -->
 # Machine first: separate "readable" from "verifiable"
 
@@ -12,10 +12,10 @@ re-check each one's reasons, and do not keep doing it because "everyone does it 
 
 ## What this stance assumes, and how to overturn it
 
-The whole methodology rests on two premises. **To argue against this stance, aim at these two
-premises, not at the "relaxed" and "kept" tables.**
+The whole methodology rests on one premise. **To argue against this stance, aim at this
+premise, not at the "relaxed" and "kept" tables.**
 
-### Premise 1: context windows are now in the 2×10⁵ – 10⁶ token range
+### Premise: context windows are now in the 2×10⁵ – 10⁶ token range
 
 Three tiers: 200K / 500K / 1M. Other vendors' numbers are not
 written down here.
@@ -29,37 +29,15 @@ starts to bite, this project has never measured.
 - **What it does not hold up**: "bound the scope of reasoning" is not among the
   relaxations.
 
-### Premise 2: concurrent interleavings can now be decided exhaustively
-
-A judgement like "is this barrier enough" splits in two:
-
-| Who | Does what | Precision |
-|---|---|---|
-| The tool | **Exhausts** every interleaving a given formal model permits, and returns a verdict | Complete for the formal model you actually wrote |
-| The model | Translates the synchronisation pattern in the code into that formal model; enumerates which scenarios to ask about | **Incomplete — the gap is here** |
-
-**Calibration**: the tool is precise, the model is not. Nothing guarantees you did not omit
-a scenario that should have been asked, or that what you wrote down is what the code does today.
-
-Which tool to use, how to show its verdicts have discriminating power, and how to bind the formal
-model you wrote to the code: **the project decides, tests and verifies them itself**, in its
-project-local rules. The shared gate carries none of this layer.
-
-- **What it holds up**: "exhaustiveness is machine-checkable", and what follows
-  from it — "prefer exhaustive explicit branches" and "only a bounded control-flow
-  path count can be verified to the end". How to write that is in the "Branches" and
-  "Functions and nesting" sections of `code-discipline.md`.
-
 ### When a premise fails, take these back
 
-Each premise has a row stating what observation would overturn it. Observe the
+This table states what observations would overturn the premise. Observe the
 phenomenon in a row and the relaxation in that same row is withdrawn on the spot:
 
 | What you observe | What is withdrawn |
 |---|---|
 | At this project's actual scale, the model misses a constraint that is already in its context | The "keep PRs small" relaxation; go back to slicing at a size that fits |
 | Generated duplicate code no longer matches its generator | The "DRY" relaxation; back to no duplication |
-| The verdict of the tool the project uses to exhaust interleavings contradicts what real hardware shows | "Exhaustiveness is machine-checkable"; that tool demotes to reference and stops being a gate |
 
 ## When you meet an established principle, run this procedure
 

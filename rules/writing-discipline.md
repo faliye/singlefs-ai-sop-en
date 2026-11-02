@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:4fa61ec4217b95152c75d306a40aa0dbca0a55a525ea2ed3ad4e9e2f7fb6c55c -->
+<!-- generated-from: rules/writing-discipline.md sha256:809755bf80ad04daea1c11f8897cce4e594e97d983459d55128db21440c7c3bd -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -106,7 +106,11 @@ reviewer can take and verify for themselves.
 
 ### No abbreviations, nothing referred to by a code name
 
-The criterion and the registry are those of `code-discipline.md`: the "Names" section and the rule "Comments contain no abbreviations and refer to nothing by a code name". The gate does not check this.
+The criterion and the registry are those of `code-discipline.md`: the "Names" section and the rule "Comments contain no abbreviations and refer to nothing by a code name".
+
+The gate stage "代号" (`scripts/code-name-lint.py`) judges the `.md` lines added relative to the diff base for two shapes: digits followed by one lowercase letter (optionally followed by `-<letters or digits>`), and two uppercase letters followed by two digits. Nothing inside backticks, fences, HTML comments, link targets or web addresses is judged, nor references to numbered steps such as "step 1b".
+A project's own numbering systems that have a registry (mutation names, experiment numbers) are registered in `.claude/code-names` at the project root: one line `<regular expression>  # reason`; a code name that the expression matches in full is not judged.
+Abbreviations, other shapes of code name, code comments and text outside `.md` are not checked by the gate; lines already present at the base are not swept.
 
 ### Write conjunctions as conjunctions; unpack noun strings into sentences
 

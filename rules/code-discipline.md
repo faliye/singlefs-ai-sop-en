@@ -1,4 +1,4 @@
-<!-- generated-from: rules/code-discipline.md sha256:340067c292c375df7887f5bd640eb27fce34789a31d94b41dabdced88f5a09f8 -->
+<!-- generated-from: rules/code-discipline.md sha256:cac39907dbeab6c977f909c9870504a32fb22a2fa47bdd86320c499f446260ca -->
 <!-- doc-lint:rule-definition -->
 # Code discipline: how machine-first lands in code
 
@@ -41,6 +41,7 @@ Names fixed from outside are not ours to decide: implement `Display` and the met
 | **A name stands on its own, without the module path** | Write `block::BlockAddress`, not `block::Address`. Type names thereby form a hand-made namespace (`BlockAddress`, `JournalAddress`, `LogicalAddress`…); write them that way |
 | **No ordinals or positions as names** | Functions, variables, parameters, types, fields, constants, modules and files alike: names such as `layer0`, `stream_0`, `step2`, `phase_1`, `first_item`, which only say "which number", are not allowed; name what it does and what it handles: `stream_0` → `metadata_journal_stream`, `layer0` → `checksum_verification_layer`. Instances that truly differ only by position go into one collection, told apart by a typed index (`stream_index: StreamIndex`), not given numbered names one by one. A registered project number with its short name is used as is — see "The abbreviation registry" |
 | **A new meaning gets a new name** | Shadow a name only when the meaning stays the same; when raw data becomes verified data, or a byte count becomes a block count, pick a new name |
+| **One definition per name per scope** | Within one scope of one file (a module, a class body, a function body; for shell, the whole file), no function, method or class is defined twice under the same name. Before adding a definition, search that file for the name; on a clash, rename one or delete one. A property setter, `@overload`, and singledispatch `register` do not count |
 
 ### No abbreviations; the criterion is whether there is one authoritative definition
 
@@ -394,6 +395,7 @@ public API — gets its own criterion; you cannot get there by saying "explicit 
 | Lossy `as` conversions | clippy `cast_possible_truncation`, `cast_sign_loss`, `cast_possible_wrap` |
 | `unsafe` blocks need `// SAFETY:` | clippy `undocumented_unsafe_blocks` |
 | Shadowing with an unrelated meaning | clippy `shadow_unrelated` |
+| The same name defined twice in one scope of a `.py` or `.sh` file | `scripts/duplicate-definitions.py` (gate stage "同名定义"): scans the whole repository, skipping frozen evidence; for shell it judges only definitions written at column 0. When a later definition overriding an earlier one is intended, write `# duplicate-definitions:allow <reason>` on the later definition's line. An assignment overriding a function, an imported name overridden by a def, and same names across files are beyond it, left to review |
 | Warnings are errors | clippy `-D warnings` |
 | Whether a name says enough, whether one concept has one name, whether a function does one thing, whether a comment says why, whether a comment cites a line number in another file, whether a name or a comment uses an ordinal or a position as a stand-in, whether a comment contains an abbreviation, whether error variants follow the caller's decisions, whether loop state is written out, `..Default::default()` | review |
 | Names, abbreviations and stand-ins in code other than `.rs` (shell, python and the like) and in documents | **not yet a check**; `gate.sh` lists it among the unimplemented stages (key 「命名纪律（shell）」) |

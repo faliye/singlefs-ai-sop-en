@@ -1,11 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:4a670b99778d77a47a11079f37bb2db9ed400c0baa088fdeb90f84d7f88017e7 -->
+<!-- generated-from: rules/command-safety.md sha256:37f60847d0c6531070a23427f996726fc1dbf9981fe2d10700533a96ddd6727b -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
 Eight of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
 by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
 subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
-an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, and **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). The rest are still prose, because the criterion for
+an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, and **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). Creating an unregistered file or directory at the project root is judged by the hook `scripts/claude-hooks/root-entry-guard.sh` and by `gate.sh`'s "New project-root entries" (`项目根的新条目`). The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
 can and cannot prove").
 
@@ -25,6 +25,29 @@ a script, `git stash` first, or copy the whole repository and work on the copy.
 
 **`rm -rf` on a variable path needs an empty-value guard**: write `rm -rf "${build_directory:?}/cache"`, not
 `rm -rf "$build_directory/cache"`. `rm -rf "$build_directory"` with nothing after it needs no guard.
+
+## Do not create files or directories at the project root
+
+Do not create a file or directory at the project root (the top level of the repository). Put new things into a directory that already exists: drafts and logs go in `$TMPDIR` or the session's scratch directory; scripts, records and outputs go in the directories the project has set for them.
+Recreating something after deleting it counts as creating it. Entries ignored by `.gitignore` count too. The entries this package itself needs at the root — `.git`, `.claude`, `CLAUDE.md`, `.singlefs-ai-sop-version` — need no registration.
+
+When something really has to be created at the root:
+
+1. Ask the user first: say the name, what goes in it, and why it cannot go into an existing directory.
+2. Once the user agrees, register one line `<name>  # reason` in `.claude/root-entries` at the project root: the name is the single top-level component, with no other `/`; the reason says what goes in it and why it sits at the root, at least 4 characters; one line per name.
+3. Then create it. Commit the registry and the new entry in the same commit.
+4. When the entry is deleted, delete its line from the registry in the same change.
+
+Something a tool rebuilds every time (a build directory and the like) is registered once.
+
+| Who judges | What |
+|---|---|
+| Hook `scripts/claude-hooks/root-entry-guard.sh` | Write, Edit or NotebookEdit writing into a root entry that does not exist yet and is not registered: refused before it runs. Changing the registry (with those tools, or a Bash command that writes to it): the user has to confirm in the UI. After a Bash command, new unregistered entries at the root: reported to the agent, which must move them or ask |
+| Gate stage "New project-root entries" (`项目根的新条目`, `scripts/root-entries.py`) | Every root entry added relative to the diff base (tracked, and untracked but not ignored) must be registered. A registry line with no reason, too short a reason, a name with more than one level, a duplicate, or a registered entry that does not exist and is not covered by `.gitignore`: red |
+
+Register the hook in `.claude/settings.json`; how is in its file header.
+
+What it cannot judge: whether the user agreed and whether the reason holds — review. Ignored entries are not judged by the gate; only the hook sees them. Something a Bash command creates is reported only after the command has run. A Bash write to the registry whose path is built in a variable or written from an interpreter is not recognised and asks for no confirmation.
 
 ## `pkill -f` / `killall` are forbidden outright
 
@@ -91,12 +114,7 @@ that `wait` does not return once the timeout logic is broken) is not saved by pa
 - they share one writable state (the same temp directory, the same target directory, the same device). To go parallel, give each item its own;
 - each item is fast by itself, running only a few milliseconds.
 
-Take the degree of parallelism (processes, and threads within a process) from an argument or an environment variable, falling back to `nproc`; do not hard-code it; heavy work such as virtual machines and builds gets
-its own ceiling from memory and devices.
-The cargo commands the shared scripts start (`scripts/check.sh`) run through the prefix registered in `.claude/cargo-command-prefix` at the project root:
-one line `<command and arguments>  # reason`, split on whitespace with no quoting, relative paths taken from the project root, each cargo command going through it once.
-If the file exists but yields no usable prefix, that is red; it never falls back to running without the wrapper:
-words that look like paths (containing `/`, or ending in `.sh` or `.py`; options starting with `-` and assignments containing `=` do not count) must exist, and a dry run of the prefix (`<prefix> true`) must succeed; under `gate.sh --staged`, a registration present in the source repository but missing from HEAD plus the index is red as well.
+Take the degree of parallelism (processes, and threads within a process) from an argument or an environment variable, falling back to `nproc`; do not hard-code it.
 
 ## Parallelism must not swallow the failures
 
@@ -121,11 +139,7 @@ input that must go red, and see whether the parallel version still goes red.
 ## Do not use echo to fake success
 
 Do not report success the way `<command> 2>/dev/null; echo "done"` does.
-Any command that changes state must be verified by **reading the state back**:
-after `systemctl stop <service name>`, read back the **output** of `systemctl is-active <service name>`; only `inactive` or `failed` counts as stopped.
-Then read its `cgroup.procs` (the directory is `/sys/fs/cgroup` followed by `systemctl show -p ControlGroup --value <service name>`); only an empty read counts as its processes being gone.
-Neither the exit code of `stop` nor the exit code of `is-active` is enough: `is-active` returns 0 only for `active`, and also returns non-zero for `activating` and `deactivating`.
-To judge whether a service is up before stopping it, look at the output the same way: `active`, `activating`, `reloading` and `deactivating` all count as up, and so do processes in its cgroup.
+Any command that changes state must be verified by **reading the state back**: what is judged is the content read back, not the exit code of that command.
 
 ## Files under `/proc`, `/sys` and cgroupfs: read the contents to judge emptiness
 
@@ -197,7 +211,7 @@ to `${TMPDIR:-/tmp}`.
 **The harness that creates an image deletes it itself when the test ends**: on success, on failure and on panic alike. Rust uses a Drop guard; shell uses `trap … EXIT`.
 Keeping it to look at the scene is switched on by an explicit switch (an environment variable), and the path is printed when it is kept; without the switch it is deleted.
 A gate stage that goes red may leave its scene in `$TMPDIR` and name the path in its remedy.
-A cache meant to be reused across runs (build output, a verdict store and the like) is not an image: put it under `${GATE_CROSS_RUN_TMPDIR:-${TMPDIR:-/tmp}}` or a place the project sets, not in `$TMPDIR`.
+A cache meant to be reused across runs (build output and the like) is not an image: put it under `${GATE_CROSS_RUN_TMPDIR:-${TMPDIR:-/tmp}}` or a place the project sets, not in `$TMPDIR`.
 
 `gate.sh` checks this: each run gives the stages a `TMPDIR` of that run's own, and at the end looks at what is left in it (the stage "No temporary files left behind", `跑完没留下临时文件`):
 if every other stage is green, whatever is left goes red, listed by name and size, and is deleted on exit; if some stage went red, this item is recorded as not judged this run, and the run's temporary directory is kept whole with its path printed — delete it yourself once you have looked.

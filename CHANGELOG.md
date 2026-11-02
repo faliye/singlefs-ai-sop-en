@@ -4,6 +4,30 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.69 — 2026-11-03
+
+**Three new checks: the same name defined twice in one scope, code names in newly added text, and dispatch prompts that borrow another place's convention without a source; no new files or directories at the project root (a hook plus a gate stage); the few singlefs-only items move out of the shared rules: the workspace lock, the cargo prefix registry, how to stop a systemd service, the artifact-line pointer, and the premise that concurrent interleavings are decided exhaustively.**
+
+Rules:
+- `command-safety.md`: new section "Create no new files or directories at the project root": when one is really needed, ask the user first, and once they agree register one line `<name>  # reason` in `.claude/root-entries` at the project root before creating it.
+- `code-discipline.md`: the "Names" table gains a row "One definition per name per scope"; "Which half the gate handles" gains the matching row.
+- `writing-discipline.md`, "No abbreviations, no code names": states what the gate stage "代号" judges and does not judge; a project's own numbering systems are registered in `.claude/code-names`.
+- `verify-before-claiming.md`: new section "Relaying another place's convention carries its source or its original words"; "Which half the gate handles" states that the hook `borrowed-convention-guard.sh` judges it.
+- Removed: the workspace-lock item in item 4 of `session-wrapup.md`; from `command-safety.md`, the cargo prefix registry paragraph, the lines on reading back `systemctl` and `cgroup.procs` (the sentence "a state-changing command reads the state back" stays), the half-sentence "heavy work gets its own ceiling from memory and devices", and "verdict store" in an example; from `evidence-discipline.md` "Quote the artifact line whole", the paragraph on the one-line pointer after archiving and `.claude/product-line-prefixes`; from `machine-first.md`, Premise 2 "concurrent interleavings can now be decided exhaustively" and its row in the withdrawal table. Only singlefs uses these; they moved into singlefs's local rules.
+
+Scripts and gate:
+- `duplicate-definitions.py` (new): gate stage "同名定义". For `.py`, ast finds the same def / async def / class name twice in a module, class body or function body (setter, getter, deleter, register and overload pass); for `.sh`, the same function name defined twice at column 0 in one file; exemption `# duplicate-definitions:allow <reason>`; 4 breakage switches.
+- `code-name-lint.py` (new): gate stage "代号". Judges only `.md` lines added relative to the diff base, for two shapes: digits followed by one lowercase letter, and two uppercase letters followed by two digits; backticks, fences, HTML comments, links, web addresses and references to numbered steps are not judged; projects register `.claude/code-names`; 7 breakage switches.
+- `borrowed-convention.py` and the hook `claude-hooks/borrowed-convention-guard.sh` (new): on PreToolUse for Agent, Task and SendMessage, a borrowing sentence with no `path:line`, no quotation of the original, and no "path plus function name" in that sentence is refused; 4 breakage switches.
+- `root-entries.py` and the hook `claude-hooks/root-entry-guard.sh` (new): the gate stage "项目根的新条目" judges that every root entry added relative to the base is registered; the hook refuses Write, Edit and NotebookEdit into an unregistered new root entry, asks the user before the registry is changed, and reports unregistered entries a Bash command left behind.
+- `source-files.py` (new): how to walk the repository's source files and which repository to judge when none is given, shared by `relay-timing-lint.py` and `duplicate-definitions.py`; `relay-timing-lint.py` now calls it, with unchanged output.
+- `break-switch-selftest.py` (new): the selftest ending shared by python gates and hooks: turn each breakage switch on in turn and check it goes red on the sample it names.
+- `check.sh`: the cargo prefix registry (`.claude/cargo-command-prefix`) is gone; cargo starts directly; `gate.sh --staged` no longer checks that registry, and `lib.sh` drops its constant.
+- `show-me-test.sh`: the remedy on refusal no longer gives "on-disk format" and "crash recovery" as examples; it says "touches a project invariant" and "only verifiable with an environment up".
+- `stage-selftest.sh`, `i18n-sync.sh`, `selftest.sh`: copying samples uses `cp -dR --preserve=timestamps,links`, not preserving permissions (preserving them fails on an NFS-shared tree).
+- `skills/gate/SKILL.md`: the table gains the stages "项目根的新条目", "同名定义" and "代号"; the reach of "转发计时" becomes the whole repository.
+- `selftest.sh`: samples for all of the above; the 8 cargo prefix cases are removed.
+
 ## 0.0.68 — 2026-10-31
 
 **Five new rules: build tests under real conditions, every breakage switch must go red, one change changes every related piece of code and configuration, settle a stopped sub-agent's changes and who takes over, name background and script tasks clearly; `shell-lint.sh` adds S8 (judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size); `check.sh` runs clippy once per feature combination.**

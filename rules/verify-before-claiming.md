@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:71f4c903cf26841da5c6c3962121f75968126b0377da5e4258a969412c86c131 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:db37e18c415d03849bf43d1a3f1ebae1c41e6f65ade2029dc9989917db7ba0d6 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -51,9 +51,23 @@ and see whether it has been placed in some existing class.
 ⇒ **Before saying "only these places" or "these are all the matches", do not truncate the output**; if it is long,
 count first (`grep -c`, `| wc -l`), and read the contents once the count matches.
 
+## Relaying another place's convention carries its source or its original words
+
+In a prompt sent to a subagent or a message sent to another session, a sentence that says "same convention as X", "do it the way X does", or "same as `X`" carries, in that same sentence, one of these:
+
+- `path:line` (or a path, or "same file", together with "line N");
+- a quotation of the original: at least 6 characters inside 「」, or the sentence ends in a colon and the next line starts with `>`;
+- a path together with a function name in backticks, or a heading inside 「」.
+
+When unsure what the original says, read it before dispatching. Writing only your own understanding of it ("same convention: take the qualified name") is not a source.
+
 ## Which half the gate handles
 
-**Not one item is a check.** `scripts/doc-lint.sh` reaches only the written side (a kb entry's source and status, whether
+The hook `scripts/claude-hooks/borrowed-convention-guard.sh` (judgement in `scripts/borrowed-convention.py`) handles "Relaying another place's convention carries its source or its original words": it judges before dispatching a subagent (Agent, Task) and before SendMessage, and refuses when a borrowing sentence has neither a source nor the original words in that sentence.
+The borrowing phrases it recognises are those in `BORROW_PHRASES` in `scripts/borrowed-convention.py`; phrases outside it are not judged. Whether the source points to the right place, or the original was copied correctly, it does not judge.
+A project registers it in `.claude/settings.json`; how is in the hook's file header.
+
+The remaining items are not checks. `scripts/doc-lint.sh` reaches only the written side (a kb entry's source and status, whether
 a number carries its short name); it cannot check whether a sentence was just verified. "Check now, before you say it"
 runs entirely on people (`show-me-test.md`: the gate proves that evidence requirements are met, not semantic correctness).
 
