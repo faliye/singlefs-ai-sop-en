@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:054c4f7c815882e6ad2a499827fcb0944529480f6a8cf8cc1667a466b28b49f8 -->
+<!-- generated-from: rules/sop-first.md sha256:0a2ea729c610e2d80b8f5a35411bfee66d4b7dfc0d2f36517ca4a1f8ae7ce4c3 -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -35,6 +35,8 @@ inside a loop carries `# gate-lint:detail` (its remedy lives on the summary), an
 summary line carries `# gate-lint:summary`.
 
 **When you cannot write the `howto`, do not add the check yet.**
+
+**The remedy itself must pass the other gates.** A remedy command printed by one gate, copied and run as is, must not be rejected by another gate in the project. The side that writes the rejection feeds the remedy command it prints, in its self-test, to the project's other gates on the same trigger point, and fails if any of them rejects it; where it cannot feed them (the other gate is not in this package, or the project has not registered it), the self-test's success line reports "not run this time".
 
 ## Three properties of a good gate
 

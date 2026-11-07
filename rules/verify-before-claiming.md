@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:db37e18c415d03849bf43d1a3f1ebae1c41e6f65ade2029dc9989917db7ba0d6 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:499ef432b0a0747d625be407dc3ac59c8953dfe0ff900d29bf3529adc4fa2762 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -50,6 +50,12 @@ and see whether it has been placed in some existing class.
 ⚠️ **Truncated output is a narrow claim too**: `grep … | head -12` shows the first 12 lines, not every match.
 ⇒ **Before saying "only these places" or "these are all the matches", do not truncate the output**; if it is long,
 count first (`grep -c`, `| wc -l`), and read the contents once the count matches.
+
+## A check with no outcome yet is not written as passed
+
+For a check that has been handed off and has not finished (a test, the gate, a rerun, a self-test), the body, records and reports say only "submitted, awaiting the outcome", never "green", "passed" or "all caught".
+Once the outcome is out and you have read the line that gives the verdict, change it to a conclusion and quote that line.
+When several checks share one sentence, split the one without an outcome into a sentence of its own; it does not ride along with the ones that already passed.
 
 ## Relaying another place's convention carries its source or its original words
 

@@ -4,6 +4,25 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.70 — 2026-11-07
+
+**One new gate stage: no symbolic links in the repository (stage "Symbolic links", exemptions registered in `.claude/soft-link-exempt`). New rules: when something goes wrong, first look for another agent that owns that area; a check with no outcome yet is not reported as passed; the way out a gate prints must itself pass the other gates. doc-lint picks its criteria per file suffix in mixed-language projects; the code-name check honours names declared on the same page.**
+
+Rules:
+- `command-safety.md`: new sections "No symbolic links in the repository" and "When you hit a problem, first look for another agent that owns that area"; the opening list now says `gate.sh` stage "Symbolic links" judges symlinks.
+- `verify-before-claiming.md`: new section "A check with no outcome yet is not written up as passed".
+- `sop-first.md`: "Every rejection must give a next step" gains a paragraph "The way out must itself pass the other gates".
+- `session-wrapup.md` item 4: when the gate is red on files this round did not change, follow that section of `command-safety.md` to find the agent that owns them.
+- `writing-discipline.md`: a term a `.md` declares itself with `<!-- doc-lint:not-numbers … -->` is not judged within that file.
+
+Scripts and gate:
+- `soft-links.py` (new): gate stage "Symbolic links". Scans symlinks under the project root (tracked, untracked, ignored) and index entries with mode `120000`, listing every unregistered one; under `gate.sh --staged` it also scans the source repository's working tree; a malformed or duplicated exemption line, or a registered path that is not a symlink, is red.
+- `doc-lint.sh`: files named `.en.md`, `.ja.md`, `.zh.md` use that language's history heading and word list, the rest follow the package language; the Japanese position word 「上記」 no longer matches inside 「以上記」; the translationese list only fires on 进行 / 予以 / 加以 followed by a verb character, and the archaic 「是故」 no longer matches 「是故障」.
+- `code-name-lint.py`: a term a `.md` declares itself passes within that file only, other files are still judged; new break switch `file-declarations-ignored`.
+- `gate.sh`, `skills/gate/SKILL.md`: wire in the "Symbolic links" stage.
+- `selftest.sh`: adds 9 symlink cases, the mixed-language history samples and the per-page declaration case.
+- Three gate-lint / shell-lint samples had only their comment wording changed; verdicts are unchanged.
+
 ## 0.0.69 — 2026-11-03
 
 **Three new checks: the same name defined twice in one scope, code names in newly added text, and dispatch prompts that borrow another place's convention without a source; no new files or directories at the project root (a hook plus a gate stage); the few singlefs-only items move out of the shared rules: the workspace lock, the cargo prefix registry, how to stop a systemd service, the artifact-line pointer, and the premise that concurrent interleavings are decided exhaustively.**

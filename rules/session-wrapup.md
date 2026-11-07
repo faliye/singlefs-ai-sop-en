@@ -1,4 +1,4 @@
-<!-- generated-from: rules/session-wrapup.md sha256:846c2b27cc61cb7b8beca486814db3bfeae5cb36109dcb19d01fd2ba7f087b74 -->
+<!-- generated-from: rules/session-wrapup.md sha256:9b0a547cf1443b2de9c39af8862ba4ec763bc076efaaed0a86a234134ce09a96 -->
 <!-- doc-lint:rule-definition -->
 # Wrap-up: required before the end of every round of work
 
@@ -59,7 +59,7 @@ When several sessions work concurrently, go through these one by one before wrap
   the changes into "this round" and "not this round" and commit only your own.
 - **"The gate went red = I broke something" no longer holds.** On a red, first check
   whether the files it names are part of this round's changes. If they are not, report
-  honestly "red, but not from this round" and do not fix it in passing.
+  honestly "red, but not from this round" and do not fix it in passing; find whoever owns it by `command-safety.md` "When you hit a problem, first find out whether another agent owns that part".
   When you cannot tell, run `bash .claude/scripts/gate.sh --staged`: it runs the whole gate
   in a temporary worktree on HEAD plus the index only; whatever goes red there is what this commit brings in.
   When run without `--staged`, `gate.sh` fingerprints the working tree at the start and at the end and goes red when they differ.

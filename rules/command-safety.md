@@ -1,11 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:37f60847d0c6531070a23427f996726fc1dbf9981fe2d10700533a96ddd6727b -->
+<!-- generated-from: rules/command-safety.md sha256:5afa10eedc88d2f4ba0ac404c1c7c83d17a0d63295205c0aec710e172e169db0 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
 Eight of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
 by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
 subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
-an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, and **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). Creating an unregistered file or directory at the project root is judged by the hook `scripts/claude-hooks/root-entry-guard.sh` and by `gate.sh`'s "New project-root entries" (`项目根的新条目`). The rest are still prose, because the criterion for
+an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, and **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). Creating an unregistered file or directory at the project root is judged by the hook `scripts/claude-hooks/root-entry-guard.sh` and by `gate.sh`'s "New project-root entries" (`项目根的新条目`). An unregistered symbolic link in the repository is judged by `gate.sh`'s "Soft links" (`软链接`). The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
 can and cannot prove").
 
@@ -48,6 +48,21 @@ Something a tool rebuilds every time (a build directory and the like) is registe
 Register the hook in `.claude/settings.json`; how is in its file header.
 
 What it cannot judge: whether the user agreed and whether the reason holds — review. Ignored entries are not judged by the gate; only the hook sees them. Something a Bash command creates is reported only after the command has run. A Bash write to the registry whose path is built in a variable or written from an interpreter is not recognised and asks for no confirmation.
+
+## No symbolic links in the repository
+
+The repository (from the project root down, `.git` excepted) holds no symbolic links: tracked, untracked and `.gitignore`-ignored ones all count. To use a file from elsewhere, copy it in, or write its real path where it is used.
+This package's repositories and every project that installs the package follow this, each registering under its own project root.
+
+A symbolic link that really has to stay:
+
+1. Register one line `<path relative to the project root>  # reason` in `.claude/soft-link-exempt` at the project root: no leading `/`, no `.` or `..`; the reason says what it points to and why it cannot be replaced by a copy or a written-out path, at least 4 characters; one line per path.
+2. When the link is deleted or replaced by a regular file, delete its line in the same change.
+
+The gate stage "Soft links" (`软链接`, `scripts/soft-links.py`) judges: symbolic links in the working tree, and index entries with mode `120000`, that are not registered are listed path by path and judged red; under `gate.sh --staged` the source repository's working tree is judged too.
+An exempt-table line with no reason, too short a reason, a path not relative to the project root, a duplicate, or a registered path that is not a symbolic link: red.
+
+What it cannot judge: whether the reason holds — review. Anything inside `.git` is not judged.
 
 ## `pkill -f` / `killall` are forbidden outright
 
@@ -98,6 +113,22 @@ Long work may run long, but someone has to be watching it:
 - **Name background tasks and script tasks in the language used with the user, saying what each is and which job it is waiting for.** Tasks running at the same time may not share a name; one whose name alone does not say what it is doing is renamed before it is started.
 - **Before waiting for a line in a log, make sure that line is really written to that file.**
 - In sessions such as Claude Code, put long work in the background and come back to re-check it periodically, instead of idling in the foreground.
+
+## When you hit a problem, first find out whether another agent owns that part
+
+This covers a problem met mid-work that your own task cannot solve or that is not your task's to solve: the gate is red on a file you did not change, a file you need to change is being changed by another session, something you need is produced by another task, or you cannot fix it or are unsure how.
+
+Before fixing it, working around it, or stopping to wait, do these in order:
+
+1. **First find out who owns it.** List the agents and sessions that are running (in Claude Code, `ListAgents`), and from each one's task name, the files it is changing and its recent actions, judge whether any of them owns the part where the problem is. When unsure whether it is theirs, send a message and ask.
+2. **If one owns it, send it a message** (in Claude Code, `SendMessage`), and do not change the part it owns yourself. The message says: which file, which line, what you observe, how to reproduce it, whether your own change brought it in, and what you want it to do or what you are asking it.
+3. **If you cannot fix it yourself, or you lack information or permissions someone else holds, message for help on your own initiative**; do not quietly work around it, and do not idle.
+4. **If nobody owns it**: if it belongs to your own task, handle it yourself; if not, report it to the user or to whoever dispatched you, saying where the problem is and whom you suggest handing it to.
+5. **Once the message is sent, carry on with the work in hand that does not depend on it**, and take that part up again when the reply comes. If the other side keeps not responding, report it to the user or to whoever dispatched you; do not take over the part it owns on your own.
+
+How to judge a red on a file you did not change is in `session-wrapup.md` item 4 "Is another session in flight in the same repository?"; relaying another place's convention in a message follows `verify-before-claiming.md` "Relaying another place's convention carries its source or its original words".
+
+This is not yet a check: whether you looked for an owner and whether you sent what should have been sent is left to review.
 
 ## Within one script, run the checks in parallel when they can be
 

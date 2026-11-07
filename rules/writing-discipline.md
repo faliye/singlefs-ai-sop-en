@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:809755bf80ad04daea1c11f8897cce4e594e97d983459d55128db21440c7c3bd -->
+<!-- generated-from: rules/writing-discipline.md sha256:4a074d2cf541d82116b4ffc6588c03cd975dd137d7c83d8c4a8d306bc4b2f5c1 -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -108,7 +108,7 @@ reviewer can take and verify for themselves.
 
 The criterion and the registry are those of `code-discipline.md`: the "Names" section and the rule "Comments contain no abbreviations and refer to nothing by a code name".
 
-The gate stage "代号" (`scripts/code-name-lint.py`) judges the `.md` lines added relative to the diff base for two shapes: digits followed by one lowercase letter (optionally followed by `-<letters or digits>`), and two uppercase letters followed by two digits. Nothing inside backticks, fences, HTML comments, link targets or web addresses is judged, nor references to numbered steps such as "step 1b".
+The gate stage "代号" (`scripts/code-name-lint.py`) judges the `.md` lines added relative to the diff base for two shapes: digits followed by one lowercase letter (optionally followed by `-<letters or digits>`), and two uppercase letters followed by two digits. Nothing inside backticks, fences, HTML comments, link targets or web addresses is judged, nor references to numbered steps such as "step 1b"; labels that a `.md` file declares itself with `<!-- doc-lint:not-numbers … -->` are not judged in that file, and are judged as usual in every other file.
 A project's own numbering systems that have a registry (mutation names, experiment numbers) are registered in `.claude/code-names` at the project root: one line `<regular expression>  # reason`; a code name that the expression matches in full is not judged.
 Abbreviations, other shapes of code name, code comments and text outside `.md` are not checked by the gate; lines already present at the base are not swept.
 
