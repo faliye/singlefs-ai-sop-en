@@ -1,4 +1,4 @@
-<!-- generated-from: rules/test-discipline.md sha256:42b81efce34776d66f82fa8d4e33fe63b61eba049789ff336cd0a0e3730389d4 -->
+<!-- generated-from: rules/test-discipline.md sha256:d22ed6161fd7baa9aa6789b9450178b6275a857d72b2624bac668ce3febf3c70 -->
 <!-- doc-lint:rule-definition -->
 # Testing discipline
 
@@ -122,6 +122,13 @@ Before asserting, confirm the check **has discriminating power**: when verifying
 After writing a check, ask: if the thing under test really were broken, would this go
 red? If you cannot answer, it is not finished.
 
+A check that compares a before value with an after value (before and after a change, two runs, two lists) fails as a whole when either side is empty or could not be read; it never prints "equal" or "unchanged".
+
+## Each self-test cell gives the same verdict alone as in the full run, and failure text does not impersonate another cell
+
+- Where a self-test is split into cells that can be run singly by name, each cell run alone gives the same verdict as it does inside the full run: a cell reads no variable, file or state left by another cell, and builds and initialises what it uses itself.
+- Failure text does not contain the shape that starts a failure line (for example "✗ <label> <name>:"): quote sample text in another form, because whoever extracts cell names reads such a quote as one more red cell.
+
 ## Test under real conditions; do not invent conditions that cannot be reached
 
 - Resources, configuration and scale in a test take the values the thing under test will really meet: take them from the project's configuration or configuration template, and do not write into the test a number that never occurs in the real environment.
@@ -129,6 +136,12 @@ red? If you cannot answer, it is not finished.
 - When the condition to verify cannot be produced in a test, write down "this one cannot be tested"; do not substitute a condition that can be produced but never occurs for real.
 
 This is not yet a check: whether the values are the real environment's and whether the conditions can be reached is left to review.
+
+## When checking whether a resource suffices, add back what this process already holds
+
+When checking whether a resource (GPU memory, memory, handles, disk quota) suffices, the free amount you read excludes what this process itself already holds: if an earlier case or an earlier step in the same process holds it, later ones judge themselves short. Add back what this process holds before judging, or judge once at process start, before anything is taken.
+
+This one is not yet a check; it relies on review.
 
 ## Every breakage switch must go red
 
@@ -152,7 +165,8 @@ whether the round count is enough, how a deterministic experiment is written, wh
 criteria were pinned before the run, whether both controls ran, whether a failure clause can
 ever fire, whether an assertion pinning an absolute value sits beside the cross-arm one,
 whether a quantity a clause feeds into a predicate was reported as a trajectory, whether a
-mutant is equivalent, whether a check has discriminating power, whether a negative
+mutant is equivalent, whether a check has discriminating power, whether a before-and-after
+comparison fails when one side is empty, whether a negative
 result proves the path really executed, whether phases outside a relay loop were timed inside the process under test,
 whether the side under test can read a positive control's answer, whether each registered quantity
 maps to a decision it is meant to settle.
@@ -161,3 +175,5 @@ maps to a decision it is meant to settle.
 
 "Did not reproduce" does not mean "no problem". To claim "this path is correct", you
 need a reading proving that path **actually executed**.
+
+A probe that sweeps a batch of cells and counts how often one branch occurred reports, with every count, how many times that branch was tried (the denominator). A count whose denominator is 0 is written only as "the apparatus never reaches it", never as "not hit" or "no counterexample", and does not support a conclusion; when other cells use up that branch's attempt budget first, the denominator is likewise 0.

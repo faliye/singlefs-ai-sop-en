@@ -1,11 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:5afa10eedc88d2f4ba0ac404c1c7c83d17a0d63295205c0aec710e172e169db0 -->
+<!-- generated-from: rules/command-safety.md sha256:3f6251dcd2a298efd8388e0d4e4b9ca4525a7254abd476fa2ee5b1e157d4cdc7 -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
-Eight of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
+Ten of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
 by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
 subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
-an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, and **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). Creating an unregistered file or directory at the project root is judged by the hook `scripts/claude-hooks/root-entry-guard.sh` and by `gate.sh`'s "New project-root entries" (`项目根的新条目`). An unregistered symbolic link in the repository is judged by `gate.sh`'s "Soft links" (`软链接`). The rest are still prose, because the criterion for
+an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**, **a space inside a prefix-removal pattern on `$*` or `$@`**, and **cutting text shown to people by bytes**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). Creating an unregistered file or directory at the project root is judged by the hook `scripts/claude-hooks/root-entry-guard.sh` and by `gate.sh`'s "New project-root entries" (`项目根的新条目`). An unregistered symbolic link in the repository is judged by `gate.sh`'s "Soft links" (`软链接`). The rest are still prose, because the criterion for
 checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
 can and cannot prove").
 
@@ -25,6 +25,8 @@ a script, `git stash` first, or copy the whole repository and work on the copy.
 
 **`rm -rf` on a variable path needs an empty-value guard**: write `rm -rf "${build_directory:?}/cache"`, not
 `rm -rf "$build_directory/cache"`. `rm -rf "$build_directory"` with nothing after it needs no guard.
+
+A path joined from several variables (`"$a/$b"`, `"${root}/${name}"`) can land elsewhere when one piece is empty: delete such a path by writing the literal absolute path, not the joined variables; `${joined:?}` only guards against the whole string being empty, not against one piece being empty.
 
 ## Do not create files or directories at the project root
 
@@ -108,6 +110,8 @@ Long work may run long, but someone has to be watching it:
 - **Keep detection separate from handling.** Tools that detect stuck or spinning work (hooks, watchdog scripts) only record and report and do not block commands; they do not kill processes or stop subagents, except when whoever dispatched the work does not respond.
   Whether it ends and how it is handled is decided by whoever dispatched it, after looking; if whoever dispatched it does not respond after the report (the same thing reported several times in a row, neither handled nor acknowledged), whoever reported (a person, an agent, or the detecting tool) may end it: a process with `scripts/proc.py stop <process id>`, a subagent with the tool that stops it; an ending is reported.
   A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4 "Is another session in flight in the same repository?": refuse, before writing, to overwrite an untracked file).
+- **Every way of handling that a reminder offers comes with a command that can be run.** When a detecting tool's reminder lists several ways of handling, each is written as an executable command, not just "deal with it" or "run it after confirming".
+  When a way out says "if this is really intended, run it as is", it also gives a command that records "decided to run as is"; once that is recorded, the same reminder is not pushed again for that case.
 - **After stopping a sub-agent, settle its changes and its unfinished work on the spot.** Decide file by file for whatever it left half-changed: keep it, revert it, or hand it to someone to continue; decide who takes over the work it did not finish.
   Write the decision into the record and tell whoever takes over; leave no half-made change without an owner.
 - **Name background tasks and script tasks in the language used with the user, saying what each is and which job it is waiting for.** Tasks running at the same time may not share a name; one whose name alone does not say what it is doing is renamed before it is started.
@@ -248,6 +252,22 @@ A cache meant to be reused across runs (build output and the like) is not an ima
 if every other stage is green, whatever is left goes red, listed by name and size, and is deleted on exit; if some stage went red, this item is recorded as not judged this run, and the run's temporary directory is kept whole with its path printed — delete it yourself once you have looked.
 Of the directories kept this way on a red run, only the latest 3 are kept; older ones are deleted by a later run.
 What it cannot see: harnesses that hard-code `/tmp` instead of going through `TMPDIR`, tests run by hand outside the gate, and anything created by child processes still running after the gate was interrupted.
+
+## Prefix and suffix removal on `$*` and `$@` happens once per parameter
+
+`${*#pattern}` and `${@#pattern}` (and `##`, `%`, `%%`) remove from each parameter separately and then join; when the pattern contains a space, the part it means to remove exists only in the joined string, so nothing is removed.
+To remove from the joined string, join first: `joined="$*"`, then write `"${joined#* -- }"`.
+
+S9 in `scripts/shell-lint.sh` judges this: any of these forms whose pattern contains a space goes red.
+
+## Cut text shown to people by characters, not bytes
+
+GNU `cut` with `-c` or `-b`, and `head` or `tail` with `-c`, all count bytes; cutting inside a multibyte character leaves half of it, and whoever reads the output as UTF-8 reports bad bytes.
+Cut text meant for people (failure lines, explanations, log excerpts) with `clip_text <bytes>` from `scripts/lib.sh`: cut by bytes, then drop the trailing partial character.
+Cutting that only ever sees ASCII (hex digests and the like) keeps cutting by bytes and writes `# shell-lint:bytes-ok <reason>` on that line.
+
+S10 in `scripts/shell-lint.sh` judges this: a line that has one of these byte cuts, prints outward (`say`, `bad`, `howto`, `echo`, `printf` or `✗`), and lacks that marker goes red.
+A cut stored in a variable and printed on another line is not recognised; that is left to review.
 
 ## Look before running anything destructive
 

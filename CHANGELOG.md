@@ -4,6 +4,26 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.71 — 2026-11-11
+
+**New rule "Communication discipline" (terse conversation, no pleasantries, no softening a judgment to spare feelings) and new skill `halt`. shell-lint gains S9 (a space inside a prefix-removal pattern on `$*` or `$@`) and S10 (cutting by bytes into output people read), and judges `rm -rf` on joined variables. gate-lint gains "skip counts list their entries". New optional hook `discarded-output-count-check.sh`. Several additions to the test and verify-before-claiming rules.**
+
+Rules:
+- `communication-discipline.md` (new): conversation from an agent to the user and between agents leads with the conclusion, has no pleasantries, does not soften judgments and does not restate; before asking the user to decide, the scope words in the question are checked on the spot. Wired into `CLAUDE.md` in all three languages and into the project template.
+- `command-safety.md`: new sections "Prefix and suffix removal on `$*` and `$@` happens once per parameter" and "Cut text shown to people by characters, not bytes"; an `rm -rf` path joined from several variables is written as the literal absolute path; every way of handling that a detecting tool's reminder offers comes with a runnable command.
+- `show-me-test.md`: entries not recorded, skipped or discarded go into the log one by one; states that `gate-lint.sh` judges one half of this.
+- `test-discipline.md`: a before-and-after comparison fails when either side is empty; new sections on self-test cells giving the same verdict alone as in the full run, and on adding back what this process already holds when checking a resource; every probe count also reports its denominator.
+- `verify-before-claiming.md`: new section "A command you draw a conclusion from keeps its output"; for a cancelled or interrupted run, ✓ lines already in the log are not the outcome.
+
+Scripts and gates:
+- `shell-lint.sh`: new S9 and S10; S5 also judges a variable joined from several variables; S4 no longer flags git undo commands written as data inside a here-doc (one fed to a shell is still judged).
+- `gate-lint.sh`: new check "skip counts list their entries" with the exemption marker `# gate-lint:skip-listed <reason>`; new break switch `item-blind`.
+- `claude-hooks/discarded-output-count-check.sh` (new, registration optional): when a Bash command discards output and also judges a count or emptiness, it records the hit and reminds; it does not refuse.
+- `lib.sh`: new `clip_text`; failure lines in `doc-lint.sh` and `shell-lint.sh` are cut with it.
+- `doc-lint.sh`: the example number in the way out for self-reference is now the generic `D1（数据可移动性）`.
+- `selftest.sh`: cases and break switches for the items above.
+- `skills/halt/SKILL.md` (new): when the user asks to stop, stop everything and wait for direct user input.
+
 ## 0.0.70 — 2026-11-07
 
 **One new gate stage: no symbolic links in the repository (stage "Symbolic links", exemptions registered in `.claude/soft-link-exempt`). New rules: when something goes wrong, first look for another agent that owns that area; a check with no outcome yet is not reported as passed; the way out a gate prints must itself pass the other gates. doc-lint picks its criteria per file suffix in mixed-language projects; the code-name check honours names declared on the same page.**

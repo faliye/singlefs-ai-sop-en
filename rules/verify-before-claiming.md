@@ -1,4 +1,4 @@
-<!-- generated-from: rules/verify-before-claiming.md sha256:499ef432b0a0747d625be407dc3ac59c8953dfe0ff900d29bf3529adc4fa2762 -->
+<!-- generated-from: rules/verify-before-claiming.md sha256:f412f1fc774f4bbbcc5cb2d979c215ed10962ad01b7263bf3833369649d6f235 -->
 <!-- doc-lint:rule-definition -->
 # Check now, before stating external state
 
@@ -51,11 +51,19 @@ and see whether it has been placed in some existing class.
 ⇒ **Before saying "only these places" or "these are all the matches", do not truncate the output**; if it is long,
 count first (`grep -c`, `| wc -l`), and read the contents once the count matches.
 
+## A command you draw a conclusion from keeps its output
+
+A command you will cite to say "zero matches", "no errors" or "the exit code shows …" does not send stderr to `/dev/null` and does not discard stdout (`2>/dev/null`, `&>/dev/null` and `>/dev/null 2>&1` all count as discarding).
+A 0 printed by a form like `grep -c pattern file 2>/dev/null || echo 0` is not taken as zero matches.
+
+For empty output or a 0, first confirm the command really ran: look at its exit code (append `; echo rc=$?` to the same command) and its error output, and only once it ran take the result as zero matches.
+
 ## A check with no outcome yet is not written as passed
 
 For a check that has been handed off and has not finished (a test, the gate, a rerun, a self-test), the body, records and reports say only "submitted, awaiting the outcome", never "green", "passed" or "all caught".
 Once the outcome is out and you have read the line that gives the verdict, change it to a conclusion and quote that line.
 When several checks share one sentence, split the one without an outcome into a sentence of its own; it does not ride along with the ones that already passed.
+A run that was cancelled, hit a resource cap or was interrupted has no outcome, whatever ✓ lines its log already printed; the outcome is the final verdict given by whoever scheduled it, and that line is what you quote.
 
 ## Relaying another place's convention carries its source or its original words
 
@@ -72,6 +80,10 @@ When unsure what the original says, read it before dispatching. Writing only you
 The hook `scripts/claude-hooks/borrowed-convention-guard.sh` (judgement in `scripts/borrowed-convention.py`) handles "Relaying another place's convention carries its source or its original words": it judges before dispatching a subagent (Agent, Task) and before SendMessage, and refuses when a borrowing sentence has neither a source nor the original words in that sentence.
 The borrowing phrases it recognises are those in `BORROW_PHRASES` in `scripts/borrowed-convention.py`; phrases outside it are not judged. Whether the source points to the right place, or the original was copied correctly, it does not judge.
 A project registers it in `.claude/settings.json`; how is in the hook's file header.
+
+The hook `scripts/claude-hooks/discarded-output-count-check.sh` handles one half of "A command you draw a conclusion from keeps its output": it judges after a Bash command has run, and when the command discards output and the same command also judges a count or emptiness (`grep -c`, `wc -l`, `test -z`, `[ -z`, `|| echo 0` and the like), it writes an entry to its detection record and adds a one-line reminder; it does not refuse.
+The forms it recognises are those in that hook's `DISCARD_FORMS` and `COUNT_FORMS`; a command that carries `# discarded-output: <why discarding is fine>` is recorded without a reminder. Whether a conclusion was drawn from that command, it does not judge.
+A project may leave it unregistered (its file header says `# hook-registration: optional`); how to register it is in the hook's file header.
 
 The remaining items are not checks. `scripts/doc-lint.sh` reaches only the written side (a kb entry's source and status, whether
 a number carries its short name); it cannot check whether a sentence was just verified. "Check now, before you say it"

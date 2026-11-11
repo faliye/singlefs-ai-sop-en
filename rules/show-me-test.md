@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:6b8f6a34b5fc96a8bf6a8a0dee59c656ad5a66d7f6d597e46ec94c271daef424 -->
+<!-- generated-from: rules/show-me-test.md sha256:ad7d8bcf7763b49561d7717b0cf3f54db2323be171a802270f52d77f4ae69533 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -87,6 +87,8 @@ are reported with `report_not_run` from `lib.sh` (a stage that does not source `
 and `gate.sh` gathers them into the summary's "not run this time"; a warning printed only in the stage's own output does not count as reporting. A run that reported such a part is not recorded as "the last success" (`rules/preflight-discipline.md`),
 and a local stage that reported one does not count as covering its `# gate-covers:` item either.
 
+**Entries not recorded, skipped or discarded go into the log one by one**: when a success line or summary reports a count such as "not recorded N", "skipped N" or "discarded N", the same output lists those entries one by one (when there are many, the first N, then the count of the rest); writing them only into a temporary file that is deleted at the end does not count as listing them.
+
 **Batch scripts must not swallow per-round failures** (`|| true` and
 friends), and output paths must not be reused across rounds. The criterion is "can this
 output prove it came from this round": delete old output before the run, and check
@@ -100,7 +102,9 @@ which must carry a quantity counted in the script (a variable that was accumulat
 
 **Reporting "how many were checked" is not enough: "which were not checked" must be listed one by one too, and that list must be computed on the spot.**
 **The skip list must come from the same data as the scanned set, computed on the spot**; the success line reports both "ran <count>; did not run <count>: named one by one".
-This is not a check yet: `gate-lint` does not look at whether a script that reports a count also lists what it skipped, so it rests on whoever writes the stage.
+`gate-lint.sh` judges one half (`.sh` only): a script whose output reports a count such as "skipped N", "not recorded N", "discarded N" or "not run N" (the words it matches are `跳过`, `没记`, `作废`, `没跑`, `未跑`) must have, in the same script, an output line that lists the entries one by one; a line written into a file does not count.
+Where the entries are listed elsewhere in a way it cannot recognise, write `# gate-lint:skip-listed <reason>` at the end of the line that reports the count, with a reason of at least 8 characters.
+Whether the list comes from the same data as the scanned set and is computed on the spot, and whether what is listed is what the count counts, it does not judge; that rests on whoever writes the stage.
 
 # When a change is not rolled out across the whole repository at once, every excluded file gets registered
 
