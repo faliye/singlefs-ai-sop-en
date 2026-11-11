@@ -1,4 +1,4 @@
-<!-- generated-from: agents/INDEX.md sha256:15ba3972baf020b2904c501b950dd8c2f9bfd34c0dc0503fd876298003588cf0 -->
+<!-- generated-from: agents/INDEX.md sha256:0e0cb3db0b441b28ca8902a6adb80d8d9ab89e1f8c52c409095117faaf2ff50a -->
 # Shared subagent definitions
 
 **This layer is governed; it is currently empty** (`rules/kb-discipline.md` section 3, "Record "we do not know" explicitly").
@@ -38,8 +38,7 @@ mutants are equivalent mutants", not "reviews code".
 1. **Pin down the output format.** Say what it returns, in what order, and which pieces
    of evidence each item carries.
 2. **Report only what was run, never what was inferred.** The report carries its own
-   evidence (which command, which file, what output) — the same rule as
-   `rules/evidence-discipline.md`, applied to delegation.
+   evidence (which command, which file, what output).
 3. **It has to be able to say what it did not do.** What could not run, what was not
    verified, listed explicitly (`rules/show-me-test.md`: unimplemented stages stay
    listed).

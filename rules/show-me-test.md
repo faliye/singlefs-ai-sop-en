@@ -1,4 +1,4 @@
-<!-- generated-from: rules/show-me-test.md sha256:ad7d8bcf7763b49561d7717b0cf3f54db2323be171a802270f52d77f4ae69533 -->
+<!-- generated-from: rules/show-me-test.md sha256:936f73f30f956b9bcb2b1a03eac561f334459a10e5a584ac9c33a69fcce508d5 -->
 <!-- doc-lint:rule-definition -->
 # The acceptance rule: Show me test
 
@@ -14,49 +14,6 @@
 "I will add them in the next patch" do not count. Documentation and script changes are exempt, and so are changes that only touch comments in `.rs` files (only when the code, with comments and whitespace removed, is token for token the same as before; code blocks in doc comments that compile as doctests, and adding or removing doc comments or `// SAFETY:` comments, count as code; the judgement is `scripts/comment-only-change.py`).
 
 Enforced by `scripts/show-me-test.sh` (`gate.sh` runs it as one stage).
-
-## A new test must first be shown to go red
-
-**Every "verification" must be able to fail.** The right procedure: **break the code under test,
-confirm the test goes red, then put it back.** A test that cannot be shown to go red is the same as no test.
-
-Scripts only see whether a test exists and cannot verify this step: **state in the commit message
-how you confirmed it goes red** — which line you broke, which assertion you saw fail. If you cannot
-write that down, you did not do it.
-
-Where a mutation harness exists, go one step further: turn "break this → that assertion
-goes red" into a **checked-in mutation list** that the replay gate keeps re-running. The
-commit-message account is the fallback for repositories without a harness, not the first
-choice.
-
-**Design argument follows the same procedure**: for every hole an adversarial round finds, first
-build a world in the model that **must report non-zero**, then change the rule.
-
-## Turn traps you have hit into checks that fail, not into reminder sentences
-
-When to add one follows the "Boundary" section of `sop-first.md`: record it as debt first and add it in a batch; one that keeps recurring right now is added on the spot.
-
-When a new trap is found, the first reaction is "how does this become a red line in the gate",
-not "which document does this go in": make it a check that refuses to run on the spot, not a
-reminder sentence like "careful not to do <something> while <some situation>".
-
-### But first ask which layer the trap is on: inside one apparatus, or in the measurement basis
-
-**The criterion is not "was this trap turned into a check that goes red", it is "which
-layer is this trap on"**:
-
-| Where the trap is | Where the check goes |
-|---|---|
-| in the behaviour of one piece of code | next to that code is enough |
-| **in the measurement basis of the model** (how the same quantity is to be computed, whether the boundary counts, what the unit is) | **between apparatuses**: when two of them compute the same quantity, a check must force them onto the same number, and go red when they disagree |
-
-**Quick criterion**: stand up a second apparatus, do the same thing from scratch — would
-you step into it again? If yes, the trap is in the measurement basis, and the check has to
-stand across apparatuses.
-
-**A cross-apparatus check must pin "which quantity this name refers to"**: two quantities get two
-registered names, each pinned to its own value ("one semantic concept, one name across the repository" in
-`code-discipline.md`).
 
 ## The final criterion is set by the project
 
@@ -89,11 +46,6 @@ and a local stage that reported one does not count as covering its `# gate-cover
 
 **Entries not recorded, skipped or discarded go into the log one by one**: when a success line or summary reports a count such as "not recorded N", "skipped N" or "discarded N", the same output lists those entries one by one (when there are many, the first N, then the count of the rest); writing them only into a temporary file that is deleted at the end does not count as listing them.
 
-**Batch scripts must not swallow per-round failures** (`|| true` and
-friends), and output paths must not be reused across rounds. The criterion is "can this
-output prove it came from this round": delete old output before the run, and check
-for a completion marker that could only have been produced by this run.
-
 **Scanning zero items is not passing either.**
 A check that scans a set of objects must report **how many items it checked** in its
 success line; `gate-lint.sh` enforces this: it judges the last success line in the script,
@@ -106,22 +58,6 @@ which must carry a quantity counted in the script (a variable that was accumulat
 Where the entries are listed elsewhere in a way it cannot recognise, write `# gate-lint:skip-listed <reason>` at the end of the line that reports the count, with a reason of at least 8 characters.
 Whether the list comes from the same data as the scanned set and is computed on the spot, and whether what is listed is what the count counts, it does not judge; that rests on whoever writes the stage.
 
-# When a change is not rolled out across the whole repository at once, every excluded file gets registered
-
-When a specification, an operation or a change
-covers only part of the files, **whatever it did not cover gets registered in an exclusion
-table**, one entry per line with the reason after `#`. **No exclusion table means the whole
-repository has to change.**
-
-The test is not "it is a hassle to change", it is "changing it would make the sentence false,
-or would make some gate stop working": another project's terminology and verbatim citations,
-a check's own input, a tool's own pattern table, the sentence that states this very change —
-those change into errors, so register them; everything else changes.
-
-**An entry in the exclusion table pointing at a path that does not exist is a failure.** The table has to be readable by one command.
-
-**The number in the success line needs something pinning it too.** `gate-lint` does not cover this; it rests on whoever writes the stage.
-
 **Project-local stages follow the same rules as shared ones**, and are subject to `gate-lint` and `shell-lint` too:
 `gate.sh` hands the project's registered gate-stage directory (default `.claude/gate.d/`) to both lints.
 
@@ -129,43 +65,21 @@ those change into errors, so register them; everything else changes.
 If a project has such directories, hook up a local stage in the registered gate-stage directory that hands them to both lints — both, not one:
 set `GATE_LINT_DIR` and `SHELL_LINT_DIR` respectively to the target directory when calling them.
 
-# What the gate can and cannot prove
+## Time phases inside the process under test, not in the loop that relays its output
 
-> **Gate proves evidence requirements, not semantic correctness.**
+When a wrapper starts a child process, reads its output lines and relays each one onward, **do not use the moment each line was read as a phase clock**.
 
-## Passes every gate stage and is still wrong
+**What to do**: time inside the process under test and write the number into its result line. If arrival times must be used, read the child's output to the end first and relay afterwards.
+When both an outer and an inner number exist, report a containment self-check: the outer phase must contain the inner one, and rounds where it does not are left out of the statistics.
 
-| Case | What the gate cannot reach |
-|---|---|
-| the test tests the implementation, not the contract | it counts whether a test exists, it does not judge whether the test is right |
-| the declaration is itself wrong | declaration and measurement agree → "matches", though the declaration is wrong. **Without a control case** that proves nothing |
-| the invariant itself is wrong | the checks will faithfully judge a wrong rule, all green |
-| the covered path is not the one that breaks | coverage is not correctness |
-| the number in the prose disagrees with its own artifact | the replay's **range** assertion pins only which band the conclusion lands in, not the number in the prose: the wider the range, the further the prose can drift |
-| two apparatuses compute different numbers for the same quantity | assertions and mutations take effect **inside one apparatus**; across apparatuses nothing is comparing anything |
-| the design is wrong | the gate cannot reach this layer at all |
+The gate stage "Relay timing" (`转发计时`, `scripts/relay-timing-lint.py`) judges this: a loop in the project's `.rs` and `.py` files that reads a child process's output (which directories are scanned follows that script) must not both timestamp lines and relay them.
 
-## Corollaries
+## Every breakage switch must go red
 
-1. **A green gate does not mean the code need not be read.** People look at
-   **"is the test testing the right thing"**.
+A breakage switch is a switch, used only by the self-test, that deliberately breaks one place when turned on.
 
-2. **Semantic correctness lives in `kb/decisions.md` and `kb/invariants.md`, not in
-   the gate.** The gate only guarantees those two are **written down, implemented,
-   and in sync with the code**; whether they are *right* is on humans.
+- Turn every switch on one at a time and run the self-test: the self-test must exit non-zero, and go red in the cell the switch table names.
+- A switch that does not go red when turned on, or goes red somewhere other than the named cell, is fixed on the spot: change the self-test so it goes red in that cell, or change the switch so it really breaks the named place; if neither can be fixed, delete the switch. No switch that cannot go red is kept.
+- After adding a switch, changing the switch table, or changing the code a switch breaks, rerun the affected switches one by one.
 
-3. **The gate is a floor, not a ceiling** (`rules/sop-first.md`).
-
-4. **Unimplemented stages stay explicitly listed.** `gate.sh` prints that list every time.
-   When a project stage declares coverage of an item (`# gate-covers:`),
-   the item leaves the list only if that stage ran and passed this round.
-
-5. **A handed-back list that a machine confirms is complete is not thereby judged right.**
-   For work a subagent judges item by item (sweeps, re-reviews), what can be made into a check is "every item has a verdict, every verdict is one of the recognised kinds, and the reason quotes that item's own words";
-   that stops "the sample was enough" and "wave the whole group through", but not wrong verdicts. So after the completeness check, still spot-check and re-judge across **every kind of verdict**; redo the stretch where a spot check hits a wrong verdict, then sample again.
-
-## No categories by source; evidence only
-
-This project **defines no categories by source** and writes no special rules for
-any of them. There is one division only: **submissions that carry evidence, and
-those that do not.**
+Gates and hooks written in python check every switch, turned on one at a time, at the end of `--selftest` the way `scripts/break-switch-selftest.py` does; those written in shell carry one must-go-red case per switch in `scripts/selftest.sh`.

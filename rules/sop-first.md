@@ -1,4 +1,4 @@
-<!-- generated-from: rules/sop-first.md sha256:0a2ea729c610e2d80b8f5a35411bfee66d4b7dfc0d2f36517ca4a1f8ae7ce4c3 -->
+<!-- generated-from: rules/sop-first.md sha256:38246268f0b6691314b1dbcf0e77704be098f4e0a4a9bc870e31e13846c64a87 -->
 <!-- doc-lint:rule-definition -->
 # SOP before code
 
@@ -48,7 +48,8 @@ summary line carries `# gate-lint:summary`.
 ## Boundary
 
 **Before a rule gets in, ask "can this become a check that fails?"**
-If it cannot, leave it in the kb as open; do not write it as a rule.
+If it cannot, it does not enter this package: put it in the project-local `.claude/rules/`, or leave it in the kb as open for now.
+Every section of this package's rules states which script or hook judges it; a section that cannot say so moves to the project.
 
 **What can become a check takes the form the "newly found trap" item gives: a check that goes red, not a reminder; when to add it is decided in batches.** A trap you hit is first recorded in the project's debt table (saying what input it must stop), and the batch is assessed once a week:
 within a batch, checks that judge the same thing on the same set of objects merge into one, and each one added on its own states which past occurrences it stops; a trap that keeps recurring right now, or that destroys data, is added on the spot without waiting for the batch.

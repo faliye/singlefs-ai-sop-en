@@ -1,95 +1,9 @@
-<!-- generated-from: rules/writing-discipline.md sha256:4a074d2cf541d82116b4ffc6588c03cd975dd137d7c83d8c4a8d306bc4b2f5c1 -->
+<!-- generated-from: rules/writing-discipline.md sha256:1f50309b91a6fcaad31acfb14e377ab6e15b03e8a26efdb7776eb34676d2f34f -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
 This covers everything written for people to read: rules, README, design notes, the kb,
-commit messages, code comments, gate failure messages. Three things: first work out who
-it is for, make the length match the weight of the change, and write plainly.
-
-## First work out who this is for
-
-Three kinds of document, three ways of writing:
-
-| Kind | Who uses it | Goal | Rule |
-|---|---|---|---|
-| **Design documents** | humans read them through | make people **agree** and **get started** | `design-doc-discipline.md` |
-| **Engineering kb** | model retrieval | keep the model from **making things up** | `kb-discipline.md` |
-| **Rules** | execution | must be turnable into a check that fails | `rules-discipline.md` |
-
-Before writing, ask: will this be read start to finish by a person, or pulled out
-one item at a time by a model?
-
-**The one rule common to all three**: body text states only the current state;
-history goes to the end.
-
-## Length must match the weight of the change
-
-**The ruler: for a change of a few to a few dozen lines, the commit body caps at two
-paragraphs and new code comments cap at one line.** If it will not fit, first check whether
-you are writing something that should not be written.
-
-**Cutting it down to size is the job of whoever wrote the code, not of whoever
-reviews it.**
-
-### As short as possible without losing content
-
-**The test: if this sentence goes, what does the reader no longer know?** If you cannot
-name what was lost, cut it — "it reads more smoothly" and "it looks more thorough" are
-not content.
-
-Cut these three outright: restating a point already
-made in different words, prefacing an unchallenged conclusion with a run-up, and writing
-the same criterion once positively and once negatively.
-
-**But brevity may not be bought with content** — evidence, the basis behind a number, and
-the next step (`sop-first.md`'s `howto`) may none of them be dropped. What to keep is in two sections:
-"'Shorter is better' is not 'shorter is righter'" and "Hard data does not count against the ruler".
-
-### "Shorter is better" is not "shorter is righter"
-
-When in doubt, keep it.
-
-These three are cut too far:
-
-| Cut down to | What was lost |
-|---|---|
-| "measured 3.26×" | **The basis**: what hardware, what workload, what block size |
-| "rejected" | **The next step**: `sop-first.md` requires every rejection to carry a `howto` |
-| "per that one decision" | **The grounds**: why it was settled that way |
-
-**The reverse test pairs with the forward test; a sentence must pass both**:
-
-- Forward: if I **delete** this sentence, what does the reader know less? Cannot say → delete it.
-- Reverse: if I **keep** this sentence, what does the reader know more? Can say → it stays, however short you wanted to be.
-
-### Hard data does not count against the ruler
-
-Core measurements provided for review do not count toward the length: this covers only what a
-reviewer can take and verify for themselves.
-
-| Does not count (include it) | Still counts (cut it) |
-|---|---|
-| numbers: hit/miss counts, before-and-after, timings | why this number matters and what it shows |
-| the reproduction command and its verbatim output | how I came to think of running that command |
-| the basis needed to re-run: version, configuration, hardware | which dead ends were tried |
-
-**Include only the few decisive numbers**; the full record stays in `kb/` or `records/`.
-
-### Cut these categories
-
-1. **Subjective assessment.** Replace it with a checkable fact.
-2. **Content duplicated between the body and the kb.** Conclusions in the body,
-   verification method in the kb.
-3. **Circumstantial evidence.** Evidence requiring the reader to supply a reasoning
-   step; replace it with the kind that is the conclusion directly.
-4. **The full derivation chain.** How you found it step by step: leave it out.
-5. **Background exposition in code comments.** A comment says what this line is; it
-   does not carry an argument.
-6. **Defending the history.** A commit says only **what changed**; the discussion is
-   in the previous round's record.
-7. **Quoted source code.** Same for logs and dumps:
-   state the conclusion. The exception is decisive evidence the reader could not
-   verify without it.
+commit messages, code comments, gate failure messages.
 
 ## Keep the style simple and natural
 
@@ -121,7 +35,7 @@ Do not replace conjunctions with `⇒`, `×`, `+`, and do not compress an action
 - Keep bold for verdicts and numbers; do not bold whole sentences or paragraphs.
 - Label-style colons ("mechanism:", "basis:", "measurement:") may stay in a kb, but a complete sentence must follow the colon.
 
-The gate does not check this. The `⇒` already in `rules/` have not been swept yet; do not take them as examples.
+The gate stage "代号" (`scripts/code-name-lint.py`) judges `⇒`: a `.md` line added relative to the diff base that contains `⇒` goes red; table rows and anything inside backticks are not judged. Noun strings, `×` and `+` it does not judge; lines already present at the base are not swept.
 
 ### The test
 

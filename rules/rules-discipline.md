@@ -1,4 +1,4 @@
-<!-- generated-from: rules/rules-discipline.md sha256:84ce1a0220ce4d90c2f7b27db38181f831f3d3cd6bc2430e1fb10341751298d9 -->
+<!-- generated-from: rules/rules-discipline.md sha256:d4907beb6dc2d756fcf1a8cc443cc1aae4f57e51a24428c270d720bb3bdae05e -->
 <!-- doc-lint:rule-definition -->
 # Rule-file discipline
 
@@ -82,9 +82,9 @@ Enforced by `scripts/doc-lint.sh`.
 The body may not name a project that uses these rules, nor its paths,
 nor its file names, and may not use its decision or experiment numbers as examples. Write examples in a
 form that names no one: a wiring path like `.claude/gate.d/` is a shared convention and may be written;
-a specific `.claude/gate.d/55-<stage name>.sh` may not.
+a specific numbered file name under `.claude/gate.d/` may not.
 
-The gate does not judge this clause; it is left to review.
+`scripts/rules-lint.sh` judges two kinds of this: the name of a project that uses these rules, and a specific numbered file name in the gate directory (`gate.d/<digits>-`). It judges only this package's own rules, not a project's `.claude/rules/`; decision numbers, experiment numbers and other paths it cannot recognise.
 
 ## What the gate covers
 
@@ -96,7 +96,7 @@ when that directory does not exist): the latter is started by the `gate.sh` stag
 one per line in the project root's `.claude/rules-lint-exclude`; delete a line once that file is done —
 the exclusion list only shrinks.
 
-Clause 7 "No positional references in the body, and no self-reference" is judged by `scripts/doc-lint.sh`, not by `rules-lint`; clause 8 "The body carries nothing specific to one consumer" is not judged by the gate.
+Clause 7 "No positional references in the body, and no self-reference" is judged by `scripts/doc-lint.sh`, not by `rules-lint`; clause 8 "The body carries nothing specific to one consumer" is judged by `rules-lint` for the two kinds it can recognise literally.
 
 **What it cannot cover**: the line in clause 2 "Keep the criterion, move the argument out" (which sentence is criterion and which is argument), and
 whether the link under the deterrent points at the right place. Those rest on a person reading them aloud, and on review.

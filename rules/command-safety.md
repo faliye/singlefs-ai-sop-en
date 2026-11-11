@@ -1,13 +1,11 @@
-<!-- generated-from: rules/command-safety.md sha256:3f6251dcd2a298efd8388e0d4e4b9ca4525a7254abd476fa2ee5b1e157d4cdc7 -->
+<!-- generated-from: rules/command-safety.md sha256:9c713ebeacf3fb1a14d1a2c1fba18edc45671b27e3d3d13e080bfc7b079690ca -->
 <!-- doc-lint:rule-definition -->
 # Process and command discipline
 
 Ten of these are failing checks, judged by `scripts/shell-lint.sh`: **killing processes
 by pattern match** (`pkill -f`, `killall`), **`pgrep -f`**, **carrying a value out of a
 subshell through a variable**, **git's undo commands inside a script**, **`rm -rf` on
-an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**, **a space inside a prefix-removal pattern on `$*` or `$@`**, and **cutting text shown to people by bytes**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). Creating an unregistered file or directory at the project root is judged by the hook `scripts/claude-hooks/root-entry-guard.sh` and by `gate.sh`'s "New project-root entries" (`项目根的新条目`). An unregistered symbolic link in the repository is judged by `gate.sh`'s "Soft links" (`软链接`). The rest are still prose, because the criterion for
-checking them mechanically is not worked out yet (`show-me-test.md`, "what the gate
-can and cannot prove").
+an unguarded variable path**, **a `wait` with no arguments**, **a pipeline ending in `grep -q` in a script that sets `pipefail`**, **judging whether a file under `/proc`, `/sys` or cgroupfs is empty by its size**, **a space inside a prefix-removal pattern on `$*` or `$@`**, and **cutting text shown to people by bytes**. Whether a test harness deleted the images it created when it finished is judged by `gate.sh`'s "No temporary files left behind" (`跑完没留下临时文件`). Creating an unregistered file or directory at the project root is judged by the hook `scripts/claude-hooks/root-entry-guard.sh` and by `gate.sh`'s "New project-root entries" (`项目根的新条目`). An unregistered symbolic link in the repository is judged by `gate.sh`'s "Soft links" (`软链接`). A command that discards output and also judges a count or emptiness is recorded and reminded about by the hook `scripts/claude-hooks/discarded-output-count-check.sh`. Build directories and repository copies a subagent has not deleted before handing back are judged by the hook `scripts/claude-hooks/handback-scratch-check.sh`.
 
 ## Before anything you cannot take back, think once more
 
@@ -26,7 +24,8 @@ a script, `git stash` first, or copy the whole repository and work on the copy.
 **`rm -rf` on a variable path needs an empty-value guard**: write `rm -rf "${build_directory:?}/cache"`, not
 `rm -rf "$build_directory/cache"`. `rm -rf "$build_directory"` with nothing after it needs no guard.
 
-A path joined from several variables (`"$a/$b"`, `"${root}/${name}"`) can land elsewhere when one piece is empty: delete such a path by writing the literal absolute path, not the joined variables; `${joined:?}` only guards against the whole string being empty, not against one piece being empty.
+A path joined from several variables (`"$a/$b"`, `"${root}/${name}"`) can land elsewhere when one piece is empty, and `${joined:?}` only guards against the whole string being empty: on the line that joins it, every piece carries a guard (`dir="${root:?}/${name:?}/x"`); a fixed path is written as the literal absolute path.
+S5 in `scripts/shell-lint.sh` judges this: when the argument of `rm -rf` is a variable joined in this file, and the line that joins it has a piece without a guard, it goes red.
 
 ## Do not create files or directories at the project root
 
@@ -90,67 +89,6 @@ and when it refuses it gives the pid-based ways to do the same thing. It is a Cl
 
 In a session where it is not registered, commands typed by hand still rely on this text alone.
 
-## Sample processes a harness starts go in a process group of their own
-
-When a harness, a judging script or a replay script starts sample processes (a real shell, the program under test, a sample command), the criterion is: **when each sample finishes, not one of the processes it started is left.**
-
-- Put each sample in a process group of its own: in shell start it with `setsid`; in Python pass `start_new_session=True` to `subprocess`.
-- On timeout and at the end, signal the whole group, TERM first and KILL after a grace period: in Python `os.killpg(<process-group-id>, <signal>)`, in shell `kill -TERM -- -<process-group-id>`. Do not stop only the process you started directly.
-- After the run, check `/proc` by process group id that nothing is left in the group; stop what is left and write it into that sample's failure message.
-- Stopping only the direct child leaves the grandchildren behind: a `cat` started by a process substitution holds the write end of the pipe, and whoever reads that pipe never gets EOF.
-
-This is not a check yet: whether what a script starts is a sample, and whether it stopped the whole group on timeout and at the end, cannot be told reliably from the script; it rests on review.
-
-## Once you start a background task or a subagent, re-check it on a schedule, and end it only when whoever dispatched it does not respond
-
-Long work may run long, but someone has to be watching it:
-
-- **Anything started gets re-checked.** For a task started in the background or a subagent sent off, whoever dispatched it checks on a schedule: how long since its last action,
-  whether it is sitting in a wait loop, whether the same command keeps running with byte-identical output, whether the files it writes are still growing.
-- **Keep detection separate from handling.** Tools that detect stuck or spinning work (hooks, watchdog scripts) only record and report and do not block commands; they do not kill processes or stop subagents, except when whoever dispatched the work does not respond.
-  Whether it ends and how it is handled is decided by whoever dispatched it, after looking; if whoever dispatched it does not respond after the report (the same thing reported several times in a row, neither handled nor acknowledged), whoever reported (a person, an agent, or the detecting tool) may end it: a process with `scripts/proc.py stop <process id>`, a subagent with the tool that stops it; an ending is reported.
-  A hook that refuses one specific dangerous form is not covered here (`session-wrapup.md` item 4 "Is another session in flight in the same repository?": refuse, before writing, to overwrite an untracked file).
-- **Every way of handling that a reminder offers comes with a command that can be run.** When a detecting tool's reminder lists several ways of handling, each is written as an executable command, not just "deal with it" or "run it after confirming".
-  When a way out says "if this is really intended, run it as is", it also gives a command that records "decided to run as is"; once that is recorded, the same reminder is not pushed again for that case.
-- **After stopping a sub-agent, settle its changes and its unfinished work on the spot.** Decide file by file for whatever it left half-changed: keep it, revert it, or hand it to someone to continue; decide who takes over the work it did not finish.
-  Write the decision into the record and tell whoever takes over; leave no half-made change without an owner.
-- **Name background tasks and script tasks in the language used with the user, saying what each is and which job it is waiting for.** Tasks running at the same time may not share a name; one whose name alone does not say what it is doing is renamed before it is started.
-- **Before waiting for a line in a log, make sure that line is really written to that file.**
-- In sessions such as Claude Code, put long work in the background and come back to re-check it periodically, instead of idling in the foreground.
-
-## When you hit a problem, first find out whether another agent owns that part
-
-This covers a problem met mid-work that your own task cannot solve or that is not your task's to solve: the gate is red on a file you did not change, a file you need to change is being changed by another session, something you need is produced by another task, or you cannot fix it or are unsure how.
-
-Before fixing it, working around it, or stopping to wait, do these in order:
-
-1. **First find out who owns it.** List the agents and sessions that are running (in Claude Code, `ListAgents`), and from each one's task name, the files it is changing and its recent actions, judge whether any of them owns the part where the problem is. When unsure whether it is theirs, send a message and ask.
-2. **If one owns it, send it a message** (in Claude Code, `SendMessage`), and do not change the part it owns yourself. The message says: which file, which line, what you observe, how to reproduce it, whether your own change brought it in, and what you want it to do or what you are asking it.
-3. **If you cannot fix it yourself, or you lack information or permissions someone else holds, message for help on your own initiative**; do not quietly work around it, and do not idle.
-4. **If nobody owns it**: if it belongs to your own task, handle it yourself; if not, report it to the user or to whoever dispatched you, saying where the problem is and whom you suggest handing it to.
-5. **Once the message is sent, carry on with the work in hand that does not depend on it**, and take that part up again when the reply comes. If the other side keeps not responding, report it to the user or to whoever dispatched you; do not take over the part it owns on your own.
-
-How to judge a red on a file you did not change is in `session-wrapup.md` item 4 "Is another session in flight in the same repository?"; relaying another place's convention in a message follows `verify-before-claiming.md` "Relaying another place's convention carries its source or its original words".
-
-This is not yet a check: whether you looked for an owner and whether you sent what should have been sent is left to review.
-
-## Within one script, run the checks in parallel when they can be
-
-**Criterion: this batch of checks do not depend on each other, and every one of them has to start a
-subprocess to do its work (a build, a test run, a virtual machine, a python process). Then run them in parallel,
-instead of waiting for them one at a time.**
-
-Once it is fast, look again at where the remaining time goes: a case that idles on purpose (one that verifies, say,
-that `wait` does not return once the timeout logic is broken) is not saved by parallelism.
-
-**These three do not go parallel**:
-
-- a later item reads an earlier item's product;
-- they share one writable state (the same temp directory, the same target directory, the same device). To go parallel, give each item its own;
-- each item is fast by itself, running only a few milliseconds.
-
-Take the degree of parallelism (processes, and threads within a process) from an argument or an environment variable, falling back to `nproc`; do not hard-code it.
-
 ## Parallelism must not swallow the failures
 
 There are only two ways to collect: record `pids+=($!)` when starting and take the exit code with `wait "$pid"`
@@ -168,13 +106,8 @@ them back in the order the work was handed out.
 **However many items were handed out, that many have to come back.** Count them when collecting, and turn the
 whole thing red when the count does not match what was handed out.
 
-**After making something parallel, prove again that it can go red.** Do what `show-me-test.md` says: feed it an
+**After making something parallel, prove again that it can go red**: feed it an
 input that must go red, and see whether the parallel version still goes red.
-
-## Do not use echo to fake success
-
-Do not report success the way `<command> 2>/dev/null; echo "done"` does.
-Any command that changes state must be verified by **reading the state back**: what is judged is the content read back, not the exit code of that command.
 
 ## Files under `/proc`, `/sys` and cgroupfs: read the contents to judge emptiness
 
@@ -184,48 +117,10 @@ To judge whether such a file is empty, or whether there are processes, read the 
 S8 in `scripts/shell-lint.sh` judges this: any of these three forms applied to a path that literally starts with `/proc/` or `/sys/`, or whose file name is `cgroup.<name>`, turns red.
 Paths held entirely in variables with an unrecognizable file name are not judged; languages other than shell (python's `os.path.getsize`, `st_size` and the like) are not judged and are left to review.
 
-## Result collection needs a completeness gate
-
-**Do this**: have the program under test report, on its final line, how many results it
-emitted; the collector compares the count and discards the round on a mismatch.
-That gate must itself be proven to go red first — feed it a fake program that claims
-one more result than it actually emits, and it must fail.
-
-## A script with a gate hands over its output only after judging it
-
-When one script both produces a result and decides whether that result is usable, **the output goes to the caller only
-after the verdict**.
-
-**What to do**: write the result to a temporary file first and output it only once the gate passes; on red, stdout stays
-empty. This gate must be shown to go red as well: change the script back to "output first, judge later", and the
-self-test must go red.
-
 ## Assignments inside a subshell do not travel back to the parent
 
 In `exit_code="$(run_one ...)"`, any variable `run_one` assigns is **empty in the parent**.
 **Pass values through a file or an argument, not through a variable.** It is a check that goes red in `scripts/shell-lint.sh`.
-
-## After a script edits a file, read it back — a compiler warning is a free signal
-
-When a script does a string replacement on code or documents, two things to do:
-
-1. **The replacement must assert it hit something**: zero replacements is an error to
-   raise, not "ran the script, so it's done".
-2. **Read back after editing**: grep for the new content, or just run it and see
-   whether the behavior changed.
-
-**Never wave off a compiler or linter warning.**
-
-## Three silent failures at a process boundary
-
-| Form | How to write it |
-|---|---|
-| `inner; exit_code=$?` under `set -e` | Take the exit code inside an `if`: `if inner; then exit_code=0; else exit_code=$?; fi` |
-| `export <variable name>="$(<command>)"` / `local <variable name>="$(<command>)"` | Assign first, `export` second — write it as two lines |
-| An environment variable used for a handshake leaking into a child process | `unset` it as soon as it is read; clear it with `env -u` when starting a child process |
-
-**The criterion is "how many process levels does this value cross"**: cross one and you
-have to ask whether it is still there at the next level, and whether it should be.
 
 ## The exit code of a pipeline is not the one you want
 
@@ -269,7 +164,35 @@ Cutting that only ever sees ASCII (hex digests and the like) keeps cutting by by
 S10 in `scripts/shell-lint.sh` judges this: a line that has one of these byte cuts, prints outward (`say`, `bad`, `howto`, `echo`, `printf` or `✗`), and lacks that marker goes red.
 A cut stored in a variable and printed on another line is not recognised; that is left to review.
 
-## Look before running anything destructive
+## A command you draw a conclusion from keeps its output
 
-For `mkfs` / `dd` / `dmsetup remove`, **the target device must come from a variable, and `lsblk` must print it for
-confirmation first**; never hard-code a literal `/dev/sdX`.
+A command you will cite to say "zero matches", "no errors" or "the exit code shows …" does not send stderr to `/dev/null` and does not discard stdout (`2>/dev/null`, `&>/dev/null` and `>/dev/null 2>&1` all count as discarding).
+A 0 printed by a form like `grep -c pattern file 2>/dev/null || echo 0` is not taken as zero matches.
+
+For empty output or a 0, first confirm the command really ran: look at its exit code (append `; echo rc=$?` to the same command) and its error output, and only once it ran take the result as zero matches.
+
+The hook `scripts/claude-hooks/discarded-output-count-check.sh` judges one half of this: it judges after a Bash command has run, and when the command discards output and the same command also judges a count or emptiness (`grep -c`, `wc -l`, `test -z`, `[ -z`, `|| echo 0` and the like), it writes an entry to its detection record and adds a one-line reminder; it does not refuse.
+The forms it recognises are those in that hook's `DISCARD_FORMS` and `COUNT_FORMS`; a command that carries `# discarded-output: <why discarding is fine>` is recorded without a reminder. Whether a conclusion was drawn from that command, it does not judge.
+A project may leave it unregistered (its file header says `# hook-registration: optional`); how to register it is in the hook's file header.
+
+## Before a subagent hands back, it deletes the build directories and repository copies it created
+
+The repository copies a subagent made in its scratch directory, and the build directories it compiled into with its own `CARGO_TARGET_DIR`, are deleted by the subagent itself before it hands back:
+
+- **Delete**: the build directories this subagent created this time (`target`, the directory `CARGO_TARGET_DIR` points at, and any other cache carrying `CACHEDIR.TAG`) and its repository copies (clones, copied repositories, git worktrees).
+  Remove a worktree from its source repository with `git worktree remove --force <path>`, so the registration there goes too; `rm -rf` the rest.
+- **Do not delete**: reports, artifacts that are to be committed, replay material the main agent still has to check; anything a predecessor, the main agent or another agent created, even in the same scratch directory;
+  anything inside the project root (the project's own `target`, worktrees Claude Code created inside the project) — those belong to the main agent.
+- Before deleting, record the size with `du -sh`; the handback report carries one line saying what was deleted and how big each was.
+- For anything not deleted, the handback report carries one line per path: "Not deleted <full path>: <why>". Merely citing the path as a source ("ran on the copy at …") does not count.
+
+The hook `scripts/claude-hooks/handback-scratch-check.sh` checks this, attached in two places:
+
+- PreToolUse of the handback tool (`SubagentHandback`): stops the handback before it happens. If a build directory, worktree or repository copy that sits in a temporary directory, was created while one of this subagent's own tool calls had not yet finished,
+  and was mentioned in its calls, is still there, and the report being handed back has no line for it, the handback is refused and the list is given to the subagent.
+- SubagentStop: the fallback when the subagent stops without going through the handback tool. A delivered handback report that carries the line lets it through (a refused handback does not count);
+  after a stop is blocked, writing the line in the reply or in a written report and then stopping lets it through (merely running du, ls or Read on it does not count).
+
+The project registers both in `.claude/settings.json`; how to write them is in that hook's header.
+What it cannot recognise still has to be deleted: paths that live only in a variable, directories a script created internally that no call mentions, anything more than one level below a directory it created,
+source copies with no `.git` that were never built in, and anything created by a detached process (`nohup`, `setsid`, `&`) after the call returned. Whether the report carries the line saying what was deleted and how big, it does not check.

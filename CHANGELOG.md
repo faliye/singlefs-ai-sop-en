@@ -4,6 +4,28 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.72 — 2026-11-11
+
+**This package keeps only rules a check judges: six rule files with no check, and the review-only sections of the others, move out of the package into the project. "No pleasantries" in the communication rule is now judged by the stop hook `courtesy-phrase-check.sh`. shell-lint S5 judges the unguarded segment on the joining line. The code-name check gains `⇒` and dated status sentences. rules-lint gains "the body names nothing belonging to one consumer".**
+
+Rules:
+- Removed `evidence-discipline.md`, `engineering-philosophy.md`, `machine-first.md`, `test-discipline.md`, `verify-before-claiming.md` and `session-wrapup.md`. Their sections that a check judges moved into the rules that stay: the sections on timing segments inside the process under test and on every break switch going red went to `show-me-test.md`; the sections on keeping the output of a command you draw a conclusion from, and on a subagent deleting its own build directories and repository copies before handing back, went to `command-safety.md`; the section on relaying another place's convention with its source went to `communication-discipline.md`.
+- `sop-first.md`, "Boundary": a rule that cannot become a check does not enter this package and goes to the project's `.claude/rules/`; every section of a rule here names the script or hook that judges it.
+- `communication-discipline.md`: keeps only "No pleasantries" (judged by the stop hook) and the section on relaying a convention (judged by the hook before dispatch).
+- `pushback-discipline.md`: retitled "Warning records"; keeps only the format of the warning file.
+- `command-safety.md`: when an `rm -rf` path is joined from several variables, every segment on the joining line carries a `${name:?}` guard.
+- `rules-discipline.md` item 8, `kb-discipline.md` item 8 and `writing-discipline.md`: each states which script judges which half.
+- `code-discipline.md`, `design-doc-discipline.md`, `show-me-test.md` and `writing-discipline.md`: sections that rest on review moved out of the package.
+- `CLAUDE.md` in all three languages and the project template: nine rules stay loaded through `@`; `code-discipline.md` and `preflight-discipline.md` are read once before writing code or scripts; changes to rules and scripts are synced to the consumer project's copy without waiting for a release.
+
+Scripts and gates:
+- `claude-hooks/courtesy-phrase-check.sh` and `courtesy-phrase.py` (new): at stop, judges whether the last reply of the turn contains a pleasantry from the word list; if so it blocks the stop and requires a rewrite, once per reply. Registered on `Stop` and `SubagentStop`.
+- `shell-lint.sh`: for a joined variable, S5 now judges the joining line and goes red when any expansion on it lacks `${name:?}`.
+- `code-name-lint.py`: new checks for `⇒` used as a conjunction (table rows and backticks are not judged) and for kb sentences where a date is followed by a status label and a colon; new break switches `arrow-ignored` and `dated-status-ignored`.
+- `rules-lint.sh`: new check "belongs to a consumer": the name of the consuming project, and a concrete numbered file name in the gate directory; only this package's own rules are judged.
+- `selftest.sh`: cases and break switches for the items above.
+- Ways out and file headers in scripts and hooks that pointed at the removed rules now point at the rules that stay.
+
 ## 0.0.71 — 2026-11-11
 
 **New rule "Communication discipline" (terse conversation, no pleasantries, no softening a judgment to spare feelings) and new skill `halt`. shell-lint gains S9 (a space inside a prefix-removal pattern on `$*` or `$@`) and S10 (cutting by bytes into output people read), and judges `rm -rf` on joined variables. gate-lint gains "skip counts list their entries". New optional hook `discarded-output-count-check.sh`. Several additions to the test and verify-before-claiming rules.**

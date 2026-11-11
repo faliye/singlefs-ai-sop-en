@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:06cec33b290d2d71c6115d9fdc18dc75b0b86c8ff4fff03ba803946ef1d6e7cc -->
+<!-- generated-from: CLAUDE.md sha256:98ce248a585c3fca633a7b5afbe7fd42b8c407b51602b282f1d080471b8a9db0 -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -8,7 +8,8 @@ designed. It has exactly one user.
 Work inside this repository is bound by these rules too.
 
 Changing the specification proper **must bump `VERSION` in the same change**.
-Releases are batched weekly: rule and script changes accumulate in the working tree and go out as one version a week; fixes for false positives and misjudgements accumulate into that version; the consumer project syncs its copy once per release.
+Releases are batched weekly: rule and script changes accumulate in the working tree and go out as one version a week; fixes for false positives and misjudgements accumulate into that version.
+Changes in the working tree are synced to the consumer project's copy without waiting for a release, and whatever downstream has to change along with them is changed in the same round. On a day `scripts/` changed, run `shell-lint.sh` and `gate-lint.sh` once each on this repository and on the consumer project's gate directory; fix what is red on the spot or hand it to the session that owns it.
 **Which paths count as "the specification
 proper" is defined by `GOVERNED` in `scripts/version-discipline.sh`** — that is the
 only list, and it is not copied here.
@@ -43,25 +44,21 @@ coverage check.
 
 ## Rules (always in force)
 
+**This package takes only rules that a check judges**: what cannot be judged goes into the project-local `.claude/rules/` (`rules/sop-first.md`, "Boundary").
 **Explanations and arguments are superfluous in `rules/`.** A rule states only criteria, steps, scope and exceptions, defaults, and pointers (`rules/rules-discipline.md`, item 1 "The body carries four things only" and item 2 "Keep the criterion, move the argument out").
 
-@rules/engineering-philosophy.md
 @rules/sop-first.md
 @rules/show-me-test.md
-@rules/machine-first.md
-@rules/code-discipline.md
 @rules/writing-discipline.md
 @rules/design-doc-discipline.md
 @rules/kb-discipline.md
 @rules/rules-discipline.md
-@rules/test-discipline.md
-@rules/evidence-discipline.md
-@rules/verify-before-claiming.md
 @rules/pushback-discipline.md
 @rules/communication-discipline.md
 @rules/command-safety.md
-@rules/preflight-discipline.md
-@rules/session-wrapup.md
+
+Two rules are not `@`-loaded permanently: read each in full once before writing code or scripts, then look it up by name: `rules/code-discipline.md`, `rules/preflight-discipline.md`.
+<!-- doc-lint:read-once code-discipline.md preflight-discipline.md -->
 
 ## Where a thing belongs
 

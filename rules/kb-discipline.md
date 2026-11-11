@@ -1,4 +1,4 @@
-<!-- generated-from: rules/kb-discipline.md sha256:dd25d23439184879f62c2e251bc5f2f57338ed1537256c706fa4d053187dce93 -->
+<!-- generated-from: rules/kb-discipline.md sha256:c4d6964c6d9e88841d0cf43df2d27f2ee19bde1e3b53dfe1250a6516f44f1f91 -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
@@ -145,11 +145,14 @@ A registered file must close with a "## Revision history" section, kept even wit
 Without that registry, every file under kb must close with the section. `INDEX.md` is never judged.
 Enforced by `scripts/doc-lint.sh`.
 
+For history entries numbered "（其 <ordinal>）", look up the highest existing number under the same `### <date>` heading before taking one.
+The gate stage "History entry numbers" (`历史条目编号`, `scripts/history-ordinal.sh`) judges this: an entry added this time whose number collides goes red.
+
 ### A dated snapshot of the current state is history too, and stays stuck on that day
 
 A current-state sentence carries no date: when the state changes, change the current value, and write what it looked like on that day into "## Revision history" (not in a file that is not registered as carrying history; there the history lives in git).
-For an existing dated current-state sentence ("Status on <date>: …" and the like), delete the date and keep the fact; check the fact itself once first (`verify-before-claiming.md`), and if it is stale, change it to the current value.
+For an existing dated current-state sentence ("Status on <date>: …" and the like), delete the date and keep the fact; check the fact itself once first, and if it is stale, change it to the current value.
 To tell whether a dated sentence is a current-state sentence, delete the date and read it again — if it reads as saying how things are today (whether something exists, how many, what is still owed), it is a current-state sentence;
 only if it reads as saying what was done that day (changed to, settled, ran once) is it an event sentence.
 
-The gate does not check this for now.
+The gate stage "代号" (`scripts/code-name-lint.py`) judges one shape of this: in kb lines added relative to the diff base, a date followed within 4 characters by 现状, 目前状态 or 当前状态 ("current state") and then a colon goes red. Other shapes, and lines already in the base, are not judged.
