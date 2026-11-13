@@ -4,6 +4,22 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.73 — 2026-11-13
+
+**Two new hooks: the session title starts with the session number on startup and resume (`session-number-title.sh`), and before stopping the messages other sessions sent are checked for an answer (`unanswered-message-check.sh`). stage-selftest feeds cases in parallel. naming-lint fixes two false positives.**
+
+Rules:
+- `communication-discipline.md`: new section "Before stopping, check the messages other sessions sent": each one is either answered or has a line "no reply to <session name>: <reason>" in the reply; a notice with no session name whose sender is unknown does not count.
+- `communication-discipline.md`: new section "Session titles start with the session number": the title reads `(number) title`, the number taken from the default name `<directory name>-<number>`; when it cannot be read, one is computed from the session ID, skipping numbers other sessions use.
+
+Scripts and gate:
+- `claude-hooks/unanswered-message-check.sh` and `unanswered-message.py` (new): at stop, list messages neither answered nor declined with a "no reply to" line; the same list is blocked only once; on `Stop`.
+- `claude-hooks/session-number-title.sh` and `session-number-title.py` (new): on `SessionStart` (startup, resume, fork) write the number; on `UserPromptSubmit` put back a removed number and fill in the generated title; a title the user chose only gets the number. Never exits 2.
+- `session-transcript.py`: the code that reads hook input and records the fingerprint of the last block moved here, shared by `courtesy-phrase.py` and `unanswered-message.py`.
+- `stage-selftest.sh`: cases are fed in parallel by default (`--jobs`, or `STAGE_SELFTEST_JOBS`, else nproc); results are read back in registration order and a dispatch/collect mismatch turns the whole stage red; stages whose cases cannot run at once write `# stage-selftest: serial <reason>`; new break switch `lose-one-result`.
+- `naming-lint.sh`: the `b` prefix of a byte literal `b'x'` is not judged; a leading `a` followed by more parts is the English article and is not judged.
+- `selftest.sh`: wires in the cases and break switches for the items above.
+
 ## 0.0.72 — 2026-11-11
 
 **This package keeps only rules a check judges: six rule files with no check, and the review-only sections of the others, move out of the package into the project. "No pleasantries" in the communication rule is now judged by the stop hook `courtesy-phrase-check.sh`. shell-lint S5 judges the unguarded segment on the joining line. The code-name check gains `⇒` and dated status sentences. rules-lint gains "the body names nothing belonging to one consumer".**
