@@ -1,4 +1,4 @@
-<!-- generated-from: CLAUDE.md sha256:98ce248a585c3fca633a7b5afbe7fd42b8c407b51602b282f1d080471b8a9db0 -->
+<!-- generated-from: CLAUDE.md sha256:bcafa554712bda3767e5482ba071efaa302e2a3265896f6e44f8cf90c0f69151 -->
 <!-- doc-lint:rule-definition -->
 # singlefs-ai-sop-en
 
@@ -11,24 +11,22 @@ Changing the specification proper **must bump `VERSION` in the same change**.
 Releases are batched weekly: rule and script changes accumulate in the working tree and go out as one version a week; fixes for false positives and misjudgements accumulate into that version.
 Changes in the working tree are synced to the consumer project's copy without waiting for a release, and whatever downstream has to change along with them is changed in the same round. On a day `scripts/` changed, run `shell-lint.sh` and `gate-lint.sh` once each on this repository and on the consumer project's gate directory; fix what is red on the spot or hand it to the session that owns it.
 **Which paths count as "the specification
-proper" is defined by `GOVERNED` in `scripts/version-discipline.sh`** — that is the
-only list, and it is not copied here.
+proper" is defined by `GOVERNED` in `scripts/version-discipline.sh`.**
 A bump comes with a section for that version at the top of `CHANGELOG.md` — one section per
 version, no gaps — judged by `scripts/changelog-lint.sh`.
 
 ## Language of collaboration
 
 **When working in this repository, conduct the conversation and produce all output in English.**
-Work in the language of the repository you installed; the reasoning and the list of
-editions live in [README](README.md) under "Pick the edition in your own language",
-not here.
+Work in the language of the repository you installed; the list of
+editions is in [README](README.md) under "Pick the edition in your own language".
 
 **Where editions read differently, the language does not decide — the actual
 behaviour of `scripts/` does.**
 
 **Changing a rule means changing every published edition and merging them together**;
-the person making the change is the one who guarantees they agree. The gate can only
-see that a hash does not match — not whether the editions say the same thing.
+whether the editions say the same thing is guaranteed by the person making the change; the gate can only
+see that a hash does not match.
 
 **Master is pushed only through `bash scripts/push-all.sh`, which checks and pushes every edition together.**
 It first checks every language repository (on master, clean working tree, same VERSION, gate green), connects to
@@ -45,7 +43,7 @@ coverage check.
 ## Rules (always in force)
 
 **This package takes only rules that a check judges**: what cannot be judged goes into the project-local `.claude/rules/` (`rules/sop-first.md`, "Boundary").
-**Explanations and arguments are superfluous in `rules/`.** A rule states only criteria, steps, scope and exceptions, defaults, and pointers (`rules/rules-discipline.md`, item 1 "The body carries four things only" and item 2 "Keep the criterion, move the argument out").
+A rule states only criteria, steps, scope and exceptions, defaults, and pointers, not explanations and arguments (`rules/rules-discipline.md`, item 1 "The body carries four things only" and item 2 "Keep the criterion, move the argument out").
 
 @rules/sop-first.md
 @rules/show-me-test.md
@@ -62,11 +60,8 @@ Two rules are not `@`-loaded permanently: read each in full once before writing 
 
 ## Where a thing belongs
 
-**This SOP was made for its one user, and nothing here
-presumes it generalises to other projects.** The criterion is not "would another
-project need it too".
-
-To decide where a piece of content goes, look at what it governs:
+This SOP was made only for its one user; the criterion is not "would another
+project need it too". To decide where a piece of content goes, look at what it governs:
 
 - **Collaboration** — what evidence a submission carries, how documents are written,
   where decisions are recorded, what next step a gate rejection must give.

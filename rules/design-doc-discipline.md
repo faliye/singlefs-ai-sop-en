@@ -1,10 +1,9 @@
-<!-- generated-from: rules/design-doc-discipline.md sha256:42bf1c9d03def1c42c37ea4295d22ce9467ff8056e0229aae1f3f3e37bb92d3c -->
+<!-- generated-from: rules/design-doc-discipline.md sha256:d2e707023a70c72a8b9a3016ea7c0668b6891606317f28fae23dda50007de156 -->
 <!-- doc-lint:rule-definition -->
 # Design document discipline
 
 **Applies to**: README, design notes, `records/` — **things humans read through.**
-
-Knowledge documents for model retrieval follow `kb-discipline.md`.
+Knowledge documents for model retrieval follow `kb-discipline.md`; `CLAUDE.md` and `rules/*.md` follow `rules-discipline.md`.
 
 ## 1. Body text states only the current state; history goes to the end
 
@@ -19,18 +18,12 @@ the end:
 - Was <old approach> / now <new approach> / basis for the change: <why it changed>
 ```
 
-**Corollaries**:
 - Changed a decision? **Edit the body directly.** Do not annotate "(was <old value>)" beside it.
 - A conclusion overturned? **Delete the old conclusion from the body** and put
   "was <old conclusion> / now <new conclusion> / what overturned it" at the end.
 - No `~~strikethrough~~`, `[deprecated]`, `(superseded by <the later decision>)` in the body.
 - Same for code comments: write "why it is this way now", not "how it used to be".
-  **Pitfall comments in checking code are the exception** ("this bypass measurably
-  got through, hence this check"). The criterion is what it points at:
-  pointing at **why this code looks the way it does now** → keep;
-  pointing at **a version that no longer exists** → delete.
-
-`CLAUDE.md` and `rules/*.md` follow a different discipline; see `rules-discipline.md`.
+  Pitfall comments in checking code ("this bypass measurably got through, hence this check") are the exception: one pointing at why this code looks the way it does now is kept; one pointing at a version that no longer exists is deleted.
 
 History statements in body text, and where the history section sits, are enforced by
 `scripts/doc-lint.sh`, which scans only `.md`; the clause on code comments rests on review.

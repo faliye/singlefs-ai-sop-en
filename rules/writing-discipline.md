@@ -1,4 +1,4 @@
-<!-- generated-from: rules/writing-discipline.md sha256:1f50309b91a6fcaad31acfb14e377ab6e15b03e8a26efdb7776eb34676d2f34f -->
+<!-- generated-from: rules/writing-discipline.md sha256:495897761644fd7524735650de56e8d7a46027abe927bf06a3a7f8d092867192 -->
 <!-- doc-lint:rule-definition -->
 # Writing discipline
 
@@ -22,51 +22,35 @@ commit messages, code comments, gate failure messages.
 
 The criterion and the registry are those of `code-discipline.md`: the "Names" section and the rule "Comments contain no abbreviations and refer to nothing by a code name".
 
-The gate stage "代号" (`scripts/code-name-lint.py`) judges the `.md` lines added relative to the diff base for two shapes: digits followed by one lowercase letter (optionally followed by `-<letters or digits>`), and two uppercase letters followed by two digits. Nothing inside backticks, fences, HTML comments, link targets or web addresses is judged, nor references to numbered steps such as "step 1b"; labels that a `.md` file declares itself with `<!-- doc-lint:not-numbers … -->` are not judged in that file, and are judged as usual in every other file.
-A project's own numbering systems that have a registry (mutation names, experiment numbers) are registered in `.claude/code-names` at the project root: one line `<regular expression>  # reason`; a code name that the expression matches in full is not judged.
-Abbreviations, other shapes of code name, code comments and text outside `.md` are not checked by the gate; lines already present at the base are not swept.
+A project's own numbering systems that have a registry (mutation names, experiment numbers) are registered in `.claude/code-names` at the project root: one line `<regular expression>  # reason`; a code name is not judged only when the expression matches it in full.
+Labels that a `.md` file declares itself with `<!-- doc-lint:not-numbers … -->` are used as usual in that file.
 
 ### Write conjunctions as conjunctions; unpack noun strings into sentences
 
-Do not replace conjunctions with `⇒`, `×`, `+`, and do not compress an action into a noun string like "verbatim verification of the four mandatory sites".
-
-- Where "so / because / then / but" belongs, write the word, not `⇒`; inside a table cell, where space is tight, symbols may stay.
+- Where "so / because / then / but" belongs, write the word, not `⇒`, `×` or `+` in its place; inside a table cell, symbols may stay.
 - Unpack noun strings: "main agent additionally verbatim-verifies four mandatory sites" becomes "I also checked the four mandatory sites word for word."
 - Keep bold for verdicts and numbers; do not bold whole sentences or paragraphs.
 - Label-style colons ("mechanism:", "basis:", "measurement:") may stay in a kb, but a complete sentence must follow the colon.
-
-The gate stage "代号" (`scripts/code-name-lint.py`) judges `⇒`: a `.md` line added relative to the diff base that contains `⇒` goes red; table rows and anything inside backticks are not judged. Noun strings, `×` and `+` it does not judge; lines already present at the base are not swept.
 
 ### The test
 
 **Read it out loud.** Would you say this sentence to a colleague? If not, rewrite it.
 
-Three concrete questions:
-
 - Do people use this word when talking? If not, swap it.
-- Is this sentence explaining the previous one? If the previous one was already clear,
-  delete this one.
+- Is this sentence explaining the previous one? The previous one was already clear: delete this one.
 - Does this "however" actually reverse anything? If the two halves agree, drop it.
 
 ### Don't overcorrect
 
-**Plain does not mean vague.** Terms, measurement bases, numbers and commands stay
-exact: "block size 16 KiB" must not become "blocks aren't big".
-
-**Plain does not mean opinion-free either.** "This shouldn't be settled yet", "this
-approach is wrong" — write exactly that, without a run-up before turning into it.
+- Terms, measurement bases, numbers and commands stay exact: "block size 16 KiB" must not become "blocks aren't big".
+- Write a judgement directly: "This shouldn't be settled yet", "this approach is wrong", without a run-up before turning into it.
 
 ### Which half the gate handles
 
-`scripts/doc-lint.sh` checks **the fixed phrasings in a word list** (the common
-padding and archaic constructions). A hit turns red and suggests the replacement. The rules
-proper (`rules/*.md`, `CLAUDE.md`, skill bodies) are checked the same way: the
-`<!-- doc-lint:rule-definition -->` at the head of a file exempts only the examples quoted in
-backticks and 「」; the body is checked as usual.
+| Who judges | What |
+|---|---|
+| `scripts/doc-lint.sh` | The fixed phrasings in a word list (the common padding and archaic constructions); a hit turns red and suggests the replacement. The rules proper are checked the same way: in a file whose head carries `<!-- doc-lint:rule-definition -->`, only the examples quoted in backticks and 「」 are exempt; the body is checked as usual |
+| The gate stage "代号" (`scripts/code-name-lint.py`) | In the `.md` lines added relative to the diff base, two shapes of code name (digits followed by one lowercase letter, optionally followed by `-<letters or digits>`; two uppercase letters followed by two digits) and `⇒` (table rows and anything inside backticks are not judged); lines already present at the base are not swept; a code name inside backticks, fences, HTML comments, link targets or web addresses is not judged, nor are references to numbered steps such as "step 1b" |
 
-**What it cannot check**: whether a sentence flows, whether a concession is redundant,
-whether an explanation is bloated; those need a person to read it aloud.
-A green word list only means the traps in the word list were avoided.
-
-The word list is Chinese and covers Chinese only. In the English and Japanese repositories this check
-reports **unimplemented** explicitly rather than passing silently (`show-me-test.md`: the gate must not pretend to pass).
+The word list is Chinese only; in the English and Japanese repositories the word-list item reports unimplemented explicitly.
+Whether a sentence flows, whether a concession is redundant, noun strings, `×` and `+`, other shapes of abbreviation and code name, code comments and text outside `.md` are not checked by the gate; those need a person to read it aloud.

@@ -1,4 +1,4 @@
-<!-- generated-from: agents/INDEX.md sha256:0e0cb3db0b441b28ca8902a6adb80d8d9ab89e1f8c52c409095117faaf2ff50a -->
+<!-- generated-from: agents/INDEX.md sha256:e028f8397050376a3a5fc274c811934e93636c054f167f2069e46615f4468ffa -->
 # Shared subagent definitions
 
 **This layer is governed; it is currently empty** (`rules/kb-discipline.md` section 3, "Record "we do not know" explicitly").
@@ -40,8 +40,7 @@ mutants are equivalent mutants", not "reviews code".
 2. **Report only what was run, never what was inferred.** The report carries its own
    evidence (which command, which file, what output).
 3. **It has to be able to say what it did not do.** What could not run, what was not
-   verified, listed explicitly (`rules/show-me-test.md`: unimplemented stages stay
-   listed).
+   verified, listed explicitly (`rules/show-me-test.md`, "The gate must not pretend to pass").
 
 ## How it is wired in
 

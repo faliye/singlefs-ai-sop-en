@@ -1,5 +1,7 @@
 # singlefs-ai-sop-en
 
+[中文](https://github.com/faliye/singlefs-ai-sop-zh) | **English** | [日本語](https://github.com/faliye/singlefs-ai-sop-ja)
+
 **English edition of the contributor governance SOP.**
 
 **It governs "how a project collaborates with AI"** — what evidence a submission must

@@ -4,6 +4,24 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.74 — 2026-11-16
+
+**Rules and standard texts condensed and de-duplicated: eight rules, the gate skill, the decide skill, `CLAUDE.md` and the README; a new hook `message-target-guard.sh` (look for other sessions only among the running ones); kb numbers and short names are judged per language; several gate stages are faster.**
+
+Rules:
+- Condensed `command-safety.md`, `communication-discipline.md`, `kb-discipline.md`, `sop-first.md`, `show-me-test.md`, `rules-discipline.md`, `writing-discipline.md` and `design-doc-discipline.md`: what repeats the script headers ("how it judges, what it cannot recognise, how to register") is dropped; the body keeps only criteria, steps, thresholds, exemption markers and one line "judged by …". Clause 7 of `rules-discipline.md` now points at clause 1 of `kb-discipline.md` for the position-reference criteria. The eight files go from about 54 KB to 35 KB in the Chinese edition.
+- `communication-discipline.md`: new section "Look for other sessions only among the running ones"; the section "Scope and exceptions" is removed and its sentence moved to the top; "The session title starts with the number" gains the prompt-derived title.
+- `kb-discipline.md`: the list of position references is complete; clause 5 gains "kb with translations: numbers and short names are judged per language"; clause 8 takes the ordinal within the same `##` section, `### date` and named item.
+- `rules-discipline.md`: "What the gate judges" now lists the project `CLAUDE.md`, agent definitions and skill bodies that `rules-lint.sh` actually scans.
+- `skills/gate/SKILL.md`: the stage table gains a "Rule" column and details point at the rules; the four stages that run only in the SOP repository are a separate table. The README is de-duplicated and links the three editions.
+
+Scripts and gate:
+- `claude-hooks/message-target-guard.sh` and `message-target.py` (new): judged before SendMessage; a recipient that looks like a session name while no running session on this machine matches it is rejected; hooked on `PreToolUse`.
+- `doc-lint.sh`, `number-name-sync.sh`, `doc-lint-fix-names.py`, `package-family.py`: kb files are grouped by language suffix (`.zh.md`, `.en.md`, `.ja.md`) and the registration and citations of a number are judged within each language; three new fixture sets.
+- `session-number-title.py`: a title that has no text yet is derived from the start of the prompt.
+- `gate-lint.sh`, `history-ordinal.sh`, `script-modes.sh`, `relay-timing-lint.py`: files and lines that cannot match are filtered literally before the regular expressions and line-by-line scans. `hooks-registered.sh`: the hook self-tests start in parallel and exit codes are collected in start order; an incomplete collection is red.
+- The header of `shell-lint.sh` says "ten checks".
+
 ## 0.0.73 — 2026-11-13
 
 **Two new hooks: the session title starts with the session number on startup and resume (`session-number-title.sh`), and before stopping the messages other sessions sent are checked for an answer (`unanswered-message-check.sh`). stage-selftest feeds cases in parallel. naming-lint fixes two false positives.**

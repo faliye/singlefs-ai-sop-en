@@ -1,78 +1,45 @@
-<!-- generated-from: rules/kb-discipline.md sha256:c4d6964c6d9e88841d0cf43df2d27f2ee19bde1e3b53dfe1250a6516f44f1f91 -->
+<!-- generated-from: rules/kb-discipline.md sha256:57af63ffe2ca4e1ff4717c2453318c0f6af21ba630c647ead9c098ecece4ffff -->
 <!-- doc-lint:rule-definition -->
 # Knowledge document discipline
 
-**Applies to**: `kb/*.md` — **things models retrieve from.** When a project moves kb text out of `.claude/kb/`
-(say, next to some crate), it registers the project root's `.claude/kb-directories` (one per line, relative to
-the project root, with a `#` reason; multiple lines are fine); absent, it stays `.claude/kb/`. `doc-lint.sh`,
-`history-ordinal.sh` and `number-name-sync.sh` all read this same registration.
+**Applies to**: `kb/*.md` — **things models retrieve from.** The kb is written for being pulled out one item at a time; its goal is to keep the model from making things up, and being pleasant to read is not the objective.
 
-The kb is written for **being pulled out one item at a time**, not for being read through.
-**Its one goal is to keep the model from making things up.** Being pleasant to read is not the objective.
+The kb lives in `.claude/kb/` by default; when a project moves it elsewhere, it registers the project root's `.claude/kb-directories` (one per line, relative to
+the project root, with a `#` reason; multiple lines are fine).
+
+Enforced by `scripts/doc-lint.sh`, and the exact patterns are the ones in it; the forms it does not check, writers keep to all the same.
+The criteria are chosen by this package's language; what is not implemented it reports explicitly as unimplemented.
 
 ## 1. Every fact stands on its own
 
-A fact must still hold when retrieved alone, without the other paragraphs in its section.
+A fact must still hold when retrieved alone. Three kinds of reference are not written:
 
-**No positional references** — "as stated above", "same as above", "see above",
-"mentioned earlier", "the aforementioned", "as described below";
-positional references such as "see below", "see the section below", "see the table above", "that
-table above"; the bare forms without "see": "the above-mentioned", "the text below", "the table below",
-"the three items above", "below is the original text before it was voided", "the following is", "item by item, as follows:";
-and phrasings that point at the adjacent paragraph or line, such as "see the next paragraph" and "same as the line above".
-
-"the previous entry" / "the next entry" are **outside the gate** and checked by people: writers still
-do not use them to point at another entry.
-
-"Above" and "below" (上面 / 下面): **the gate checks only the forms that point at a position in the document**:
-those preceded by the start of a sentence, punctuation, or a function word such as 以, 把, 按, 取, 在 or 是,
-and followed by 的, 是, 保留, a numeral, 第 (an ordinal) or an item number, plus those that follow 列在, 照录在, 附在 or 放在
-("listed / copied / attached / placed above or below"). Physical positions such as "the four points above it", "the units below a multi-level tree"
-and "the line below each heading" are not judged. The exact patterns are the ones in `scripts/doc-lint.sh`.
-"The above" and "the following" (以上 / 以下) are checked only in forms like "the following is" and "the several items above";
-"earlier" / "later" (前面 / 后面) are **outside the gate**. "over" / "under" (上方 / 下方) are checked
-only in the two forms that carry 见 ("see above", "see below"); the bare words
-("below the field table", "the comment above `min`") are not judged.
-
-**References to time are equally forbidden** — "this round", "the current round", "the previous round", "the round before", "last round".
-Write the anchor: a date plus "that round", or the number of the experiment in question. A sentence that genuinely means any round should be rewritten without the reference
-("the round that ran it" becomes "the run that produced this artefact").
-
-The gate's criterion is **whether this line, or a heading at any level above it, carries a date**; if so it
-passes. Three things are not checked: "the next round"; "this time" / "last time"; entries in a history section.
-Compounds whose character to the left is 样, such as 样本轮 ("sample round"), are not judged.
-
-**Self-references are equally forbidden** — "this entry", "this decision", "this
-experiment", "that decision", "that experiment", "this invariant", "this section", "this chapter", "this table", "this
-file", "this document".
-"This file" is outside the gate and checked by people.
+| Don't | Examples | Write it as |
+|---|---|---|
+| **Positional references** | "as stated above", "same as above", "see above", "mentioned earlier", "the aforementioned", "as described below", "see below", "see the section below", "see the table above", "that table above", "the above-mentioned", "the text below", "the table below", "the three items above", "the following is", "item by item, as follows:", "see the next paragraph", "same as the line above", "the previous entry", "the next entry" | The name of the thing it points at |
+| **References to time** | "this round", "the current round", "the previous round", "the round before", "last round" | A date plus "that round", or the number of that experiment; one that means any round is rewritten without the reference |
+| **Self-references** | "this entry", "this decision", "this experiment", "that decision", "that experiment", "this invariant", "this section", "this chapter", "this table", "this file", "this document" | The name of the current location |
 
 **Write the current location out as a name**:
 
 | Referring to | Write it as |
 |---|---|
-| A numbered entry | write it as "number (short name)" — the same shape as item 5 "A number can serve as an index, never as a name" |
+| A numbered entry | "number (short name)", the same as item 5 "A number can serve as an index, never as a name" |
 | A section | Its heading |
+| A table | The thing it judges |
 | A document | Its filename |
 
-**Not covered**: "this project", "this repository", "this round", "this machine" refer to
-the project and are not self-references. The gate judges a self-reference only at the start of a sentence or right after punctuation;
-compounds such as 样本文档 ("sample document"), 成本表 ("cost table") and 三本文档 ("three documents") are not judged.
-
-Enforced by `scripts/doc-lint.sh`, with the criteria chosen by this package's language: Chinese judges all three; Japanese judges positional references and self-references, recognising dedicated words such as 上記, 前述, 本節 and 本文書,
-with temporal references not implemented; English implements none of the three. What is not implemented is reported explicitly as **unimplemented**, never passed silently.
+**Not covered**: "above" and "below" pointing at a physical position ("the line below each heading"); a reference to time where this line, or a heading at any level above it, carries a date; "the next round", "this time", "last time"; entries in a history section; "this project", "this repository", "this machine".
 
 ## 2. Every entry carries its source and status
 
-Source, measured or inferred, on what measurement basis. Dates go only with events: a measurement or a conclusion read elsewhere says which day it was done;
-a sentence that states the current state carries no date (see "A dated snapshot of the current state is history too, and stays stuck on that day").
+Source, measured or inferred, on what measurement basis. Dates go only with events: a measurement or a conclusion read elsewhere says which day it was done; a sentence that states the current state carries no date.
 
 - Numbers must carry their basis: blocks or bytes, metadata included or not, on what
   hardware under what workload.
 - Conclusions read elsewhere carry their source and the note "not verified in this
   project".
-- **When you cite someone else's measurement, write down what it does and does not prove.**
-  Whether it extrapolates to here is judged and written down by the person writing it.
+- When you cite someone else's measurement, write down what it does and does not prove; whether it extrapolates to here is judged and written down by the person writing it.
 - **All historical data is reference only.** To use it in support of a new conclusion,
   re-run it first and confirm it still holds today.
 
@@ -89,11 +56,10 @@ A given fact gets **exactly one** authoritative record; everywhere else links to
 
 - **Carry the name at every citation**: write it as "number (short name)", never the
   number alone.
-- **A number gets exactly one definition**; everywhere else links to it (item 4, "A
-  contradiction is worse than a gap").
+- **A number gets exactly one definition**; everywhere else links to it.
 
 **The criterion**: substitute every number in the text with its defining sentence —
-does the sentence still read? If it does not, the citation has drifted.
+does the sentence still read?
 
 **A registration site takes exactly two forms**; a number in a table's first column is not a registration:
 
@@ -104,31 +70,13 @@ does the sentence still read? If it does not, the citation has drifted.
 
 A heading without the dash (`### D1 and its relation to parity`) is not a registration.
 
-A short name may not be empty, may not equal the number itself, may not be shared by two
-numbers, and its display width is capped at 48 (a Chinese, Japanese or Korean character counts 2, an ASCII character 1 — that is, 24 Chinese, Japanese or Korean
-characters). Domain terms (`RAID5`, `SHA256`) are shaped exactly like numbers; exempt them
-explicitly: `<!-- doc-lint:not-numbers RAID5 SHA256 -->`.
+- A short name may not be empty, may not equal the number itself, may not be shared by two numbers, and its display width is capped at 48 (a Chinese, Japanese or Korean character counts 2).
+- Domain terms (`RAID5`, `SHA256`) are shaped exactly like numbers; exempt them explicitly: `<!-- doc-lint:not-numbers RAID5 SHA256 -->`.
+- When the kb carries translations, each language is judged on its own: files are grouped by language suffix (`.zh.md`, `.en.md`, `.ja.md`; a file with no suffix belongs to this package's language), a number has one registration site in each language, and a citation is compared against the registration site of its own language.
+- For citations missing their short name, first run `scripts/doc-lint-fix-names.py <file>` to add "（short name）", then run `doc-lint.sh`.
 
-**Which half the gate handles**: `scripts/doc-lint.sh` enforces the mechanically decidable
-half —
-
-| What it checks | The criterion |
-|---|---|
-| One registration site | exactly one per number |
-| The short name is usable | non-empty, not the number itself, not shared with another number, within the width cap |
-| The registry table is not broken | the marker sits directly above its table, every row reaches the name column, `name-col` ≥ 2 |
-| Citations carry the name | every citation reads `number（short name）` and matches the registration site (ignoring `**`/`` ` `` and how much whitespace) |
-| The converse | an id-shaped token recurring **≥3 times** with no registration site at all |
-
-For citations missing their short name, first run `scripts/doc-lint-fix-names.py <file>` to add "（short name）" from the registration sites, then run `doc-lint.sh`; it only adds and never judges — whether registration sites and short names are right is still judged by `doc-lint.sh`.
-
-**The half only a person can do**: the substitution criterion (does the sentence still
-read once every number is replaced by its defining phrase). Lowercase numbers (`o1`), citation
-forms other than putting the name in the link text, and whether a short name is a *good*
-name are all out of the gate's reach.
-
-**Known but not stopped**: put a `-`, `.` or `_` in front of a number (write `-D1`)
-and the gate no longer recognises it as a citation.
+`scripts/doc-lint.sh` judges: one registration site per number, the short name is usable, the registry table is not broken, citations carry the short name and match the registration site, and an id-shaped token recurring 3 or more times with no registration.
+Lowercase numbers (`o1`), forms with a `-`, `.` or `_` in front of the number (`-D1`), citation forms other than putting the name in the link text, and whether a short name is a good name, it does not judge.
 
 ## 6. Tables beat prose
 
@@ -141,18 +89,16 @@ No setup, no transitions, no conclusions to round things off.
 ## 8. Body text states only the current state; history goes to a "Revision history" at the end
 
 Which kb files carry history is registered in `.claude/history-carriers` at the project root: one directory or file per line (relative to the project root), with the reason after `#`.
-A registered file must close with a "## Revision history" section, kept even with no history yet; an unregistered file must not have that section — change its body directly, and the history lives in git.
-Without that registry, every file under kb must close with the section. `INDEX.md` is never judged.
-Enforced by `scripts/doc-lint.sh`.
+A registered file must close with a "## Revision history" section, kept even with no history yet; an unregistered file must not have that section, and the history lives in git.
+Without that registry, every file under kb must close with the section. `INDEX.md` is not judged.
 
-For history entries numbered "（其 <ordinal>）", look up the highest existing number under the same `### <date>` heading before taking one.
-The gate stage "History entry numbers" (`历史条目编号`, `scripts/history-ordinal.sh`) judges this: an entry added this time whose number collides goes red.
+For history entries numbered "（其 <ordinal>）", look up the highest existing number under the same `##` section, the same `### <date>` heading and the same named item before taking one; a collision is judged by the gate stage "History entry numbers" (`历史条目编号`, `scripts/history-ordinal.sh`).
 
 ### A dated snapshot of the current state is history too, and stays stuck on that day
 
-A current-state sentence carries no date: when the state changes, change the current value, and write what it looked like on that day into "## Revision history" (not in a file that is not registered as carrying history; there the history lives in git).
-For an existing dated current-state sentence ("Status on <date>: …" and the like), delete the date and keep the fact; check the fact itself once first, and if it is stale, change it to the current value.
-To tell whether a dated sentence is a current-state sentence, delete the date and read it again — if it reads as saying how things are today (whether something exists, how many, what is still owed), it is a current-state sentence;
-only if it reads as saying what was done that day (changed to, settled, ran once) is it an event sentence.
+A current-state sentence carries no date: when the state changes, change the current value, and write what it looked like on that day into "## Revision history" (not in a file that is not registered as carrying history).
+For an existing dated current-state sentence, delete the date and keep the fact; check the fact once first, and if it is stale, change it to the current value.
 
-The gate stage "代号" (`scripts/code-name-lint.py`) judges one shape of this: in kb lines added relative to the diff base, a date followed within 4 characters by 现状, 目前状态 or 当前状态 ("current state") and then a colon goes red. Other shapes, and lines already in the base, are not judged.
+**The criterion**: delete the date and read it again. If it reads as saying how things are today (whether something exists, how many, what is still owed), it is a current-state sentence; if it reads as saying what was done that day (changed to, settled, ran once), it is an event sentence.
+
+The gate stage "代号" (`scripts/code-name-lint.py`) judges one shape in kb lines added relative to the diff base: a date followed within 4 characters by 现状, 目前状态 or 当前状态 ("current state") and then a colon.
