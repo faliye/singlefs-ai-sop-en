@@ -4,6 +4,20 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.75 — 2026-11-18
+
+**A new rule "Verify a guess before answering", judged by the stop hook `courtesy-phrase-check.sh`; a new hook `session-checks.sh` (checks at session start, resume, clear and after compaction); when a session number collides with another running session, the session that started later changes its number.**
+
+Rules:
+- `communication-discipline.md`: new section "Verify a guess before answering": when a reply contains the wording of a guess ("可能是", "应该是", "大概", "我记得" and the like) or wording that labels itself unverified ("推测", "推论", "这是推的", "没核实" and the like), verify first and rewrite it as a conclusion with its evidence; what cannot be verified carries `未验证：<why it cannot be verified>` on the same line, with a reason of at least 4 characters.
+- `communication-discipline.md`: new section "Checks at session start and after compaction": after compaction an alignment note is added; the items a project wants checked are registered under `.claude/session-checks/`; an item that could not be checked does not block and leaves one record line.
+- `communication-discipline.md`, "Session titles start with the session number": gains "When the number is already held by another running session, the session that started later changes its number; the one that started earlier keeps it."
+
+Scripts and gate:
+- `courtesy-phrase.py`, `claude-hooks/courtesy-phrase-check.sh`: a new word list `SPECULATION_PHRASES`; a hit in the last reply on a line without `未验证：` blocks the stop. It judges the same reply as the pleasantries check, so it lives in the same hook and the registration is unchanged. New break switches `speculation-ignored` and `unverified-mark-ignored`. The word list was compared against the final replies in the 40 most recent session transcripts of the consuming project, and several false hits were removed ("八成" as a fraction, "原估计是", "按理解", "说不准确", and "可能在" stating a risk).
+- `claude-hooks/session-checks.sh` and `session-checks.py` (new): hooked on `SessionStart`, report only; when the project has `.claude/session-checks/`, `hooks-registered.sh` calls its `--check-items` to judge each item's header, executable bit and `--selftest`.
+- `session-number-title.py`: the number from the default name, the title or the state directory was not compared with the numbers other sessions hold, so two running sessions could carry the same number; now, when another session holds the same number and started earlier (by the registered `startedAt`; on a tie or a missing value, by session ID), this session takes the number computed from its session ID. New break switch `taken-number-kept`.
+
 ## 0.0.74 — 2026-11-16
 
 **Rules and standard texts condensed and de-duplicated: eight rules, the gate skill, the decide skill, `CLAUDE.md` and the README; a new hook `message-target-guard.sh` (look for other sessions only among the running ones); kb numbers and short names are judged per language; several gate stages are faster.**
