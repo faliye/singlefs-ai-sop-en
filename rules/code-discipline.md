@@ -1,4 +1,4 @@
-<!-- generated-from: rules/code-discipline.md sha256:8773ef2a4755189f8ffb27129f70aa1df1cf126850f810f50cdf919389e0e77c -->
+<!-- generated-from: rules/code-discipline.md sha256:64eff5c1ed016d0ae3a9af2013ff9e8ebee68618bbf7b46e84469577ba9a20d4 -->
 <!-- doc-lint:rule-definition -->
 # Code discipline
 
@@ -179,6 +179,15 @@ fn walk(node: &VerifiedNode) { /* ... */ }   // skip verification and you cannot
 - **A `TODO` says what is missing and why it is not done now.** A check that is owed goes into the
   project kb's debt table, and the code points there.
 
+## A code file is at most 2000 lines
+
+- A code file is a `.rs`, `.py`, `.sh` or `.wgsl` file. Not counting comments, one file is at most 2000 lines.
+- Blank lines count; a line of code followed by a trailing comment counts as code.
+- Lines holding only comments do not count: `//` and `/* */` in Rust and WGSL, `#` and module, class and function docstrings in python, `#` in shell. Blank lines inside a block comment or a docstring do not count either.
+- A `//` or `#` inside a string, a character literal, an ordinary python multi-line string or a shell heredoc body is not a comment; those lines count as code.
+- Over the limit, split by responsibility: Rust into submodules, python into imported modules, shell into sourced libraries. First write the part being moved into the new file, then delete it from the original.
+- There are no exemptions. A file already over the limit may only get shorter, until it is split.
+
 ## When not to apply them
 
 **These rules hold unconditionally for things you can delete, and need a separate calculation for
@@ -197,6 +206,7 @@ public API — gets its own criterion; you cannot get there by saying "explicit 
 | Shadowing with an unrelated meaning | clippy `shadow_unrelated` |
 | The same name defined twice in one scope of a `.py` or `.sh` file | `scripts/duplicate-definitions.py` (gate stage "同名定义"): scans the whole repository, skipping frozen evidence; for shell it judges only definitions written at column 0. When a later definition overriding an earlier one is intended, write `# duplicate-definitions:allow <reason>` on the later definition's line. An assignment overriding a function, an imported name overridden by a def, and same names across files are beyond it, left to review |
 | Warnings are errors | clippy `-D warnings` |
+| A code file is at most 2000 lines | The hook `scripts/claude-hooks/code-length-guard.sh` stops it before Write, Edit and MultiEdit: a write that leaves the file over 2000 lines and longer than before is refused. The gate stage "代码文件长度" (`scripts/code-length.py`) scans the whole repository (which directories: see `scripts/source-files.py`) and lists every file over the limit as red. The hook cannot see files written from Bash; the gate stage backs it up. A line starting with `#` in the middle of a shell multi-line string is taken for a comment; left to review |
 | Whether a name says enough, whether one concept has one name, whether a function does one thing, whether a comment says why, whether a comment cites a line number in another file, whether a name or a comment uses an ordinal or a position as a stand-in, whether a comment contains an abbreviation, whether error variants follow the caller's decisions, whether loop state is written out, `..Default::default()` | review |
 | Names, abbreviations and stand-ins in code other than `.rs` (shell, python and the like) and in documents | **not yet a check**; `gate.sh` lists it among the unimplemented stages (key 「命名纪律（shell）」) |
 

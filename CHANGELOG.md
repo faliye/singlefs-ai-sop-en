@@ -4,6 +4,20 @@ Version history for the rules and the gate. `CLAUDE.md` and `rules/*.md` keep no
 history sections (design-doc-discipline); history lives here. For per-change
 detail see `git log` — commit messages are the change notes.
 
+## 0.0.76 — 2026-11-22
+
+**A new rule "A code file is at most 2000 lines", blocked before the write by the hook `code-length-guard.sh` and backstopped before commit by the gate stage "代码文件长度"; `naming-lint` fixes a false hit on the byte-string prefix.**
+
+Rules:
+- `code-discipline.md`: new section "A code file is at most 2000 lines": a `.rs`, `.py`, `.sh` or `.wgsl` file is at most 2000 lines not counting comments; blank lines count, lines holding only comments do not, and `//` or `#` inside strings and heredocs counts as code; over the limit, split by responsibility; there are no exemptions, and a file already over the limit may only get shorter.
+
+Scripts and gate:
+- `code-length.py` (new): the gate stage "代码文件长度" scans the whole repository (which directories it scans is set by `source-files.py`) and reports each file over the limit as red; `--hook` serves the hook.
+- `claude-hooks/code-length-guard.sh` (new): hooked on `PreToolUse` for Write, Edit and MultiEdit; it refuses a write that leaves the file over 2000 lines and longer than before; shortening a file already over the limit passes.
+- `source-files.py`: new `is_walked_relative_path`, which a hook looking at one file at a time uses to tell whether that file is in the range the whole-repository scan covers.
+- `selftest.sh`: the cases for repository-level gates and hooks move into `selftest-repository-gates.sh`, which `selftest.sh` sources in place; the run order is unchanged.
+- `naming-lint.sh`: the prefix `b` of a byte string `b"x"` was taken as a name; it is now dropped, as for a byte character `b'x'`.
+
 ## 0.0.75 — 2026-11-18
 
 **A new rule "Verify a guess before answering", judged by the stop hook `courtesy-phrase-check.sh`; a new hook `session-checks.sh` (checks at session start, resume, clear and after compaction); when a session number collides with another running session, the session that started later changes its number.**
